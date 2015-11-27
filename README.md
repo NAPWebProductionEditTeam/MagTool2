@@ -1,2 +1,2 @@
 # MagTool2
-Nap MagTool
+NAP MagTool
