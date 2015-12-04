@@ -20,4 +20,5 @@ NAP MagTool
  - Change element styles
  - WYSIWYG editor
  - Header images auto-loader
- - CTA & Credits properties: Id
+ - set CTA id
+ - Automatically set unique credits ID & video ID
