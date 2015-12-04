@@ -1,7 +1,7 @@
 var app = app || {};
 
 (function(window, $, app) {
-    var base_uri = 'https://api.github.com/repos/NAPWebProductionEditTeam/MagTool2/git/refs/heads/master/';
+    var base_uri = 'http://rawgit.com/NAPWebProductionEditTeam/MagTool2/master/';
     var suffix = '?access_token=c7b0887db285fac999cd7e818af641f1a817d352';
     var css = 'build/css/app.css';
     var tpl = 'build/tpl/magtool.html';
