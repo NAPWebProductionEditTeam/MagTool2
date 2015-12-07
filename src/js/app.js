@@ -1,4 +1,4 @@
-var app = {};
+var app = app || {};
 
 // @codekit-append "Application/Loader.js";
 // @codekit-append "Application/Page.js";

@@ -11,10 +11,10 @@
         
         $.post(api, data).done(function(data) {
             callback(data);
-        })
-    }
+        });
+    };
     
     app.Server = {
         save: save
-    }
+    };
 })(window, jQuery, app);

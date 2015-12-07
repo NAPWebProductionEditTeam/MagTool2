@@ -22,5 +22,5 @@
     app.contentEditor = {
         getCreditsHtml: getCreditsHtml,
         getContentHtml: getContentHtml
-    }
+    };
 })(window, jQuery, app);

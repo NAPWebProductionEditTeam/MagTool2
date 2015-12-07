@@ -21,7 +21,7 @@
             
             callback();
         });
-    }
+    };
     
     app.Loader = {
         load: load

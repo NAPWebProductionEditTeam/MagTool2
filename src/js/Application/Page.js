@@ -1,8 +1,10 @@
+/* globals magazineBuilder */
+
 (function(window, $, app, builder) {
     var currentPage;
     
     var get = function() {
-        if (typeof currentPage == 'undefined') {
+        if (typeof currentPage === 'undefined') {
             currentPage = $('#page' + builder.get_CurrentPageNumber());
         }
         
