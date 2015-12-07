@@ -9,17 +9,19 @@ var app = app || {};
     var Loader = {
         load: function(callback) {
             // Load all required assets && js plugins.
+            var html;
             
             $.when(
                 $.get(base_uri + css + suffix).done(function() {
                     $('<link>').attr({'rel': 'stylesheet', 'href': base_uri + css + suffix})
                         .appendTo($('head'));
+                }),
+                $.get(base_uri + tpl + suffix).done(function(data) {
+                    html = data;
                 })
-            ).then();
-            
-            // $.get (css) -> done -> link rel[]
-            // $.get (html) -> done -> append to $body
-            // $.get (js libs) -> done
+            ).then(function() {
+                app.$body.append(html);
+            });
         }
     };
     
