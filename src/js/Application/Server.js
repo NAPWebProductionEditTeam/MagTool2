@@ -1,7 +1,7 @@
 (function(window, $, app) {
     var api = "http://webprod-nap.dave.net-a-porter.com/save_test";
     
-    var save = function(pageId, credit_html, content_html, callback) {
+    var save = function(pageId, credit_html, content_html) {
         var data = {
             "req_type": "save_changes",
             "page_id": pageId,
@@ -9,9 +9,7 @@
             "content": content_html
         };
         
-        $.post(api, data).done(function(data) {
-            callback(data);
-        });
+        return $.post(api, data);
     };
     
     app.Server = {
