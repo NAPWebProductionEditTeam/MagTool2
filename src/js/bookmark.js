@@ -6,8 +6,6 @@ var app = app || {};
     $.get(github_api).done(function(data) {
         app.commit = data.object.sha;
         
-        $('<script>')
-            .attr('src', 'http://rawgit.com/NAPWebProductionEditTeam/MagTool2/master/build/js/app.min.js?v=' + app.commit)
-            .appendTo($('body'));
+        $.getScript('http://rawgit.com/NAPWebProductionEditTeam/MagTool2/master/build/js/app.min.js?v=' + app.commit);
     });
 })(window, jQuery, app);

@@ -1,5 +1,7 @@
 var app = app || {};
 
+// @codekit-append "Application/postJson.js";
+
 // @codekit-append "Application/Loader.js";
 // @codekit-append "Application/Page.js";
 // @codekit-append "Application/ContentEditor.js";
