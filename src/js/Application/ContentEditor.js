@@ -38,6 +38,7 @@
     };
     
     app.ContentEditor = {
+        cleanUp: cleanUp,
         getCreditsHtml: getCreditsHtml,
         getContentHtml: getContentHtml,
         getVideoHtml: getVideoHtml
