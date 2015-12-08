@@ -17,7 +17,7 @@
         
         app.Page.get().find('[class^="credits"]').clone().appendTo($html);
         
-        return $html.html();
+        return $html.contents();
     };
     
     var getContentHtml = function() {
@@ -26,7 +26,7 @@
         app.Page.get()
             .find('.magazineContent div:not([class^="credits"]):not(.edLetterList):not(.videoHolder)').clone().appendTo($html);
         
-        return $html.html();
+        return $html.contents();
     };
     
     var getVideoHtml = function() {
@@ -34,7 +34,7 @@
         
         app.Page.get().find('.videoHolder #videojs').clone().appendTo($html);
         
-        return $html.html();
+        return $html.contents();
     };
     
     app.ContentEditor = {
