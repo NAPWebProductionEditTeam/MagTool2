@@ -1,8 +1,8 @@
 (function(window, $, app) {
-    var base_uri = 'http://cdn.rawgit.com/NAPWebProductionEditTeam/MagTool2/master/';
+    var base_uri = 'http://magtool.local/';
     var suffix = '?v=' + app.commit;
-    var css = 'build/css/app.css';
-    var tpl = 'build/tpl/magtool.html';
+    var css = 'css/app.css';
+    var tpl = 'tpl/magtool.html';
     
     var load = function(callback) {
         // Load all required assets && js plugins.
