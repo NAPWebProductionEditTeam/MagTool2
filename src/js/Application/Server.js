@@ -9,6 +9,8 @@
             "content": content_html
         };
         
+        console.log(data);
+        return;
         return $.postJson(api, JSON.stringify(data));
     };
     
