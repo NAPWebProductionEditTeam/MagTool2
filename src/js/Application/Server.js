@@ -9,7 +9,7 @@
             "content": content_html
         };
         
-        return $.postJson(api, data);
+        return $.postJson(api, JSON.stringify(data));
     };
     
     app.Server = {
