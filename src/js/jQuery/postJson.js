@@ -4,7 +4,8 @@
             global: false,
             type: "POST",
             cache: false,
-            contentType: "application/json"
+            contentType: "application/json",
+            data: data
         });
     };
 })(jQuery);
