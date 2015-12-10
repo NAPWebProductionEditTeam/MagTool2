@@ -1,8 +1,6 @@
 (function(window, $, app) {
-    var $html = $('#html');
-    
     var clearHtml = function() {
-        $html.html('');
+        $('#html').html('');
     };
     
     var cleanUp = function () {
@@ -13,15 +11,18 @@
     };
     
     var getCreditsHtml = function() {
+        var $html = $('#html');
+        
         clearHtml();
         
-        console.log($html);
         app.Page.get().find('[class^="credits"]').clone().appendTo($html);
         
         return $html.html();
     };
     
     var getContentHtml = function() {
+        var $html = $('#html');
+        
         clearHtml();
         
         app.Page.get()
@@ -31,6 +32,8 @@
     };
     
     var getVideoHtml = function() {
+        var $html = $('#html');
+        
         clearHtml();
         
         app.Page.get().find('.videoHolder #videojs').clone().appendTo($html);
