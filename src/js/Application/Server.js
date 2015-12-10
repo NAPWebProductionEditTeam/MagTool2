@@ -10,8 +10,7 @@
         };
         
         console.log(data);
-        return;
-        return $.postJson(api, JSON.stringify(data));
+        return $.postJson(api, data);
     };
     
     app.Server = {
