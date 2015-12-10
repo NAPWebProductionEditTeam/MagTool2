@@ -15,7 +15,6 @@
     var getCreditsHtml = function() {
         clearHtml();
         
-        console.log($html);
         app.Page.get().find('[class^="credits"]').clone().appendTo($html);
         
         return $html.html();

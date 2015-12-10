@@ -10,6 +10,8 @@
         };
         
         console.log(data);
+        data = window.JSON.stringify(data);
+        console.log(data);
         return $.postJson(api, data);
     };
     
