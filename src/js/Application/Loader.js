@@ -1,5 +1,5 @@
 (function(window, $, app) {
-    var base_uri = 'http://rawgit.com/NAPWebProductionEditTeam/MagTool2/master/';
+    var base_uri = 'http://cdn.rawgit.com/NAPWebProductionEditTeam/MagTool2/master/';
     var suffix = '?v=' + app.commit;
     var css = 'build/css/app.css';
     var tpl = 'build/tpl/magtool.html';
