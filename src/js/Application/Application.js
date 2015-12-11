@@ -4,6 +4,11 @@
     app.$body = $('body');
     
     app.Loader.load(function() {
+        // Initialize modules
+        for (var module in app.modules) {
+            app[module] = new app.modules[module]();
+        }
+        
         // FadeIn
     });
     

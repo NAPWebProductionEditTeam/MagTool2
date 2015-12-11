@@ -1,5 +1,9 @@
 var app = app || {};
 
+(function(app) {
+    app.modules = {};
+})(app);
+
 // @codekit-append "jQuery/postJson.js";
 
 // @codekit-append "Application/Loader.js";

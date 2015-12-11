@@ -1,27 +1,25 @@
 /* globals magazineBuilder */
 
 (function(window, $, app, builder) {
-    var currentPage;
-    
-    var get = function() {
-        if (typeof currentPage === 'undefined') {
-            currentPage = $('#page' + builder.get_CurrentPageNumber());
-        }
+    function Page() {
+        var currentPage;
         
-        return currentPage;
-    };
+        this.get = function() {
+            if (typeof currentPage === 'undefined') {
+                currentPage = $('#page' + builder.get_CurrentPageNumber());
+            }
+            
+            return currentPage;
+        };
+        
+        this.getId = function() {
+            return this.get().data('id');
+        };
+        
+        this.getTitle = function() {
+            return this.get().data('feature-title');
+        };
+    }
     
-    var getId = function() {
-        return get().data('id');
-    };
-    
-    var getTitle = function() {
-        return get().data('feature-title');
-    };
-    
-    app.Page = {
-        get: get,
-        getId: getId,
-        getTitle: getTitle
-    };
+    app.modules.Page = Page;
 })(window, jQuery, app, magazineBuilder);
