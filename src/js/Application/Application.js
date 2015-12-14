@@ -33,8 +33,8 @@
             console.log('page unlocked');
         }).fail(function() {
             console.log('couldnt unlock');
-        })
-    }
+        });
+    };
     
     app.save = function() {
         app.ContentEditor.cleanUp();

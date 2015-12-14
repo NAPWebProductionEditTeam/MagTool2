@@ -11,7 +11,7 @@
             data = window.JSON.stringify(data);
             
             return $.postJson(api, data);
-        }
+        };
         
         this.unlock = function(pageId) {
             var data = {
@@ -22,7 +22,7 @@
             data = window.JSON.stringify(data);
             
             return $.postJson(api, data);
-        }
+        };
         
         this.save = function(pageId, credit_html, content_html) {
             var data = {
