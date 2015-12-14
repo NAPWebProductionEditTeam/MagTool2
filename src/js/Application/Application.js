@@ -16,10 +16,10 @@
         var pageId = app.Page.getId();
         
         app.Server.edit(pageId).done(function(data) {
-            if (data.response.indexOf("is locked for editing") > -1) {
-                console.log('page locked');
+            if (data.response.indexOf('is locked for editing') > -1) {
+                console.log('Locked the page; ready to edit');
             } else {
-                console.log('ready for edit');
+                console.log('Page is being edited');
             }
         }).fail(function() {
             console.log('receiving errors');
