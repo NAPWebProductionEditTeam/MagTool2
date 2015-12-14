@@ -12,6 +12,30 @@
         // FadeIn
     });
     
+    app.edit = function() {
+        var pageId = app.Page.getId();
+        
+        app.Server.edit(pageId).done(function(data) {
+            if (data.response.indexOf("is locked for editing") > -1) {
+                console.log('page locked');
+            } else {
+                console.log('ready for edit');
+            }
+        }).fail(function() {
+            console.log('receiving errors');
+        });
+    };
+    
+    app.unlock = function() {
+        var pageId = app.Page.getId();
+        
+        app.Server.unlock(pageId).done(function() {
+            console.log('page unlocked');
+        }).fail(function() {
+            console.log('couldnt unlock');
+        })
+    }
+    
     app.save = function() {
         app.ContentEditor.cleanUp();
         
