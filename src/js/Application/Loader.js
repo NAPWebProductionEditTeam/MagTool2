@@ -1,6 +1,6 @@
 (function(window, $, app) {
     var base_uri = 'http://magtool.local/';
-    var suffix = '?v=' + app.commit;
+    var suffix = '?v=' + app.version;
     var css = 'css/app.css';
     var tpl = 'tpl/magtool.html';
     
