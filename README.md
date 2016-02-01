@@ -22,3 +22,5 @@ NAP MagTool
  - Header images auto-loader
  - set CTA id
  - Automatically set unique credits ID & video ID
+ - Undo changes / Edit history / Cmd + Z
+ - Auto-translate common text

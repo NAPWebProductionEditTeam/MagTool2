@@ -17,6 +17,7 @@
                 html = data;
             })
         ).then(function() {
+            console.log(html);
             app.$body.append(html);
             
             callback();
