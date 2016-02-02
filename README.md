@@ -1,6 +1,6 @@
 # MagTool2
 
-NAP MagTool
+NAP MagTool.
 
 ## Required Functionality
 
