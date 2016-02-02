@@ -16,6 +16,26 @@
     }
 }
 
+.btn {
+    transition: background-color .3s, border-color .3s;
+    
+    .fa:not(:only-child) {
+        padding-right: 4px;
+    }
+    
+    &.text-left {
+	   text-align: left;
+    }
+    
+    &.text-right {
+	   text-align: right;
+    }
+    
+    &.text-justify {
+	   text-align: justify;
+    }
+}
+
 &#magtool {
     .btn-group {
         > .btn {
