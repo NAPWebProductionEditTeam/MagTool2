@@ -1,0 +1,24 @@
+label[for] {
+    cursor: pointer;
+}
+
+%flexRow, %flexCol{
+    display: flex !important;
+    
+    &:before, &:after{
+        content: none !important;
+    }
+}
+%flexRow{
+    flex-direction: row;
+}
+%flexCol{
+    flex-direction: column;
+}
+
+%flexAround{
+    justify-content: space-around;
+}
+%flexBetween{
+    justify-content: space-between;
+}

@@ -1,26 +1,27 @@
-<div class="magtool">
+<div class="magtool" id="magtool">
     <div class="container">
-        <section class="col-md-2">
-            <div class="btn-group-vertical col-md-offset-6" role="group" aria-label="...">
-                <button type="button" class="btn btn-default glyphicon glyphicon-edit"> Start Edit</button>
-                <button type="button" class="btn btn-default glyphicon glyphicon-folder-open"> Unlock</button>
-            </div>
+        <section class="col-md-2 text-right section">
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-edit"></i> Edit</button>
+            <button type="button" class="btn btn-default btn-block"><i class="fa fa-unlock"></i> Unlock</button>
         </section>
-        <section class="col-md-4">
+        <section class="col-md-4 section">
             <div class="form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Slug:</label>
                     <div class="col-sm-9">
-                        <div class="radio">
-                        <label class="radio-inline" for="slugLeft">
-                            <input type="radio" name="slug" id="slugLeft" value="left"> L
-                        </label>
-                        <label class="radio-inline" for="slugRight">
-                            <input type="radio" name="slug" id="slugRight" value="right"> R
-                        </label>
-                        <label class="radio-inline" for="slugNone">
-                            <input type="radio" name="slug" id="slugNone" value="none"> None
-                        </label>
+                        <div class="btn-group">
+                            <input type="radio" class="radioBtn" name="slug" id="slugLeft" value="left">
+                            <label class="btn btn-default" for="slugLeft">
+                                Left
+                            </label>
+                            <input type="radio" class="radioBtn" name="slug" id="slugRight" value="right">
+                            <label class="btn btn-default" for="slugRight">
+                                Right
+                            </label>
+                            <input type="radio" class="radioBtn" name="slug" id="slugNone" value="none">
+                            <label class="btn btn-default" for="slugNone">
+                                None
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -28,15 +29,15 @@
                     <label class="col-sm-3 control-label">Credits:</label>
                     <div class="col-sm-9">
                         <div class="btn-group">
-                            <button class="btn" type="button"><em class="glyphicon glyphicon-transfer"></em></button>
-                            <button class="btn" type="button"><em class="glyphicon glyphicon-adjust"></em></button>
-                            <button class="btn" type="button"><em class="glyphicon glyphicon-remove"></em></button>
+                            <button class="btn btn-default" type="button" title="Toggle position"><i class="fa fa-exchange"></i></button>
+                            <button class="btn btn-default" type="button" title="Toggle colour"><i class="fa fa-adjust"></i></button>
+                            <button class="btn btn-default" type="button" title="Hide"><i class="fa fa-times"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <section class="col-md-6">
+        <section class="col-md-6 section">
             <!-- Specific tools -->
         </section>
     </div>

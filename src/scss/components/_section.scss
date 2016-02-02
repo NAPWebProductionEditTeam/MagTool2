@@ -1,0 +1,8 @@
+@include component(section) {
+    height: 100%;
+    border-right: 1px solid #484848;
+    
+    &:last-child {
+        border-right: none;
+    }
+}

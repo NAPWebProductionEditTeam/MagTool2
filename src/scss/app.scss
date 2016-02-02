@@ -1,9 +1,18 @@
+$app: 'magtool';
+
+$csstyle-part-symbol: '/';
+$csstyle-root-id: $app;
+
+@import "core/core";
+
 .magtool {
+    @import 'core/normalize';
 	@import "../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
     
     @import 'components';
 }
 
+@import 'tweaks';
 @import 'layouts';
 
 #html {
