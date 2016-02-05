@@ -19,7 +19,11 @@
         this.getTitle = function() {
             return this.get().data('feature-title');
         };
+        
+        this.getIssueId = function() {
+            return $("#magazineHolder").data('id');
+        };
     }
     
     app.modules.Page = Page;
-})(window, jQuery, app, magazineBuilder);
+})(window, jQuery, MagTool, magazineBuilder);

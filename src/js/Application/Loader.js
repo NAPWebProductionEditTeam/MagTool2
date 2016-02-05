@@ -1,5 +1,4 @@
 (function(window, $, app) {
-    var base_uri = 'http://magtool.local/';
     var suffix = '?v=' + app.version;
     var fa = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
     var css = 'css/app.css';
@@ -10,19 +9,18 @@
         var html;
         
         $.when(
-            $.get(base_uri + css + suffix).done(function() {
-                $('<link>').attr({'rel': 'stylesheet', 'href': base_uri + css + suffix})
+            $.get(app.base_uri + css + suffix).done(function() {
+                $('<link>').attr({'rel': 'stylesheet', 'href': app.base_uri + css + suffix})
                     .appendTo($('head'));
             }),
             $.get(fa).done(function() {
                 $('<link>').attr({'rel': 'stylesheet', 'href': fa})
                     .appendTo($('head'));
             }),
-            $.get(base_uri + tpl + suffix).done(function(data) {
+            $.get(app.base_uri + tpl + suffix).done(function(data) {
                 html = data;
             })
-        ).then(function() {
-            console.log(html);
+        ).done(function() {
             app.$body.append(html);
             
             callback();
@@ -32,4 +30,4 @@
     app.Loader = {
         load: load
     };
-})(window, $, app);
+})(window, $, MagTool);

@@ -1,16 +1,9 @@
-/* globals console */
+var MagTool = MagTool || {};
 
 (function(window, $, app) {
-    app.$body = $('body');
+    app.modules = {};
     
-    app.Loader.load(function() {
-        // Initialize modules
-        for (var module in app.modules) {
-            app[module] = new app.modules[module]();
-        }
-        
-        // FadeIn
-    });
+    app.$body = $('body');
     
     app.edit = function() {
         var pageId = app.Page.getId();
@@ -57,4 +50,4 @@
             // change tool ui --> error
         });
     };
-})(window, $, app);
+})(window, $, MagTool);

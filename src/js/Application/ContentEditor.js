@@ -48,4 +48,4 @@
     }
     
     app.modules.ContentEditor = ContentEditor;
-})(window, jQuery, app);
+})(window, jQuery, MagTool);

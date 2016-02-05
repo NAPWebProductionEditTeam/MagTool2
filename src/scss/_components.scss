@@ -1,3 +1,7 @@
 @import "components/container";
 @import "components/section";
 @import "components/form";
+
+label[for] {
+    cursor: pointer;
+}

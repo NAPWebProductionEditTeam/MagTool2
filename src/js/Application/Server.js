@@ -39,4 +39,4 @@
     }
     
     app.modules.Server = Server;
-})(window, jQuery, app);
+})(window, jQuery, MagTool);

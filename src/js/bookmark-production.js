@@ -1,4 +1,4 @@
-var app = app || {};
+var MagTool = MagTool || {};
 
 (function(window, $, app) {
     // In production we grab the latest release rather than the latest commit.
@@ -11,6 +11,6 @@ var app = app || {};
     $.get(git_release).done(function(data) {
         app.version = data.length === 0 ? '0.0.0' : data[0].tag_name.replace('v', '');
         
-        $.getScript(app.base_uri + 'js/app.min.js?v=' + app.version);
+        $.getScript(app.base_uri + 'js/MagazineTool.min.js?v=' + app.version);
     });
-})(window, jQuery, app);
+})(window, jQuery, MagTool);
