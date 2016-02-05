@@ -12,9 +12,11 @@
             var creditsHolder = getCreditHolder();
             var creditsWhole = getCreditWhole();
             if(creditsHolder.is('creditsWholeRight')) {
-                creditsHolder.addClass('creditsWholeLeft').removeClass('creditsWholeRight');
+                creditsHolder.addClass('creditsHolderLeft').removeClass('creditsHolderRight');
+                creditsWhole.addClass('creditsWholeLeft').removeClass('creditsWholeRight');
             }else {
-                creditsHolder.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
+                creditsHolder.addClass('creditsHolderRight').removeClass('creditsHolderLeft');
+                creditsWhole.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
             }
         };
 
