@@ -5,6 +5,9 @@ var MagTool = MagTool || {};
     
     app.$body = $('body');
     
+    /**
+     * Application Actions.
+     */
     app.edit = function() {
         var pageId = app.Page.getId();
         

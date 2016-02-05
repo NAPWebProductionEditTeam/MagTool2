@@ -7,9 +7,10 @@
         
         app.$mt = $('#magtool');
         
-        /******************/
-        /*  Show Magtool  */
-        /******************/
+        
+        /**
+         * Show MagTool.
+         */
         // trigger repaint
         app.$mt.offset();
         
@@ -22,7 +23,10 @@
         $('#magtool').removeClass('hide');
     });
     
-    $('body').on('click', '[data-action]', function() {
+    /**
+     * Bind actions.
+     */
+    $('#magtool').on('click', '[data-action]', function() {
         var action = $(this).data('action');
         
         app[action]();
