@@ -7,7 +7,6 @@
     var load = function(callback) {
         // Load all required assets && js plugins.
         var html;
-        var fontAwesome = $.Deferred();
         
         $.when(
             $.get(fa).done(function() {
