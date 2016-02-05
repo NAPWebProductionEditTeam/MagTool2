@@ -1,36 +1,34 @@
-/* globals magazineBuilder */
-
 (function(window, $, app) {
-    function Credits (){
-        var getCreditHolder=function(){
+    function Credits() {
+        var getCreditHolder = function() {
             return app.Page.get().find('[class*="creditsHolder"]');
         };
         
-        var getCreditWhole=function(){
+        var getCreditWhole = function() {
             return app.Page.get().find('[class*="creditsWhole"]');
         };
         
-        this.togglePosition = function(){
+        this.togglePosition = function() {
             var creditsHolder = getCreditHolder();
             var creditsWhole = getCreditWhole();
             
-            if(creditsHolder.is('.creditsHolderRight')) {
+            if (creditsHolder.is('.creditsHolderRight')) {
                 creditsHolder.addClass('creditsHolderLeft').removeClass('creditsHolderRight');
                 creditsWhole.addClass('creditsWholeLeft').removeClass('creditsWholeRight');
-            }else {
+            } else {
                 creditsHolder.addClass('creditsHolderRight').removeClass('creditsHolderLeft');
                 creditsWhole.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
             }
         };
         
-        this.toggleColor = function(){
+        this.toggleColor = function() {
             var creditsHolder = getCreditHolder();
             var creditsWhole = getCreditWhole();
             
             creditsHolder.toggleClass('white');
         };
 
-        this.toggle = function(){
+        this.toggle = function() {
             var creditsHolder = getCreditHolder();
             var creditsWhole = getCreditWhole();
             
@@ -39,5 +37,5 @@
         };
     }
     
-    app.modules.Credits=Credits;
+    app.modules.Credits = Credits;
 })(window, jQuery, MagTool);
