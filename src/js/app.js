@@ -6,10 +6,8 @@
         }
         
         // FadeIn
-        //$('#magtool').removeClass('hide');
-//        setTimeout(function() {
-//            $('#magtool').removeClass('hide');
-//        }, 100);
+        $('#magtool').offset(); // trigger repaint so transition works
+        $('#magtool').removeClass('hide');
     });
     
     $('body').on('click', '[data-action]', function() {
