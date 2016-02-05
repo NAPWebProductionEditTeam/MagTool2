@@ -53,4 +53,28 @@ var MagTool = MagTool || {};
             // change tool ui --> error
         });
     };
+    
+    app.toggleCreditsPosition = function() {
+        app.Credits.togglePosition();
+    };
+    
+    app.toggleCreditsColor = function() {
+        app.Credits.toggleColor();
+    };
+    
+    app.toggleCredits = function() {
+        app.Credits.toggle();
+        
+        var $toggle = $('[data-action="toggleCredits"]');
+        
+        if (app.Credits.isVisible()) {
+            $toggle.attr('title', 'Hide credits');
+            
+            $toggle.find('.fa').removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            $toggle.attr('title', 'Show credits');
+            
+            $toggle.find('.fa').removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    };
 })(window, $, MagTool);

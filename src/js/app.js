@@ -7,7 +7,6 @@
         
         app.$mt = $('#magtool');
         
-        
         /**
          * Show MagTool.
          */
@@ -21,14 +20,14 @@
         
         // Fade in
         $('#magtool').removeClass('hide');
-    });
-    
-    /**
-     * Bind actions.
-     */
-    $('#magtool').on('click', '[data-action]', function() {
-        var action = $(this).data('action');
         
-        app[action]();
+        /**
+         * Bind actions.
+         */
+        $('#magtool').on('click', '[data-action]', function() {
+            var action = $(this).data('action');
+            
+            app[action]();
+        });
     });
 })(window, jQuery, MagTool);

@@ -84,6 +84,10 @@ module.exports = function(grunt) {
             files: ['<%= jshint.files %>'],
             tasks: ['jshint', 'concat:build', 'uglify:build', 'notify']
         },
+        tpl: {
+            files: ['tpl/**'],
+            tasks: ['copy:build']
+        },
         sass: {
             files: ['src/scss/**/*.scss'],
             tasks: ['sass:build', 'notify']

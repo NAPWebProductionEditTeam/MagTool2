@@ -13,4 +13,8 @@
     &.hide {
         opacity: 0;
     }
+    
+    * {
+        outline: none !important;
+    }
 }
