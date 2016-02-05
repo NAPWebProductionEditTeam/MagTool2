@@ -82,16 +82,37 @@ module.exports = function(grunt) {
     watch: {
         js: {
             files: ['<%= jshint.files %>'],
-            tasks: ['jshint', 'concat:build', 'uglify:build']
+            tasks: ['jshint', 'concat:build', 'uglify:build', 'notify']
         },
         sass: {
             files: ['src/scss/**/*.scss'],
-            tasks: ['sass:build']
+            tasks: ['sass:build', 'notify']
+        }
+    },
+    notify: {
+        concat: {
+            options: {
+                title: 'Concat Complete',
+                message: 'JS files concatenated'
+            }
+        },
+        uglify: {
+            options: {
+                title: 'Uglify Complete',
+                message: 'JS files uglified'
+            }
+        },
+        sass: {
+            options: {
+                title: 'Sass Complete',
+                message: 'Sass files compiled'
+            }
         }
     }
   });
   
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-notify');
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -100,6 +121,6 @@ module.exports = function(grunt) {
     
   grunt.loadNpmTasks('grunt-sass');
 
-  grunt.registerTask('default', ['jshint', 'concat:build', 'uglify:build', 'sass:build', 'copy:build']);
-  grunt.registerTask('dist', ['jshint', 'concat', 'uglify', 'sass', 'copy']);
+  grunt.registerTask('default', ['jshint', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify']);
+  grunt.registerTask('dist', ['jshint', 'concat', 'uglify', 'sass', 'copy', 'notify']);
 };
