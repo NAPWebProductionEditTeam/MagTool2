@@ -3,6 +3,8 @@ $app: 'magtool';
 $csstyle-part-symbol: '/';
 $csstyle-root-id: $app;
 
+$mt-height: 162px;
+
 @import "core/core";
 
 .magtool {

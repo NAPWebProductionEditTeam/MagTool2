@@ -9,12 +9,12 @@
         var html;
         
         $.when(
-            $.get(app.base_uri + css + suffix).done(function() {
-                $('<link>').attr({'rel': 'stylesheet', 'href': app.base_uri + css + suffix})
-                    .appendTo($('head'));
-            }),
             $.get(fa).done(function() {
                 $('<link>').attr({'rel': 'stylesheet', 'href': fa})
+                    .appendTo($('head'));
+            }),
+            $.get(app.base_uri + css + suffix).done(function() {
+                $('<link>').attr({'rel': 'stylesheet', 'href': app.base_uri + css + suffix})
                     .appendTo($('head'));
             }),
             $.get(app.base_uri + tpl + suffix).done(function(data) {

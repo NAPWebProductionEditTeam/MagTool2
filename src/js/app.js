@@ -5,11 +5,21 @@
             app[module] = new app.modules[module]();
         }
         
-        // FadeIn
-        //$('#magtool').removeClass('hide');
-//        setTimeout(function() {
-//            $('#magtool').removeClass('hide');
-//        }, 100);
+        app.$mt = $('#magtool');
+        
+        /******************/
+        /*  Show Magtool  */
+        /******************/
+        // trigger repaint
+        app.$mt.offset();
+        
+        // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
+        var mtHeight = app.$mt.outerHeight();
+        app.$body.css({'padding-top': mtHeight});
+        $(window).scrollTop($(window).scrollTop() + mtHeight);
+        
+        // Fade in
+        $('#magtool').removeClass('hide');
     });
     
     $('body').on('click', '[data-action]', function() {

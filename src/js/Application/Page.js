@@ -1,4 +1,4 @@
-/* globals magazineBuilder */
+/* global magazineBuilder */
 
 (function(window, $, app, builder) {
     function Page() {
