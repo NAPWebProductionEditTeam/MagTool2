@@ -85,7 +85,7 @@ module.exports = function(grunt) {
             tasks: ['jshint', 'concat:build', 'uglify:build', 'notify:concat']
         },
         tpl: {
-            files: ['tpl/**'],
+            files: ['src/tpl/**'],
             tasks: ['copy:build']
         },
         sass: {
