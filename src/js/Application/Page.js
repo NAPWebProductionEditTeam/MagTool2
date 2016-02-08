@@ -12,6 +12,10 @@
             return currentPage;
         };
         
+        this.getContent = function() {
+            return this.get().find('.magazineContent');
+        };
+        
         this.getId = function() {
             return this.get().data('id');
         };

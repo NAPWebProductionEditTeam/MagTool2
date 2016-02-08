@@ -1,60 +1,73 @@
 /* globals magazineBuilder */
 
 (function(window, $, app) {
-    function Slug (){
-        var slugPosRight = function (){
-           return $("#magtool").find("#slugRight");
-        };
-        var slugPosLeft = function(){
-            return $("#magtool").find("#slugLeft");
-        };
-        var slugPosNone : function(){
-            return $("#magtool").find("#slugNone");
-        };
+    function Slug() {
+        var slugLeftClass = 'push-right-0';
+        var slugRightClass = 'pull-left-0';
 
-        var newSlug = function(){
-            return jQuery('<div/>', {
+        var createNewSlug = function() {
+            return $('<div/>', {
                 class: 'editSlug push-down-0'
             });
         };
-        var pushright = "push-right-0";
-        var pullleft = "pull-left-0";
 
-        this.findSlug = function (){
-            return app.Page.get().find(".editSlug, .beautySlug, .travelSlug")
+        this.findSlug = function() {
+            return app.Page.get().find('.editSlug, .beautySlug, .travelSlug');
         };
 
-        this.getSlug = function() {
-            if (this.findSlug().hasClass(this.pushright)) {
-                this.slugPosLeft().prop("checked", true);
-            } else if (this.findSlug().hasClass(this.pullleft)) {
-                this.slugPosRight().prop("checked", true);
-            } else {
-                this.slugPosNone().prop("checked", true);
+        this.detectSlugProperties = function() {
+            var $slug = this.findSlug();
+            
+            if ($slug.hasClass(slugLeftClass)) {
+                $('#slugLeft').prop('checked', true);
+            } else if ($slug.hasClass(slugRightClass)) {
+                $('#slugRight').prop('checked', true);
             }
 
-            if (this.findSlug().length) {
-                $("#magtool select[name:'slug-type']").val(this.findSlug().attr('class').replace(/.*?(\w+Slug).*/, '$1'));
+            if ($slug.length) {
+                app.$mt.find('select[name="slug-type"]').val($slug.attr('class').replace(/.*?(\w+Slug).*/, '$1'));
             }
         };
-
-           this.change=function () {
-                    var selector= $("#magtool select[name:'slug-type']");
-                switch($(this).val()) {
-                    case 'beautySlug':
-                        $this.findSlug().removeClass('editSlug travelSlug').addClass('beautySlug');
-                        break;
-                    case 'travelSlug':
-                        $this.findSlug().removeClass('editSlug beautySlug').addClass('travelSlug');
-                        break;
-                    default:
-                        $this.findSlug().removeClass('beautySlug travelSlug').addClass('editSlug');
-                        break;
+        
+        this.move = function(position) {
+            var $slug = this.findSlug();
+            
+            if (position === 'left' || position === 'right') {
+                if (! $slug.length) {
+                    $slug = createNewSlug().prependTo(app.Page.getContent());
                 }
-            };
+            }
+            
+            switch(position) {
+                case 'left':
+                    $slug.removeClass(slugRightClass).addClass(slugLeftClass);
+                    break;
+                case 'right':
+                    $slug.removeClass(slugLeftClass).addClass(slugRightClass);
+                    break;
+                default:
+                    $slug.remove();
+                    break;
+            }
+        };
+        
+        this.change = function(type) {
+            var $slug = this.findSlug();
+           
+            switch(type) {
+                case 'beautySlug':
+                    $slug.removeClass('editSlug travelSlug').addClass('beautySlug');
+                    break;
+                case 'travelSlug':
+                    $slug.removeClass('editSlug beautySlug').addClass('travelSlug');
+                    break;
+                default:
+                    $slug.removeClass('beautySlug travelSlug').addClass('editSlug');
+                    break;
+            }
+        };
 
     }
-
-    };
-    app.modules.Slug=Slug;
+    
+    app.modules.Slug = Slug;
 })(window, jQuery, MagTool);

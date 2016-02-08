@@ -18,6 +18,9 @@
         app.$body.css({'padding-top': mtHeight});
         $(window).scrollTop($(window).scrollTop() + mtHeight);
         
+        // Set slug property controllers to match the current slug
+        app.Slug.detectSlugProperties();
+        
         // Fade in
         app.$mt.removeClass('hide');
         
@@ -28,6 +31,14 @@
             var action = $(this).data('action');
             
             app[action]();
+        });
+        
+        app.$mt.find('select[name="slug-type"]').change(function() {
+            app.changeSlug($(this).val());
+        });
+        
+        app.$mt.find('input[name="slugPosition"]').change(function() {
+            app.moveSlug($(this).filter(':checked').val());
         });
     });
 })(window, jQuery, MagTool);

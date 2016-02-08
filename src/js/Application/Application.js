@@ -77,4 +77,12 @@ var MagTool = MagTool || {};
             $toggle.find('.fa').removeClass('fa-eye-slash').addClass('fa-eye');
         }
     };
+    
+    app.moveSlug = function(position) {
+        app.Slug.move(position);
+    };
+    
+    app.changeSlug = function(type) {
+        app.Slug.change(type);
+    };
 })(window, $, MagTool);
