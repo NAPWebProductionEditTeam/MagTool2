@@ -19,12 +19,12 @@
         $(window).scrollTop($(window).scrollTop() + mtHeight);
         
         // Fade in
-        $('#magtool').removeClass('hide');
+        app.$mt.removeClass('hide');
         
         /**
          * Bind actions.
          */
-        $('#magtool').on('click', '[data-action]', function() {
+        app.$mt.on('click', '[data-action]', function() {
             var action = $(this).data('action');
             
             app[action]();

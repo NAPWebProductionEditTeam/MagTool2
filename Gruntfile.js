@@ -82,7 +82,7 @@ module.exports = function(grunt) {
     watch: {
         js: {
             files: ['<%= jshint.files %>'],
-            tasks: ['jshint', 'concat:build', 'uglify:build', 'notify']
+            tasks: ['jshint', 'concat:build', 'uglify:build', 'notify:concat']
         },
         tpl: {
             files: ['tpl/**'],
@@ -90,7 +90,7 @@ module.exports = function(grunt) {
         },
         sass: {
             files: ['src/scss/**/*.scss'],
-            tasks: ['sass:build', 'notify']
+            tasks: ['sass:build', 'notify:sass']
         }
     },
     notify: {
