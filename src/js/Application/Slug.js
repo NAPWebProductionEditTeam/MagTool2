@@ -39,7 +39,7 @@
         };
 
            this.change=function () {
-
+                    var selector= $("#magtool select[name:'slug-type']");
                 switch($(this).val()) {
                     case 'beautySlug':
                         $this.findSlug().removeClass('editSlug travelSlug').addClass('beautySlug');
