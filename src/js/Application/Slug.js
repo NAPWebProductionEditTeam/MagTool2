@@ -6,8 +6,10 @@
         var slugRightClass = 'pull-left-0';
 
         var createNewSlug = function() {
+            var type = app.$mt.find('select[name="slug-type"]').val();
+            
             return $('<div/>', {
-                class: 'editSlug push-down-0'
+                class: type + ' push-down-0'
             });
         };
 
