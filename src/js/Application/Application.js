@@ -54,6 +54,19 @@ var MagTool = MagTool || {};
         });
     };
     
+    app.map_image = function() {
+        var url = '/alfresco/nap/webAssets/magazine/_shared/contents/tools/CTAamend/index.html?pageID=:pageId&issueID=:issueId&ticket=:ticket';
+        var pageId = app.Page.getId();
+        var issueId = app.Page.getIssueId();
+        var ticket = app.Page.getTitle().replace(/\s+/, '+');
+        
+        url = url.replace(':pageId', pageId);
+        url = url.replace(':issueId', issueId);
+        url = url.replace(':ticket', ticket);
+        
+        window.open(url, '_blank');
+    };
+    
     app.toggleCreditsPosition = function() {
         app.Credits.togglePosition();
     };
