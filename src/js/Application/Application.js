@@ -5,15 +5,40 @@ var MagTool = MagTool || {};
     
     app.$body = $('body');
     
+    app.registerBindings = function() {
+        /**
+         * Bind actions.
+         */
+        app.$mt.on('click', '[data-action]', function() {
+            var action = $(this).data('action');
+            
+            app[action]();
+        });
+        
+        app.$mt.find('select[name="slug-type"]').change(function() {
+            app.changeSlug($(this).val());
+        });
+        
+        app.$mt.find('input[name="slugPosition"]').change(function() {
+            app.moveSlug($(this).filter(':checked').val());
+        });
+    };
+    
     /**
      * Application Actions.
      */
     app.edit = function() {
         var pageId = app.Page.getId();
         
+        app.UI.btnGroupLoading('editSave');
+        
         app.Server.edit(pageId).done(function(data) {
+            app.UI.btnGroupLoaded('editSave');
+            
             if (data.response.indexOf('is locked for editing') > -1) {
                 console.log('Locked the page; ready to edit');
+                
+                app.UI.showBtn('editSave', 'save');
             } else {
                 console.log('Page is being edited');
             }
