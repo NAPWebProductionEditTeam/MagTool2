@@ -7,21 +7,12 @@
             $group.find('[data-name="' + button + '"]').removeClass('--hidden');
         };
         
-        this.btnGroupLoading = function(group, message) {
-            var $group = $('#' + group);
-            
-            if (typeof message === 'undefined') {
-                message = '';
-            }
-            
-            $group.addClass('--loading');
-            $group.find('.loader .message').html(message);
+        this.btnGroupLoading = function(group) {
+            $('#' + group).addClass('--loading');
         };
         
         this.btnGroupLoaded = function(group) {
-            var $group = $('#' + group);
-            
-            $group.removeClass('--loading');
+            $('#' + group).removeClass('--loading');
         };
     }
     

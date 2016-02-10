@@ -1,0 +1,83 @@
+@include component(btnGroup) {
+    position: relative;
+    
+    @include option(changable) {
+        .btn {
+            transition: opacity .3s;
+            
+            + .btn {
+                margin-top: 0;
+            }
+            
+            @include option(hidden) {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+    }
+    
+    @include option(loadable) {
+        .btn {
+            position: relative;
+            margin: auto;
+            transition: width .3s,
+                        border-width .3s,
+                        border-color .3s,
+                        border-radius .3s,
+                        background-color .3s;
+            
+            .fa, .text {
+                transition: opacity .2s ease .3s;
+            }
+            
+            &:after {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                @include size(34px, 34px);
+                border: 2px solid;
+                border-color: transparent transparent #337ab7 transparent;
+                border-radius: 34px;
+                opacity: 0;
+                transition: opacity .3s;
+                animation: bglSpin .5s linear infinite;
+            }
+        }
+        
+        @include option(loading) {
+            .btn {
+                @include size(34px, 34px);
+                border-width: 2px;
+                border-color: #222;
+                border-radius: 34px;
+                background-color: rgba(#FFF, 0);
+                pointer-events: none;
+                transition: width .3s ease .2s,
+                            border-width .3s ease .2s,
+                            border-color .3s ease .2s,
+                            border-radius .3s ease .2s,
+                            background-color .3s ease .2s;
+                
+                .fa, .text {
+                    opacity: 0;
+                    transition: opacity .2s;
+                }
+                
+                &:after {
+                    opacity: 1;
+                    transition: opacity .3s ease .2s;
+                }
+            }
+        }
+    }
+}
+
+@keyframes bglSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
