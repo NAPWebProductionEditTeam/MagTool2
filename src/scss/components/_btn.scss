@@ -1,15 +1,26 @@
+@include component(btn){
+    position: relative;
+}
+
 @include component(btnGroup) {
     position: relative;
     
     @include option(changable) {
         .btn {
-            transition: opacity .3s;
+            transition: opacity .3s, background-color .3s, border-color .3s;
             
             + .btn {
+                position: absolute;
+                top: 0;
+                left: 0;
                 margin-top: 0;
             }
             
-            @include option(hidden) {
+            @include option(show) {
+                transition: opacity .3s ease .3s, background-color .3s, border-color .3s;
+            }
+            
+            @include option(hide) {
                 opacity: 0;
                 pointer-events: none;
             }
@@ -18,13 +29,12 @@
     
     @include option(loadable) {
         .btn {
-            position: relative;
-            margin: auto;
             transition: width .3s,
+                        background-color .3s,
                         border-width .3s,
                         border-color .3s,
                         border-radius .3s,
-                        background-color .3s;
+                        opacity .3s;
             
             .fa, .text {
                 transition: opacity .2s ease .3s;
@@ -54,10 +64,10 @@
                 background-color: rgba(#FFF, 0);
                 pointer-events: none;
                 transition: width .3s ease .2s,
+                            background-color .3s ease .2s,
                             border-width .3s ease .2s,
                             border-color .3s ease .2s,
-                            border-radius .3s ease .2s,
-                            background-color .3s ease .2s;
+                            border-radius .3s ease .2s;
                 
                 .fa, .text {
                     opacity: 0;

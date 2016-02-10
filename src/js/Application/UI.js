@@ -3,8 +3,15 @@
         this.showBtn = function(group, button) {
             var $group = $('#' + group);
             
-            $group.find('.btn:not(.\\--loader)').addClass('--hidden');
-            $group.find('[data-name="' + button + '"]').removeClass('--hidden');
+            $group.find('.btn').removeClass('--show').addClass('--hide');
+            
+            if ($group.hasClass('--loading')) {
+                $group.find('[data-name="' + button + '"]').removeClass('--hide');
+            } else {
+                $group.find('[data-name="' + button + '"]').removeClass('--hide').addClass('--show').on(app.transitionEvent(), function(){
+                    $(this).off(app.transitionEvent()).removeClass('--show');
+                });
+            }
         };
         
         this.btnGroupLoading = function(group) {
