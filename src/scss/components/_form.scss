@@ -17,7 +17,8 @@
 }
 
 .btn {
-    transition: background-color .3s, border-color .3s;
+    position: relative;
+    transition: color .3s, background-color .3s, border-color .3s;
     
     .fa:not(:only-child) {
         padding-right: 4px;
