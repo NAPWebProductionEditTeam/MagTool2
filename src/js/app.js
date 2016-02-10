@@ -28,5 +28,9 @@
         
         // Register binds
         app.registerBindings();
+        
+        $(window.document).on('click', '.btn, :button, :submit, :reset', function() {
+            $(this).blur();
+        });
     });
 })(window, jQuery, MagTool);
