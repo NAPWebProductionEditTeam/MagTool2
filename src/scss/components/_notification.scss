@@ -1,0 +1,43 @@
+@include component(notification) {
+    @include fixed((top: 0, right: 32px));
+    width: 320px;
+    padding: 32px;
+    box-sizing: border-box;
+    background: #FFF;
+    transform: perspective(640px) rotateX(-90deg);
+    transform-origin: top;
+    transition: transform .5s ease-out;
+    z-index: 9999999;
+    -webkit-font-smoothing: subpixel-antialiased;
+    
+    * {
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+    
+    @include option(open) {
+        transform: perspective(640px) rotateX(0deg);
+        transition: transform .5s $ease-out-back;
+    }
+    
+    @include part(content) {
+        margin-left: (1.28571429em + .3em) * (4/3);
+    }
+    
+    @include part(header) {
+        font-size: 1em * (4/3);
+        line-height: .7em;
+    }
+    
+    @include part(body) {
+        margin: (8px * (1/0.7)) 0 0;
+        
+        &:empty {
+            display: none;
+        }
+    }
+    
+    @include part(close) {
+        @include absolute((top: 8px, right: 8px));
+        cursor: pointer;
+    }
+}

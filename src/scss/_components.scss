@@ -1,8 +1,16 @@
+@at-root {
+    @import "components/notification";
+}
+
 @import "components/container";
 @import "components/section";
 @import "components/form";
 @import "components/load";
 @import "components/btn";
+
+.clearfix {
+    @include clearfix;
+}
 
 label[for] {
     cursor: pointer;

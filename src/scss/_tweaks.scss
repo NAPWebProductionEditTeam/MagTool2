@@ -1,1 +1,214 @@
-
+@include tweak(z-depth-0, z-depth-1, z-depth-1-half, z-depth-2, z-depth-3, z-depth-4) {
+    @include option(hoverable) {
+        transition: box-shadow .2s;
+    }
+}
+@include tweak(z-depth-0) {
+    &:not(.hasZ) {
+        z-index: 1;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 2px 5px 0 rgba(#000, .16), 0 2px 10px 0 rgba(#000, .12);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 2px 5px 0 rgba(#000, .16), 0 2px 10px 0 rgba(#000, .12);
+        }
+    }
+}
+@include tweak(z-depth-1, z-depth-1-half) {
+    &:not(.hasZ) {
+        z-index: 2;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 8px 17px 0 rgba(#000, .2), 0 6px 20px 0 rgba(#000, .19);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 8px 17px 0 rgba(#000, .2), 0 6px 20px 0 rgba(#000, .19);
+        }
+    }
+}
+@include tweak(z-depth-1) {
+    box-shadow: 0 2px 5px 0 rgba(#000, .16), 0 2px 10px 0 rgba(#000, .12);
+}
+@include tweak(z-depth-1-half) {
+    box-shadow: 0 5px 11px 0 rgba(#000, .18), 0 4px 15px 0 rgba(#000, .15);
+}
+@include tweak(z-depth-2) {
+    box-shadow: 0 8px 17px 0 rgba(#000, .2), 0 6px 20px 0 rgba(#000, .19);
+    
+    &:not(.hasZ) {
+        z-index: 3;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 12px 15px 0 rgba(#000, .24), 0 17px 50px 0 rgba(#000, .19);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 12px 15px 0 rgba(#000, .24), 0 17px 50px 0 rgba(#000, .19);
+        }
+    }
+}
+@include tweak(z-depth-3) {
+    box-shadow: 0 12px 15px 0 rgba(#000, .24), 0 17px 50px 0 rgba(#000, .19);
+    
+    &:not(.hasZ) {
+        z-index: 4;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 16px 28px 0 rgba(#000, .22), 0 25px 55px 0 rgba(#000, .21);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 16px 28px 0 rgba(#000, .22), 0 25px 55px 0 rgba(#000, .21);
+        }
+    }
+}
+@include tweak(z-depth-4) {
+    box-shadow: 0 16px 28px 0 rgba(#000, .22), 0 25px 55px 0 rgba(#000, .21);
+    
+    &:not(.hasZ) {
+        z-index: 5;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 27px 24px 0 rgba(#000, .2), 0 40px 77px 0 rgba(#000, .22);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 27px 24px 0 rgba(#000, .2), 0 40px 77px 0 rgba(#000, .22);
+        }
+    }
+}
+@include tweak(z-depth-5) {
+    box-shadow: 0 27px 24px 0 rgba(#000, .2), 0 40px 77px 0 rgba(#000, .22);
+    
+    &:not(.hasZ) {
+        z-index: 6;
+    }
+}
+@include tweak(z-depth-0-inv) {
+    &:not(.hasZ) {
+        z-index: 1;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 -2px 5px 0 rgba(#000, .16), 0 -2px 10px 0 rgba(#000, .12);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 -2px 5px 0 rgba(#000, .16), 0 -2px 10px 0 rgba(#000, .12);
+        }
+    }
+}
+@include tweak(z-depth-1-inv, z-depth-1-half-inv) {
+    
+    &:not(.hasZ) {
+        z-index: 2;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 -8px 17px 0 rgba(#000, .2), 0 -6px 20px 0 rgba(#000, .19);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 -8px 17px 0 rgba(#000, .2), 0 -6px 20px 0 rgba(#000, .19);
+        }
+    }
+}
+@include tweak(z-depth-1-inv) {
+    box-shadow: 0 -2px 5px 0 rgba(#000, .16), 0 -2px 10px 0 rgba(#000, .12);
+}
+@include tweak(z-depth-1-half-inv) {
+    box-shadow: 0 -5px 11px 0 rgba(#000, .18), 0 -4px 15px 0 rgba(#000, .15);
+}
+@include tweak(z-depth-2-inv) {
+    box-shadow: 0 -8px 17px 0 rgba(#000, .2), 0 -6px 20px 0 rgba(#000, .19);
+    
+    &:not(.hasZ) {
+        z-index: 3;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 -12px 15px 0 rgba(#000, .24), 0 -17px 50px 0 rgba(#000, .19);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 -12px 15px 0 rgba(#000, .24), 0 -17px 50px 0 rgba(#000, .19);
+        }
+    }
+}
+@include tweak(z-depth-3-inv) {
+    box-shadow: 0 -12px 15px 0 rgba(#000, .24), 0 -17px 50px 0 rgba(#000, .19);
+    
+    &:not(.hasZ) {
+        z-index: 4;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 -16px 28px 0 rgba(#000, .22), 0 -25px 55px 0 rgba(#000, .21);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 -16px 28px 0 rgba(#000, .22), 0 -25px 55px 0 rgba(#000, .21);
+        }
+    }
+}
+@include tweak(z-depth-4-inv) {
+    box-shadow: 0 -16px 28px 0 rgba(#000, .22), 0 -25px 55px 0 rgba(#000, .21);
+    
+    &:not(.hasZ) {
+        z-index: 5;
+    }
+    
+    @include option(hoverable) {
+        &:hover{
+            box-shadow: 0 -27px 24px 0 rgba(#000, .2), 0 -40px 77px 0 rgba(#000, .22);
+        }
+    }
+    
+    @include option(focusable) {
+        &.focus{
+            box-shadow: 0 -27px 24px 0 rgba(#000, .2), 0 -40px 77px 0 rgba(#000, .22);
+        }
+    }
+}
+@include tweak(z-depth-5-inv) {
+    box-shadow: 0 -27px 24px 0 rgba(#000, .2), 0 -40px 77px 0 rgba(#000, .22);
+    
+    &:not(.hasZ) {
+        z-index: 6;
+    }
+}

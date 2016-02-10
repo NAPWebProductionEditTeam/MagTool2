@@ -1,3 +1,20 @@
+#magtoolComponents {
+    font-family: 'Lato', sans-serif;
+    
+    :not(.fa) {
+        font-family: 'Lato', sans-serif;
+    }
+}
+
+.mtOverride {
+    @import 'nap_overrides';
+}
+
+// Block annoying Live Chat pop-up
+#chat-invite {
+    display: none;
+}
+
 .magtool {
     position: fixed;
     top: 0;
@@ -6,9 +23,8 @@
     height: $mt-height;
     color: #FFF;
     background: #333;
-    box-shadow: 0 2px 5px 0 rgba(#000, .16), 0 2px 10px 0 rgba(#000, .12);
     transition: opacity .3s;
-    z-index: 9999999999;
+    z-index: 9999990;
     
     &.hide {
         opacity: 0;

@@ -1,90 +1,106 @@
-<div class="magtool hide" id="magtool">
-    <div class="container">
-        <section class="col-md-2 text-right section">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <div class="col-sm-11 col-sm-offset-1">
-                        <div class="btnGroup --changable --loadable" id="editSave">
-                            <button type="button" class="btn btn-default btn-block text-left" data-name="edit" data-action="edit">
-                                <i class="fa fa-fw fa-edit"></i>
-                                <span class="text">Edit Page</span>
+<div id="magtoolComponents" class="mtOverride">
+    <div class="magtool hasZ hide +z-depth-1" id="magtool">
+        <div class="container">
+            <section class="col-md-2 text-right section">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <div class="btnGroup --changable --loadable" id="editSave">
+                                <button type="button" class="btn btn-default btn-block text-left" data-name="edit" data-action="edit">
+                                    <i class="fa fa-fw fa-edit"></i>
+                                    <span class="text">Edit Page</span>
+                                </button>
+                                <button type="button" class="btn btn-default btn-block text-left --hide" data-name="save">
+                                    <i class="fa fa-fw fa-floppy-o"></i>
+                                    <span class="text">Save</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <button type="button" class="btn btn-default btn-block text-left">
+                                <i class="fa fa-fw fa-unlock"></i>
+                                Unlock
                             </button>
-                            <button type="button" class="btn btn-default btn-block text-left --hide" data-name="save">
-                                <i class="fa fa-fw fa-floppy-o"></i>
-                                <span class="text">Save</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <button type="button" class="btn btn-default btn-block text-left" data-action="map_image">
+                                <i class="fa fa-fw fa-image"></i>
+                                Image Mapping
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-11 col-sm-offset-1">
-                        <button type="button" class="btn btn-default btn-block text-left">
-                            <i class="fa fa-fw fa-unlock"></i>
-                            Unlock
-                        </button>
+            </section>
+            <section class="col-md-4 section">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Slug:</label>
+                        <div class="col-sm-9">
+                            <div class="btn-group">
+                                <input type="radio" class="radioBtn" name="slugPosition" id="slugLeft" value="left">
+                                <label class="btn btn-default" for="slugLeft">
+                                    Left
+                                </label>
+                                <input type="radio" class="radioBtn" name="slugPosition" id="slugRight" value="right">
+                                <label class="btn btn-default" for="slugRight">
+                                    Right
+                                </label>
+                                <input type="radio" class="radioBtn" name="slugPosition" id="slugNone" value="none" checked>
+                                <label class="btn btn-default" for="slugNone">
+                                    None
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-11 col-sm-offset-1">
-                        <button type="button" class="btn btn-default btn-block text-left" data-action="map_image">
-                            <i class="fa fa-fw fa-image"></i>
-                            Image Mapping
-                        </button>
+                    <div class="form-group">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <select class="form-control" name="slug-type">
+                                <option value="editSlug">The EDIT</option>
+                                <option value="beautySlug">Beauty</option>
+                                <option value="travelSlug">Travel</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <section class="col-md-4 section">
-            <div class="form-horizontal">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Slug:</label>
-                    <div class="col-sm-9">
-                        <div class="btn-group">
-                            <input type="radio" class="radioBtn" name="slugPosition" id="slugLeft" value="left">
-                            <label class="btn btn-default" for="slugLeft">
-                                Left
-                            </label>
-                            <input type="radio" class="radioBtn" name="slugPosition" id="slugRight" value="right">
-                            <label class="btn btn-default" for="slugRight">
-                                Right
-                            </label>
-                            <input type="radio" class="radioBtn" name="slugPosition" id="slugNone" value="none" checked>
-                            <label class="btn btn-default" for="slugNone">
-                                None
-                            </label>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Credits:</label>
+                        <div class="col-sm-9">
+                            <div class="btn-group">
+                                <button class="btn btn-default" type="button" title="Toggle position" data-action="toggleCreditsPosition">
+                                    <i class="fa fa-exchange"></i>
+                                </button>
+                                <button class="btn btn-default" type="button" title="Toggle colour" data-action="toggleCreditsColor">
+                                    <i class="fa fa-adjust"></i>
+                                </button>
+                                <button class="btn btn-default" type="button" title="Hide" data-action="toggleCredits">
+                                    <i class="fa fa-eye-slash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-9 col-sm-offset-3">
-                        <select class="form-control" name="slug-type">
-                            <option value="editSlug">The EDIT</option>
-                            <option value="beautySlug">Beauty</option>
-                            <option value="travelSlug">Travel</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Credits:</label>
-                    <div class="col-sm-9">
-                        <div class="btn-group">
-                            <button class="btn btn-default" type="button" title="Toggle position" data-action="toggleCreditsPosition">
-                                <i class="fa fa-exchange"></i>
-                            </button>
-                            <button class="btn btn-default" type="button" title="Toggle colour" data-action="toggleCreditsColor">
-                                <i class="fa fa-adjust"></i>
-                            </button>
-                            <button class="btn btn-default" type="button" title="Hide" data-action="toggleCredits">
-                                <i class="fa fa-eye-slash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <section class="col-md-6 section">
-            <!-- Specific tools -->
-        </section>
+            </section>
+            <section class="col-md-6 section">
+                <!-- Specific tools -->
+            </section>
+        </div>
     </div>
+    
+    <div class="notification hasZ +z-depth-2" id="notify">
+        <i class="fa fa-lg fa-fw fa-bell pull-left"></i>
+        <div class="notification/content">
+            <header class="notification/header">
+                Notification
+            </header>
+            <main class="notification/body">
+                Lorem Ipsum etc etc
+            </main>
+        </div>
+        <i class="fa fa-close notification/close"></i>
+    </div>
+    
+    <div id="html"></div>
 </div>
-<div id="html"></div>

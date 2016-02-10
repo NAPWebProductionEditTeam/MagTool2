@@ -1,4 +1,6 @@
-(function(window, app){
+var CssEvents = CssEvents || {};
+
+(function(window, app) {
     var transitionEvent = function(){
         var t;
         var el = window.document.createElement('fakeelement');
@@ -39,4 +41,4 @@
     
     app.transitionEvent = transitionEvent;
     app.animationEvent = animationEvent;
-})(window, MagTool);
+})(window, CssEvents);

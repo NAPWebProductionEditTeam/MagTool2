@@ -1,4 +1,4 @@
-(function(window, $, app) {
+(function(window, $, app, CssEvents) {
     function UI() {
         this.showBtn = function(group, button) {
             var $group = $('#' + group);
@@ -8,8 +8,8 @@
             if ($group.hasClass('--loading')) {
                 $group.find('[data-name="' + button + '"]').removeClass('--hide');
             } else {
-                $group.find('[data-name="' + button + '"]').removeClass('--hide').addClass('--show').on(app.transitionEvent(), function(){
-                    $(this).off(app.transitionEvent()).removeClass('--show');
+                $group.find('[data-name="' + button + '"]').removeClass('--hide').addClass('--show').on(CssEvents.transitionEvent(), function(){
+                    $(this).off(CssEvents.transitionEvent()).removeClass('--show');
                 });
             }
         };
@@ -24,4 +24,4 @@
     }
     
     app.modules.UI = UI;
-})(window, jQuery, MagTool);
+})(window, jQuery, MagTool, CssEvents);

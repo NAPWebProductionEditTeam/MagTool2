@@ -6,6 +6,7 @@
         }
         
         app.$mt = $('#magtool');
+        app.$notify = $('#notify');
         
         /**
          * Show MagTool.

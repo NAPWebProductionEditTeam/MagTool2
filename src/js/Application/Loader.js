@@ -29,11 +29,10 @@
     
     var reload = function() {
         app.$mt.addClass('hide');
+        app.$notify.removeClass('--open');
         
         app.getVersion(function() {
-            app.$mt.remove();
-            $('#mtCss').remove();
-            $('#html').remove();
+            $('#magazineComponents').remove();
             
             window.MagTool = {
                 base_uri: app.base_uri,

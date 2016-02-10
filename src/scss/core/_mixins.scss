@@ -1,0 +1,18 @@
+@mixin position($position, $args) {
+    position: $position;
+    @each $pos, $val in $args{
+        #{$pos}: $val;
+    }
+}
+
+@mixin absolute($args) {
+    @include position(absolute, $args);
+}
+
+@mixin fixed($args) {
+    @include position(fixed, $args);
+}
+
+@mixin relative($args) {
+    @include position(relative, $args);
+}
