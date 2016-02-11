@@ -20,7 +20,7 @@
     }
     
     @include part(content) {
-        margin-left: (1.28571429em + .3em) * (4/3);
+        margin-left: 40px;
     }
     
     @include part(header) {

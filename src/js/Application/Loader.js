@@ -3,6 +3,7 @@
     var fa = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
     var css = 'css/app.css';
     var tpl = 'tpl/magtool.html';
+    var jqUi = 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js';
     
     var load = function(callback) {
         // Load all required assets && js plugins.
@@ -19,7 +20,8 @@
             }),
             $.get(app.base_uri + tpl + suffix).done(function(data) {
                 html = data;
-            })
+            }),
+            $.getScript(jqUi)
         ).done(function() {
             app.$body.append(html);
             
@@ -32,7 +34,7 @@
         app.$notify.removeClass('--open');
         
         app.getVersion(function() {
-            $('#magazineComponents').remove();
+            $('#magtoolComponents').remove();
             
             window.MagTool = {
                 base_uri: app.base_uri,

@@ -36,7 +36,7 @@ var MagTool = MagTool || {};
             app.UI.btnGroupLoaded('editSave');
             
             if (data.response.indexOf('is locked for editing') > -1) {
-                console.log('Locked the page; ready to edit');
+                app.UI.makeDraggable();
                 
                 app.UI.showBtn('editSave', 'save');
             } else {
