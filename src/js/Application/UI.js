@@ -68,10 +68,13 @@
         
         this.removeSelectable = function() {
             var $content = app.Page.getContent();
-            var $selectables = $content.find('.draggable, .editable, .resizable');
             
-            $content.selectable('destroy');
-            $selectables.unbind('click', $selectables.data('click'));
+            if ($content.is('ui-selectable')) {
+                var $selectables = $content.find('.draggable, .editable, .resizable');
+                
+                $content.selectable('destroy');
+                $selectables.unbind('click', $selectables.data('click'));
+            }
         };
         
         this.makeDraggable = function() {
@@ -161,7 +164,7 @@
         };
         
         this.removeDraggable = function() {
-            $draggables.draggable('destroy');
+            $draggables.filter('ui-draggable').draggable('destroy');
         };
     }
     
