@@ -5,49 +5,79 @@ var MagTool = MagTool || {};
     
     app.$body = $('body');
     
+    var resolveAction = function($el) {
+        var actionNone = function() {};
+        var actionName = $el.data('action');
+        var action = app[actionName];
+        
+        if (
+            action.always ||
+            app.ContentEditor.isEditing() && action.whenEditing ||
+            ! app.ContentEditor.isEditing() && ! action.whenEditing
+        ) {
+            return action;
+        }
+        
+        return actionNone;
+    };
+    
+    var registerAction = function(name, action, always, whenEditing) {
+        action.always = always;
+        
+        if (! always) {
+            action.whenEditing = whenEditing;
+        }
+        
+        app[name] = action;
+    };
+    
+    /**
+     * Bind actions.
+     */
     app.registerBindings = function() {
-        /**
-         * Bind actions.
-         */
         app.$mt.on('click', '[data-action]', function() {
-            var action = $(this).data('action');
+            var action = resolveAction($(this));
             
-            app[action]();
+            action();
         });
         
-        app.$mt.find('select[name="slug-type"]').change(function() {
-            app.changeSlug($(this).val());
-        });
-        
-        app.$mt.find('input[name="slugPosition"]').change(function() {
-            app.moveSlug($(this).filter(':checked').val());
+        app.$mt.find('input').on('change', '[data-change]', function() {
+            var value;
+            var $this = $(this);
+            var action = resolveAction($this);
+            
+            if ($this.is('[type="radio"]')) {
+                value = $this.filter(':checked').val();
+            } else {
+                value = $this.val();
+            }
+            
+            action(value);
         });
     };
     
     /**
      * Application Actions.
      */
-    app.edit = function() {
+    registerAction('edit', function() {
         var pageId = app.Page.getId();
         
-        app.UI.btnGroupLoading('editSave');
+        app.ContentEditor.startingEdit();
         
         app.Server.edit(pageId).done(function(data) {
-            app.UI.btnGroupLoaded('editSave');
-            
             if (data.response.indexOf('is locked for editing') > -1) {
-                app.UI.makeDraggable();
-                
-                app.UI.showBtn('editSave', 'save');
+                app.ContentEditor.startEdit();
             } else {
                 console.log('Page is being edited');
+                // NOTIFY: Page Locked!
             }
         }).fail(function() {
             console.log('receiving errors');
+            // NOTIFYL Errors!
         });
-    };
+    }, false, false);
     
-    app.unlock = function() {
+    registerAction('unlock', function() {
         var pageId = app.Page.getId();
         
         app.Server.unlock(pageId).done(function() {
@@ -55,9 +85,9 @@ var MagTool = MagTool || {};
         }).fail(function() {
             console.log('couldnt unlock');
         });
-    };
+    }, false, false);
     
-    app.save = function() {
+    registerAction('save', function() {
         app.ContentEditor.cleanUp();
         
         var pageId = app.Page.getId(),
@@ -77,9 +107,9 @@ var MagTool = MagTool || {};
             console.log('Save error');
             // change tool ui --> error
         });
-    };
+    }, false, true);
     
-    app.map_image = function() {
+    registerAction('map_image', function() {
         var url = '/alfresco/nap/webAssets/magazine/_shared/contents/tools/CTAamend/index.html?pageID=:pageId&issueID=:issueId&ticket=:ticket';
         var pageId = app.Page.getId();
         var issueId = app.Page.getIssueId();
@@ -90,17 +120,17 @@ var MagTool = MagTool || {};
         url = url.replace(':ticket', ticket);
         
         window.open(url, '_blank');
-    };
+    }, true);
     
-    app.toggleCreditsPosition = function() {
+    registerAction('toggleCreditsPosition', function() {
         app.Credits.togglePosition();
-    };
+    }, false, true);
     
-    app.toggleCreditsColor = function() {
+    registerAction('toggleCreditsColor', function() {
         app.Credits.toggleColor();
-    };
+    }, false, true);
     
-    app.toggleCredits = function() {
+    registerAction('toggleCredits', function() {
         app.Credits.toggle();
         
         var $toggle = $('[data-action="toggleCredits"]');
@@ -114,13 +144,13 @@ var MagTool = MagTool || {};
             
             $toggle.find('.fa').removeClass('fa-eye-slash').addClass('fa-eye');
         }
-    };
+    }, false, true);
     
-    app.moveSlug = function(position) {
+    registerAction('moveSlug', function(position) {
         app.Slug.move(position);
-    };
+    }, false, true);
     
-    app.changeSlug = function(type) {
+    registerAction('changeSlug', function(type) {
         app.Slug.change(type);
-    };
+    }, false, true);
 })(window, $, MagTool);

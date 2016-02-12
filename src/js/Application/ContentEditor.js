@@ -1,6 +1,7 @@
 (function(window, $, app) {
     function ContentEditor() {
         var $html;
+        var editing = false;
         
         var getHtml = function() {
             if (typeof $html === 'undefined' || ! $html.length) {
@@ -14,7 +15,39 @@
             getHtml().html('');
         };
         
-        this.cleanUp = function () {
+        this.startingEdit = function() {
+            app.UI.btnGroupLoading('editSave');
+        };
+        
+        this.startEdit = function() {
+            editing = true;
+            
+            app.UI.showBtn('editSave', 'save');
+            app.UI.btnGroupLoaded('editSave');
+            
+            app.UI.makeDraggable();
+            app.UI.makeSelectable();
+        };
+        
+        this.stopingEdit = function() {
+            app.UI.btnGroupLoading('editSave');
+        };
+        
+        this.stopEdit = function() {
+            app.UI.removeSelectable();
+            app.UI.removeDraggable();
+            
+            app.UI.showBtn('editSave', 'edit');
+            app.UI.btnGroupLoaded('editSave');
+            
+            editing = false;
+        };
+        
+        this.isEditing = function() {
+            return editing;
+        };
+        
+        this.cleanUp = function() {
             app.Page.get().find('[style]:not(.videoLoader):not(object)').removeAttr('style');
             app.Page.get().find('[contenteditable], [aria-disabled], [data-mtifont], .ui-resizable, .onEdit')
                 .removeClass('onEdit ui-resizable')
