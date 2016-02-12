@@ -1,0 +1,7 @@
+.ui-draggable-dragging {
+    @extends .ui-selected;
+    
+    &:after {
+        background: rgba($uiColor, .3);
+    }
+}
