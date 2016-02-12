@@ -62,28 +62,38 @@ var MagTool = MagTool || {};
     registerAction('edit', function() {
         var pageId = app.Page.getId();
         
-        app.ContentEditor.startingEdit();
+        app.UI.btnGroupLoading('editSave');
         
         app.Server.edit(pageId).done(function(data) {
             if (data.response.indexOf('is locked for editing') > -1) {
                 app.ContentEditor.startEdit();
+                
+                app.UI.showBtn('editSave', 'save');
             } else {
                 console.log('Page is being edited');
                 // NOTIFY: Page Locked!
             }
         }).fail(function() {
             console.log('receiving errors');
-            // NOTIFYL Errors!
+            // NOTIFY: Error locking, e
+        }).always(function() {
+            app.UI.btnGroupLoaded('editSave');
         });
     }, false, false);
     
     registerAction('unlock', function() {
         var pageId = app.Page.getId();
         
+        app.UI.btnGroupLoading('editSave');
+        
         app.Server.unlock(pageId).done(function() {
             console.log('page unlocked');
+            // NOTIFY: Page unlocked
         }).fail(function() {
             console.log('couldnt unlock');
+            // NOTIFY: Unlock error, e
+        }).always(function() {
+            app.UI.btnGroupLoaded('editSave');
         });
     }, false, false);
     
