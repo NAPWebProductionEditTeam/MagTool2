@@ -1,10 +1,11 @@
 (function(window, $, app) {
     function ContentEditor() {
-        var $html;
-        var $draggables;
-        var $selected = $([]);
-        
         var editing = false;
+        
+        /**
+         * Content retrieval.
+         */
+        var $html;
         
         var getHtml = function() {
             if (typeof $html === 'undefined' || ! $html.length) {
@@ -67,6 +68,12 @@
             
             return $html.html();
         };
+        
+        /**
+         * Content interactions.
+         */
+        var $draggables;
+        var $selected = $([]);
         
         var select = function(el) {
             $selected = $selected.add(el);
