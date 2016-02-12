@@ -48,7 +48,7 @@
             $selectables.data('click', function(e) {
                 var $this = $(this);
                 
-                if (e.metaKey) {
+                if (e.metaKey|| e.shiftKey) {
                     if ($this.hasClass('ui-selected')) {
                         $this.removeClass('ui-selected');
                     } else {
