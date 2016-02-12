@@ -72,7 +72,7 @@
         /**
          * Content interactions.
          */
-        var $draggables;
+        var $draggables, $resizables;
         var $selected = $([]);
         
         var select = function(el) {
@@ -217,9 +217,31 @@
         };
         
         this.makeResizable = function() {
+            $resizables = app.Page.getContent().find('.resizable');
             
+            if($resizables.length){
+                $resizables.resizable({
+                    handles: 'e, w',
+                    grid: [ 19, 10 ],
+                    stop: function(){
+                        var $this = $(this);
+                        var width = parseInt($this.css('width'));
+
+                        if ($(this).is('[class*=span]')) {
+                            $this.removeClass(function(index, css) {
+                                return (css.match(/\bspan-\S+/g) || []).join(' ');
+                            });
+
+                            var span = Math.round(width / 19);
+
+                            $this.addClass('span-' + span);
+                        }
+                        $resizables.removeAttr("style");
+                    }
+                });
+            }
         };
-        
+
         this.removeResizable = function() {
             
         };
