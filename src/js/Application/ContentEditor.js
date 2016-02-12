@@ -29,7 +29,7 @@
             app.UI.makeSelectable();
         };
         
-        this.stopingEdit = function() {
+        this.stoppingEdit = function() {
             app.UI.btnGroupLoading('editSave');
         };
         
