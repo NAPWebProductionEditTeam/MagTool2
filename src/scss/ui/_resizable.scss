@@ -1,24 +1,35 @@
-.ui-resizable-handle {
-    @include absolute((top: 0));
-    width: 16px;
-    height: 100%;
+$uiResizableGrabSize: 32px;
 
+.ui-resizable-handle {
+    @include absolute((top: -$uiPadding, bottom: -$uiPadding));
+    width: $uiResizableGrabSize;
+    opacity: 0;
+    transition: opacity .3s;
+    
+    &:hover {
+        opacity: 1;
+    }
+    
     &:after {
         content: '';
         @include absolute((top: 0, left: 50%));
-        width: 2px;
+        width: 1px;
         height: 100%;
-        margin-left: -1px;
-        background: rgba($uiColor, .5);
+        background: rgba(#B975FF, 1);
+        box-shadow: 0 0 8px rgba(#B975FF, .5);
     }
-
+    
     &.ui-resizable-e {
-        right: 0;
+        right: - ($uiResizableGrabSize / 2 + $uiPadding);
         cursor: e-resize;
+        
+        &:after {
+            margin-left: -1px;
+        }
     }
-
+    
     &.ui-resizable-w {
-        left: 0;
+        left: - ($uiResizableGrabSize / 2 + $uiPadding);
         cursor: w-resize;
     }
 }

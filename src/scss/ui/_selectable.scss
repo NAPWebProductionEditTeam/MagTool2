@@ -7,7 +7,7 @@
 .ui-selectee {
     &:after {
         content: '';
-        @include absolute((top: -4px, right: -4px, bottom: -4px, left: -4px));
+        @include absolute((top: -$uiPadding, right: -$uiPadding, bottom: -$uiPadding, left: -$uiPadding));
         border: 1px solid rgba($uiColor, 0);
         pointer-events: none;
         transition: box-shadow .3s, background .3s, border-color .3s;
