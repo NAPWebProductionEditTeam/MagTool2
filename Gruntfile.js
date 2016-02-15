@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
         build: {
-            src: ['src/js/jQuery/**', 'src/js/lib/**', 'src/js/Application/Application.js', 'src/js/Application/**/*.js', 'src/js/app.js'],
+            src: ['bower_components/medium-editor/dist/js/medium-editor.js', 'bower_components/MediumButton/src/MediumButton.js', 'src/js/jQuery/**', 'src/js/lib/**', 'src/js/Application/Application.js', 'src/js/Application/**/*.js', 'src/js/app.js'],
             dest: 'build/js/MagazineTool.js'
         },
     },

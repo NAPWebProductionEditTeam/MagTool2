@@ -9,6 +9,8 @@ $csstyle-root-id: $app;
 $mt-height: 162px;
 
 @import 'core/core';
+@import '../../bower_components/medium-editor/dist/css/medium-editor';
+@import '../../bower_components/medium-editor/dist/css/themes/default';
 
 .magtool {
     @import 'core/normalize';

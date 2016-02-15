@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "bourbon": "^4.2.6",
-    "bootstrap-sass": "^3.3.6"
+    "bootstrap-sass": "^3.3.6",
+    "medium-editor": "^5.14.2"
   }
 }

@@ -1,4 +1,4 @@
-(function(window, $, app) {
+(function(window, $, app, Medium) {
     function ContentEditor() {
         var editing = false;
         
@@ -22,15 +22,15 @@
         this.startEdit = function() {
             editing = true;
             
-            app.UI.makeDraggable();
-            app.UI.makeResizable();
-            app.UI.makeSelectable();
+            this.makeDraggable();
+            this.makeResizable();
+            this.makeSelectable();
         };
         
         this.stopEdit = function() {
-            app.UI.removeSelectable();
-            app.UI.removeResizable();
-            app.UI.removeDraggable();
+            this.removeSelectable();
+            this.removeResizable();
+            this.removeDraggable();
             
             editing = false;
         };
@@ -251,13 +251,49 @@
                 });
             }
         };
-
+        
         this.removeResizable = function() {
             $resizables.filter('.ui-resizable');
         };
         
         this.makeEditable = function() {
-            
+            var editor = new Medium.editor('.editable', {
+                toolbar: {
+                    buttons: [
+                        'b',
+                        'i',
+                        'anchor',
+                        'h2',
+                        'h3',
+                        'h4',
+                        'h5',
+                        'span',
+                        'case'
+                    ]
+                },
+                extensions: {
+                    'b': new Medium.button({
+                        label:'<b>B</b>',
+                        start:'<strong>',
+                        end:'</strong>'
+                    }),
+                    'i': new Medium.button({
+                        label:'<b><i>I</i></b>',
+                        start:'<em>',
+                        end:'</em>'
+                    }),
+                    'span': new Medium.button({
+                        label:'<b>span</b>',
+                        start:'<span>',
+                        end:'</span>'
+                    }),
+                    'case': new Medium.button({
+                        label:'<b>Aa</b>',
+                        start:'<span class="upperCase">',
+                        end:'</span>'
+                    })
+                }
+            });
         };
         
         this.removeEditable = function() {
@@ -266,4 +302,4 @@
     }
     
     app.modules.ContentEditor = ContentEditor;
-})(window, jQuery, MagTool);
+})(window, jQuery, MagTool, {editor: MediumEditor, button: MediumButton});
