@@ -1,0 +1,24 @@
+.ui-resizable-handle {
+    @include absolute((top: 0));
+    width: 16px;
+    height: 100%;
+
+    &:after {
+        content: '';
+        @include absolute((top: 0, left: 50%));
+        width: 2px;
+        height: 100%;
+        margin-left: -1px;
+        background: rgba($uiColor, .5);
+    }
+
+    &.ui-resizable-e {
+        right: 0;
+        cursor: e-resize;
+    }
+
+    &.ui-resizable-w {
+        left: 0;
+        cursor: w-resize;
+    }
+}
