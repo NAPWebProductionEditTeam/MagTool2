@@ -39,3 +39,4 @@ Simply run `grunt watch` to watch files for changes and run a build instantly.
  - Automatically set unique credits ID & video ID
  - Undo changes / Edit history / Cmd + Z
  - Auto-translate common text
+ - Manual mode (when can't save, show lightbox with source code for infoblocks & credits)
