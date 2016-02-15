@@ -23,11 +23,13 @@
             editing = true;
             
             app.UI.makeDraggable();
+            app.UI.makeResizable();
             app.UI.makeSelectable();
         };
         
         this.stopEdit = function() {
             app.UI.removeSelectable();
+            app.UI.removeResizable();
             app.UI.removeDraggable();
             
             editing = false;
@@ -118,11 +120,34 @@
         this.removeSelectable = function() {
             var $content = app.Page.getContent();
             
-            if ($content.is('ui-selectable')) {
+            if ($content.is('.ui-selectable')) {
                 var $selectables = $content.find('.draggable, .editable, .resizable');
                 
                 $content.selectable('destroy');
                 $selectables.unbind('click', $selectables.data('click'));
+            }
+        };
+        
+        var changeXPos = function($this) {
+            var left = parseInt($this.css('left'));
+            
+            if($this.is('[class*=push-right]')){
+                var push_right = Math.round(left / 19);
+                
+                $this.removeClass(function(index, css) {
+                    return (css.match(/\bpush-right\S+/g) || []).join(' ');
+                });
+                
+                $this.addClass('push-right-' + push_right);
+            } else {
+                var right = 950 - left - $this.outerWidth();
+                var pull_left = Math.round(right / 19);
+                
+                $this.removeClass(function(index, css) {
+                    return (css.match (/\bpull-left-\S+/g) || []).join(' ');
+                });
+                
+                $this.addClass('pull-left-' + pull_left);
             }
         };
         
@@ -167,7 +192,6 @@
                     $selected.each(function() {
                         var $this = $(this);
                         var top = parseInt($this.css('top'));
-                        var left = parseInt($this.css('left'));
                         
                         if ($this.is('[class*=push-down]')) {
                             var push_down = Math.round(top / 16);
@@ -188,24 +212,7 @@
                             $this.addClass('pull-up-' + pull_up);
                         }
                         
-                        if($this.is('[class*=push-right]')){
-                            var push_right = Math.round(left / 19);
-                            
-                            $this.removeClass(function(index, css) {
-                                return (css.match(/\bpush-right\S+/g) || []).join(' ');
-                            });
-                            
-                            $this.addClass('push-right-' + push_right);
-                        } else {
-                            var right = 950 - left - $this.outerWidth();
-                            var pull_left = Math.round(right / 19);
-                            
-                            $this.removeClass(function(index, css) {
-                                return (css.match (/\bpull-left-\S+/g) || []).join(' ');
-                            });
-                            
-                            $this.addClass('pull-left-' + pull_left);
-                        }
+                        changeXPos($this);
                     }).removeClass('ui-draggable-dragging');
                 },
                 grid: [19, 16]
@@ -213,7 +220,7 @@
         };
         
         this.removeDraggable = function() {
-            $draggables.filter('ui-draggable').draggable('destroy');
+            $draggables.filter('.ui-draggable').draggable('destroy');
         };
         
         this.makeResizable = function() {
@@ -226,16 +233,19 @@
                     stop: function(){
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
-
+                        
                         if ($(this).is('[class*=span]')) {
+                            var span = Math.round(width / 19);
+                            
                             $this.removeClass(function(index, css) {
                                 return (css.match(/\bspan-\S+/g) || []).join(' ');
                             });
-
-                            var span = Math.round(width / 19);
-
+                            
                             $this.addClass('span-' + span);
                         }
+                        
+                        changeXPos($this);
+                        
                         $resizables.removeAttr("style");
                     }
                 });
@@ -243,7 +253,7 @@
         };
 
         this.removeResizable = function() {
-            
+            $resizables.filter('.ui-resizable');
         };
         
         this.makeEditable = function() {
