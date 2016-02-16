@@ -33,3 +33,9 @@ $uiResizableGrabSize: 32px;
         cursor: w-resize;
     }
 }
+
+.ui-resizable-disabled {
+    .ui-resizable-handle {
+        display: none;
+    }
+}

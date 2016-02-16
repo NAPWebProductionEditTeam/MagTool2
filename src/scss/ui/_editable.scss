@@ -1,0 +1,7 @@
+.editable {
+    @extend .ui-selectee;
+    
+    &[data-medium-focused="true"] {
+        @extend .ui-selected;
+    }
+}
