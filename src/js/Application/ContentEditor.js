@@ -99,7 +99,8 @@
             $selectables.data('click', function(e) {
                 var $this = $(this);
                 
-                if (e.metaKey|| e.shiftKey) {
+                // win ctrl || OS X cmd || shift
+                if (e.ctrlKey || e.metaKey || e.shiftKey) {
                     if ($this.hasClass('ui-selected')) {
                         $this.removeClass('ui-selected');
                     } else {
@@ -124,7 +125,7 @@
                 var $selectables = $content.find('.draggable, .editable, .resizable');
                 
                 $content.selectable('destroy');
-                $selectables.unbind('click', $selectables.data('click'));
+                $selectables.off('click', $selectables.data('click'));
             }
         };
         
@@ -219,6 +220,14 @@
             });
         };
         
+        this.enableDraggable = function() {
+            $draggables.filter('.ui-draggable').draggable('enable');
+        };
+        
+        this.disableDraggable = function() {
+            $draggables.filter('.ui-draggable').draggable('disable');
+        };
+        
         this.removeDraggable = function() {
             $draggables.filter('.ui-draggable').draggable('destroy');
         };
@@ -252,12 +261,21 @@
             }
         };
         
+        this.enableResizable = function() {
+            $resizables.filter('.ui-resizable').resizable('enable');
+        };
+        
+        this.disableResizable = function() {
+            $resizables.filter('.ui-resizable').resizable('disable');
+        };
+        
         this.removeResizable = function() {
-            $resizables.filter('.ui-resizable');
+            $resizables.filter('.ui-resizable').resizable('destroy');
         };
         
         this.makeEditable = function() {
-            var editor = new Medium.editor('.editable', {
+            window.editor = new Medium.editor('.editable', {
+                disableExtraSpaces: true,
                 toolbar: {
                     buttons: [
                         'b',
