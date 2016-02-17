@@ -34,7 +34,6 @@
                    $this.addClass('leftText');
                    break;
            }
-         this.detectSelectedAlignment();
        };
    }
     app.modules.align = Align;
