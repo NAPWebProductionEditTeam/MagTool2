@@ -2,10 +2,14 @@ var Console = Console || {};
 
 (function(console) {
     console.header = function(str) {
-        console.log('');
-        console.log('/**');
-        console.log(' * ' + str);
-        console.log(' */');
+        var header = '';
+        
+        header += '\n';
+        header += '/**\n';
+        header += ' * ' + str + '\n';
+        header += ' */';
+        
+        console.log(header);
     };
     
     console.file = function(file, contents) {
