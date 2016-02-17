@@ -220,15 +220,23 @@
             });
         };
         
-        this.enableDraggable = function() {
+        this.enableDraggable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.draggable('enable');
+            }
+            
             $draggables.filter('.ui-draggable').draggable('enable');
         };
         
-        this.disableDraggable = function() {
+        this.disableDraggable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.draggable('disable');
+            }
+            
             $draggables.filter('.ui-draggable').draggable('disable');
         };
         
-        this.removeDraggable = function() {
+        this.removeDraggable = function($el) {
             $draggables.filter('.ui-draggable').draggable('destroy');
         };
         
@@ -261,11 +269,19 @@
             }
         };
         
-        this.enableResizable = function() {
+        this.enableResizable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.resizable('enable');
+            }
+            
             $resizables.filter('.ui-resizable').resizable('enable');
         };
         
-        this.disableResizable = function() {
+        this.disableResizable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.resizable('disable');
+            }
+            
             $resizables.filter('.ui-resizable').resizable('disable');
         };
         
@@ -273,8 +289,10 @@
             $resizables.filter('.ui-resizable').resizable('destroy');
         };
         
+        var editor;
+        
         this.makeEditable = function() {
-            window.editor = new Medium.editor('.editable', {
+            editor = window.editor = new Medium.editor('.editable', {
                 disableExtraSpaces: true,
                 toolbar: {
                     buttons: [
@@ -312,10 +330,57 @@
                     })
                 }
             });
+            
+            $('.editable').dblclick(function(e) {
+                var $this = $(this);
+                
+                editor.selectAllContents();
+                
+                $('.ui-selected').removeClass('ui-selected');
+                
+                if ($this.find('.dropcap3')) {
+                    var $dropcap = $this.find('.dropcap3');
+                    var classes = [];
+                    
+                    if ($dropcap.data('class')) {
+                        classes = $dropcap.data('class').split(' ');
+                    }
+                    
+                    classes.push('dropcap3');
+                    
+                    $dropcap.attr('data-class', classes.join(' ')).removeClass('dropcap3');
+                }
+                
+                app.ContentEditor.disableDraggable($this);
+                app.ContentEditor.disableResizable($this);
+                app.ContentEditor.removeSelectable();
+            });
+            
+            $('.editable').blur(function() {
+                var $this = $(this);
+                
+                editor.destroy();
+                editor.setup();
+                
+                $this.find('[data-class]').each(function() {
+                    var $child = $(this);
+                    console.log($child);
+                    
+                    $child.addClass($child.data('class'));
+                });
+                
+                $this.attr('data-medium-focused', 'false');
+                
+                app.ContentEditor.enableDraggable($this);
+                app.ContentEditor.enableResizable($this);
+                app.ContentEditor.makeSelectable();
+            });
         };
         
         this.removeEditable = function() {
+            editor.destroy();
             
+            $('.editable').off('dblclick');
         };
     }
     
