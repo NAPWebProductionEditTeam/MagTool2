@@ -6,7 +6,7 @@
         var slugRightClass = 'pull-left-0';
 
         var createNewSlug = function() {
-            var type = app.$mt.find('select[name="slug-type"]').val();
+            var type = app.UI.getUI().find('select[name="slug-type"]').val();
             
             return $('<div/>', {
                 class: type + ' push-down-0'
@@ -27,7 +27,7 @@
             }
 
             if ($slug.length) {
-                app.$mt.find('select[name="slug-type"]').val($slug.attr('class').replace(/.*?(\w+Slug).*/, '$1'));
+                app.UI.getUI().find('select[name="slug-type"]').val($slug.attr('class').replace(/.*?(\w+Slug).*/, '$1'));
             }
         };
         

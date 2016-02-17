@@ -35,13 +35,13 @@ var MagTool = MagTool || {};
      * Bind actions.
      */
     app.registerBindings = function() {
-        app.$mt.on('click', '[data-action]', function() {
+        app.UI.getUI().on('click', '[data-action]', function() {
             var action = resolveAction($(this));
             
             action();
         });
         
-        app.$mt.find('input').on('change', '[data-change]', function() {
+        app.UI.getUI().find('input').on('change', '[data-change]', function() {
             var value;
             var $this = $(this);
             var action = resolveAction($this);

@@ -1,4 +1,4 @@
-.editable {
+[contenteditable] {
     @extend .ui-selectee;
     
     &[data-medium-focused="true"]:not(.ui-selected) {
