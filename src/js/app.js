@@ -5,18 +5,15 @@
             app[module] = new app.modules[module]();
         }
         
-        app.$mt = $('#magtool');
-        app.$notify = $('#notify');
-        
         /**
          * Show MagTool.
          */
         // trigger repaint
-        app.$mt.offset();
+        app.UI.getUI().offset();
         
         // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
         if (! app.reloading) {
-            var mtHeight = app.$mt.outerHeight();
+            var mtHeight = app.UI.getUI().outerHeight();
             app.$body.css({'padding-top': mtHeight});
             $(window).scrollTop($(window).scrollTop() + mtHeight);
         }
@@ -25,7 +22,7 @@
         app.Slug.detectSlugProperties();
         
         // Fade in
-        app.$mt.removeClass('hide');
+        app.UI.getUI().removeClass('hide');
         
         // Register binds
         app.registerBindings();

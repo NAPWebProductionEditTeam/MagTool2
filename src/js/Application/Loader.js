@@ -30,8 +30,8 @@
     };
     
     var reload = function() {
-        app.$mt.addClass('hide');
-        app.$notify.removeClass('--open');
+        app.UI.getUI().addClass('hide');
+        app.UI.getNotification().removeClass('--open');
         
         app.getVersion(function() {
             $('#magtoolComponents').remove();

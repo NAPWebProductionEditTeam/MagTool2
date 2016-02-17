@@ -22,6 +22,8 @@
         this.startEdit = function() {
             editing = true;
             
+            app.UI.enable(app.UI.getPageControls());
+            
             this.makeDraggable();
             this.makeResizable();
             this.makeSelectable();
