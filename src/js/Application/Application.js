@@ -163,4 +163,9 @@ var MagTool = MagTool || {};
     registerAction('changeSlug', function(type) {
         app.Slug.change(type);
     }, false, true);
+
+    registerAction('alignSelected', function(alignment) {
+
+        app.Align.align(alignment);
+    }, false, true);
 })(window, $, MagTool);

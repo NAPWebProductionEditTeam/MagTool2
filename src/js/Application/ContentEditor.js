@@ -116,6 +116,8 @@
             });
             
             $selectables.click($selectables.data('click'));
+
+
         };
         
         this.removeSelectable = function() {

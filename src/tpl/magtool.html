@@ -93,15 +93,18 @@
                        <label class="col-sm-1 control-label">Text:</label>
                         <div class="col-sm-4">
                             <div class="btn-group">
-                                <button class="btn btn-default" type="button" title="leftText" data-action="leftText">
+                                <input type="radio" class="radioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
+                                <label class="btn btn-default" for="leftText">
                                     <i class="fa fa-align-left"></i>
-                                </button>
-                                <button class="btn btn-default" type="button" title="rightText colour" data-action="rightText">
-                                    <i class="fa fa-align-right"></i>
-                                </button>
-                                <button class="btn btn-default" type="button" title="textAlignCenter" data-action="textAlignCenter">
+                                </label>
+                                <input type="radio" class="radioBtn" name="textAlignment" id="centerText" value="textAlignCenter" data-change="alignSelected" checked>
+                                <label class="btn btn-default" for="centerText">
                                     <i class="fa fa-align-center"></i>
-                                </button>
+                                </label>
+                                <input type="radio" class="radioBtn" name="textAlignment" id="rightText" value="rightText" data-change="alignSelected">
+                                <label class="btn btn-default" for="rightText">
+                                    <i class="fa fa-align-right"></i>
+                                </label>
                             </div>
                         </div>
                         <div class="col-sm-7"></div>
