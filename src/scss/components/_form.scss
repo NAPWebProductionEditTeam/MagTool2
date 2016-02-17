@@ -1,4 +1,4 @@
-@include component(radioBtn) {
+@include component(radioBtn, uRadioBtn) {
     display: none;
     
     + label {

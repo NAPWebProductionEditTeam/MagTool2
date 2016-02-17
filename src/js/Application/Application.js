@@ -10,12 +10,14 @@ var MagTool = MagTool || {};
         var actionName = $el.data('action');
         var action = app[actionName];
         
-        if (
-            action.always ||
-            app.ContentEditor.isEditing() && action.whenEditing ||
-            ! app.ContentEditor.isEditing() && ! action.whenEditing
-        ) {
-            return action;
+        if (action) {
+            if (
+                action.always ||
+                app.ContentEditor.isEditing() && action.whenEditing ||
+                ! app.ContentEditor.isEditing() && ! action.whenEditing
+            ) {
+                return action;
+            }
         }
         
         return actionNone;
@@ -41,12 +43,25 @@ var MagTool = MagTool || {};
             action();
         });
         
-        app.UI.getUI().find('input').on('change', '[data-change]', function() {
+        app.UI.getUI().find('input[data-change]').on('change', function() {
             var value;
             var $this = $(this);
             var action = resolveAction($this);
             
-            if ($this.is('[type="radio"]')) {
+            
+            if ($this.is('.uRadioBtn')) {
+                var name = $this.attr('name');
+                
+                app.UI.getUI().find('input[name="' + name + '"]').not($this).prop('checked', false);
+                
+                value = $this.val();
+            } else if ($this.is('[type="checkbox"]')) {
+                value = [];
+                
+                $this.filter(':checked').each(function() {
+                    value.push($(this).val());
+                });
+            } else if ($this.is('[type="radio"]')) {
                 value = $this.filter(':checked').val();
             } else {
                 value = $this.val();
@@ -163,9 +178,9 @@ var MagTool = MagTool || {};
     registerAction('changeSlug', function(type) {
         app.Slug.change(type);
     }, false, true);
-
+    
     registerAction('alignSelected', function(alignment) {
-
+        
         app.Align.align(alignment);
     }, false, true);
 })(window, $, MagTool);
