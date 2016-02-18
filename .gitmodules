@@ -1,3 +1,3 @@
-[submodule "mousetrap"]
-	path = mousetrap
+[submodule "vendor/mousetrap"]
+	path = vendor/mousetrap
 	url = https://github.com/mousetrap-js/mousetrap
