@@ -11,7 +11,7 @@
             editing = true;
             
             app.UI.enable(app.UI.getPageControls());
-
+            
             this.makeDraggable();
             this.makeResizable();
             this.makeSelectable();
@@ -28,7 +28,7 @@
         this.isEditing = function() {
             return editing;
         };
-
+        
         /**
          * Content interactions.
          */
@@ -39,12 +39,12 @@
             $el.addClass('ui-selecting');
             $selectable.selectable('instance')._mouseStop(null);
         };
-
+        
         var deselect = function($el) {
             $el.removeClass('ui-selected');
             $selectable.selectable('instance')._mouseStop(null);
         };
-
+        
         var addSelected = function(el) {
             $selected = $selected.add(el);
             $(el).addClass('ui-selected');
@@ -122,7 +122,7 @@
                     var $this = $(this);
                     
                     stopEditing($this);
-
+                    
                     if ($this.hasClass('ui-selected')) {
                         $selected = $selected.filter('.draggable').each(function() {
                             var $this = $(this);
@@ -314,34 +314,34 @@
                 
                 $dropcap.attr('data-class', classes.join(' ')).removeClass('dropcap3');
             }
-
+            
             app.ContentEditor.disableDraggable($el);
             app.ContentEditor.disableResizable($el);
             app.ContentEditor.removeSelectable();
-
+            
             editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
-
+            
             $el.blur(function() {
                 stopEditing($editing);
             });
-
+            
             $editing = $el;
         };
-
+        
         var stopEditing = function() {
             if (! $editing) {
                 return;
             }
-
+            
             var $el = $editing;
-
+            
             editor.destroy();
             $editing = null;
-
+            
             $el.off('blur');
-
+            
             $el.find('[data-class]').each(function() {
                 var $child = $(this);
                 
@@ -352,10 +352,10 @@
             app.ContentEditor.enableResizable($el);
             app.ContentEditor.makeSelectable();
             app.ContentEditor.makeEditable();
-
+            
             select($el);
         };
-
+        
         this.makeEditable = function() {
             $('.editable').dblclick(function(e) {
                 var $this = $(this);
@@ -376,6 +376,6 @@
             $('.editable').off('blur');
         };
     }
-
+    
     app.modules.ContentEditor = ContentEditor;
 })(window, Math, jQuery, MagTool, {editor: MediumEditor, button: MediumButton});
