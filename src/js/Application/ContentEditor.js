@@ -1,7 +1,7 @@
 (function(window, Math, $, app, Medium) {
     var parseInt = window.parseInt;
     var document = window.document;
-
+    
     function ContentEditor() {
         var editing = false;
         
@@ -361,6 +361,7 @@
             
             var $el = $editing;
             
+            window.getSelection().collapseToStart();
             editor.destroy();
             $editing = null;
             
@@ -394,7 +395,9 @@
         };
         
         this.removeEditable = function() {
+            window.getSelection().collapseToStart();
             editor.destroy();
+            $editing = null;
             
             $('.editable').off('dblclick');
             $('.editable').off('blur');
