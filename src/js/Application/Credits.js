@@ -36,7 +36,7 @@
             creditsWhole.toggleClass('creditsNone');
         };
         
-        this.isVisible = function () {
+        this.isVisible = function() {
             return ! getCreditsHolder().is('.creditsNone');
         };
     }

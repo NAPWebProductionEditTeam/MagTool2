@@ -6,9 +6,10 @@ var MagTool = MagTool || {};
     app.$body = $('body');
     
     var resolveAction = function($el) {
-        var actionNone = function() {};
         var actionName = $el.data('action');
         var action = app[actionName];
+        
+        var actionNone = function() {};
         
         if (action) {
             if (
@@ -48,7 +49,6 @@ var MagTool = MagTool || {};
             var $this = $(this);
             var action = resolveAction($this);
             
-            
             if ($this.is('.uRadioBtn')) {
                 var name = $this.attr('name');
                 
@@ -86,10 +86,12 @@ var MagTool = MagTool || {};
                 app.UI.showBtn('editSave', 'save');
             } else {
                 console.log('Page is being edited');
+                
                 // NOTIFY: Page Locked!
             }
         }).fail(function() {
             console.log('receiving errors');
+            
             // NOTIFY: Error locking, e
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
@@ -103,9 +105,11 @@ var MagTool = MagTool || {};
         
         app.Server.unlock(pageId).done(function() {
             console.log('page unlocked');
+            
             // NOTIFY: Page unlocked
         }).fail(function() {
             console.log('couldnt unlock');
+            
             // NOTIFY: Unlock error, e
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
@@ -127,9 +131,11 @@ var MagTool = MagTool || {};
         
         app.Server.save(pageId, credits, contents).done(function() {
             console.log('Saved successfully');
+            
             // change tool ui --> saved
         }).fail(function() {
             console.log('Save error');
+            
             // change tool ui --> error
         });
     }, false, true);

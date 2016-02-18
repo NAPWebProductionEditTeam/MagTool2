@@ -1,5 +1,6 @@
 (function(window, Math, $, app, Medium) {
     var parseInt = window.parseInt;
+    var document = window.document;
 
     function ContentEditor() {
         var editing = false;
@@ -93,7 +94,7 @@
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             
-            if($this.is('[class*=push-right]')){
+            if ($this.is('[class*=push-right]')) {
                 var push_right = Math.round(left / 19);
                 
                 $this.removeClass(function(index, css) {
@@ -106,7 +107,7 @@
                 var pull_left = Math.round(right / 19);
                 
                 $this.removeClass(function(index, css) {
-                    return (css.match (/\bpull-left-\S+/g) || []).join(' ');
+                    return (css.match(/\bpull-left-\S+/g) || []).join(' ');
                 });
                 
                 $this.addClass('pull-left-' + pull_left);
@@ -206,10 +207,10 @@
         this.makeResizable = function() {
             $resizables = app.Page.getContent().find('.resizable');
             
-            if($resizables.length){
+            if ($resizables.length) {
                 $resizables.resizable({
                     handles: 'e, w',
-                    grid: [ 19, 10 ],
+                    grid: [19, 10],
                     start: function() {
                         stopEditing($(this));
                     },
@@ -275,29 +276,29 @@
                 },
                 extensions: {
                     'b': new Medium.button({
-                        label:'<b>B</b>',
-                        start:'<strong>',
-                        end:'</strong>'
+                        label: '<b>B</b>',
+                        start: '<strong>',
+                        end: '</strong>'
                     }),
                     'i': new Medium.button({
-                        label:'<b><i>I</i></b>',
-                        start:'<em>',
-                        end:'</em>'
+                        label: '<b><i>I</i></b>',
+                        start: '<em>',
+                        end: '</em>'
                     }),
                     'span': new Medium.button({
-                        label:'<b>span</b>',
-                        start:'<span>',
-                        end:'</span>'
+                        label: '<b>span</b>',
+                        start: '<span>',
+                        end: '</span>'
                     }),
                     'case': new Medium.button({
-                        label:'<b>Aa</b>',
-                        start:'<span class="upperCase">',
-                        end:'</span>'
+                        label: '<b>Aa</b>',
+                        start: '<span class="upperCase">',
+                        end: '</span>'
                     })
                 }
             });
         };
-
+        
         var startEditing = function($el) {
             deselect($selectables);
             select($el);
@@ -319,13 +320,36 @@
             app.ContentEditor.disableResizable($el);
             app.ContentEditor.removeSelectable();
             
-            editor = makeEditor($el);
+            editor = window.editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
             
-            $el.blur(function() {
-                stopEditing($editing);
+            $(document).data('click', function(e) {
+                if (! $editing) {
+                    return;
+                }
+                
+                var $target = $(e.target);
+                var $medium = $('[id*=medium-]');
+                var stop = true;
+                
+                if ($target.is($el) || $.contains($el.get(0), e.target)) {
+                    stop = false;
+                }
+                
+                for (var i = 0; i < $medium.length; i++) {
+                    if ($.contains($medium.get(i), e.target)) {
+                        stop = false;
+                        
+                        break;
+                    }
+                }
+                
+                if (stop) {
+                    stopEditing();
+                }
             });
+            $(document).click($(document).data('click'));
             
             $editing = $el;
         };
@@ -340,7 +364,7 @@
             editor.destroy();
             $editing = null;
             
-            $el.off('blur');
+            $(document).off('click', $(document).data('click'));
             
             $el.find('[data-class]').each(function() {
                 var $child = $(this);

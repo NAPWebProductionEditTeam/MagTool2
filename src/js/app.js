@@ -8,6 +8,7 @@
         /**
          * Show MagTool.
          */
+        
         // trigger repaint
         app.UI.getUI().offset();
         

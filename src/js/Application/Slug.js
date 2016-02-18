@@ -4,7 +4,7 @@
     function Slug() {
         var slugLeftClass = 'push-right-0';
         var slugRightClass = 'pull-left-0';
-
+        
         var createNewSlug = function() {
             var type = app.UI.getUI().find('select[name="slug-type"]').val();
             
@@ -12,11 +12,11 @@
                 class: type + ' push-down-0'
             });
         };
-
+        
         this.findSlug = function() {
             return app.Page.get().find('.editSlug, .beautySlug, .travelSlug');
         };
-
+        
         this.detectSlugProperties = function() {
             var $slug = this.findSlug();
             
@@ -25,7 +25,7 @@
             } else if ($slug.hasClass(slugRightClass)) {
                 $('#slugRight').prop('checked', true);
             }
-
+            
             if ($slug.length) {
                 app.UI.getUI().find('select[name="slug-type"]').val($slug.attr('class').replace(/.*?(\w+Slug).*/, '$1'));
             }
@@ -40,7 +40,7 @@
                 }
             }
             
-            switch(position) {
+            switch (position) {
                 case 'left':
                     $slug.removeClass(slugRightClass).addClass(slugLeftClass);
                     break;
@@ -56,7 +56,7 @@
         this.change = function(type) {
             var $slug = this.findSlug();
            
-            switch(type) {
+            switch (type) {
                 case 'beautySlug':
                     $slug.removeClass('editSlug travelSlug').addClass('beautySlug');
                     break;
@@ -68,7 +68,6 @@
                     break;
             }
         };
-
     }
     
     app.modules.Slug = Slug;

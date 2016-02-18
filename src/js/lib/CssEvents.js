@@ -1,14 +1,14 @@
 var CssEvents = CssEvents || {};
 
 (function(window, app) {
-    var transitionEvent = function(){
+    var transitionEvent = function() {
         var t;
         var el = window.document.createElement('fakeelement');
         var transitions = {
-            'transition':'transitionend',
-            'OTransition':'oTransitionEnd',
-            'MozTransition':'transitionend',
-            'WebkitTransition':'webkitTransitionEnd'
+            'transition': 'transitionend',
+            'OTransition': 'oTransitionEnd',
+            'MozTransition': 'transitionend',
+            'WebkitTransition': 'webkitTransitionEnd'
         };
         
         for (t in transitions) {
@@ -24,10 +24,10 @@ var CssEvents = CssEvents || {};
         var a;
         var el = window.document.createElement('fakeelement');
         var animations = {
-            'WebkitAnimation' : 'webkitAnimationEnd',
-            'OAnimation' : 'oanimationend',
-            'msAnimation' : 'MSAnimationEnd',
-            'animation' : 'animationend'
+            'WebkitAnimation': 'webkitAnimationEnd',
+            'OAnimation': 'oanimationend',
+            'msAnimation': 'MSAnimationEnd',
+            'animation': 'animationend'
         };
         
         for (a in animations) {
