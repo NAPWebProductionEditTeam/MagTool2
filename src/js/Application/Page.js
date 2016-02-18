@@ -6,7 +6,7 @@
         
         this.get = function() {
             if (typeof $currentPage === 'undefined') {
-                $currentPage = $('#page' + builder.get_$currentPageNumber());
+                $currentPage = $('#page' + builder.get_CurrentPageNumber());
             }
             
             return $currentPage;
