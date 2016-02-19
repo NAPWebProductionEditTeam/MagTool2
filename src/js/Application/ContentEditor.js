@@ -30,6 +30,25 @@
             return editing;
         };
         
+        this.getSelection = function() {
+            return app.Page.get().find('.ui-selected');
+        }
+        
+        this.getSelectionType = function() {
+            var $selection = this.getSelection();
+            var type = '';
+            
+            $selection.each(function() {
+                var $this = $(this);
+                
+                if ($this.find('img')) {
+                    type = type === 'text' ? 'mixed' : 'image';
+                } else {
+                    type = type === 'image' ? 'mixed' : 'text';
+                }
+            });
+        };
+        
         /**
          * Content interactions.
          */
