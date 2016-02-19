@@ -40,7 +40,9 @@
             $this.removeClass('black white');
             if(color=='white'){
                 $this.addClass('white');
-            }else
+            }else{
+                $this.addClass('black');
+            }
 
         };
     }
