@@ -189,4 +189,9 @@ var MagTool = MagTool || {};
         
         app.TextEditor.align(alignment);
     }, false, true);
+
+     registerAction('changeColor', function(color) {
+
+        app.TextEditor.changeColor(color);
+    }, false, true);
 })(window, $, MagTool);
