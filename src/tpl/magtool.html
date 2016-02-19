@@ -87,85 +87,79 @@
             </section>
             <section class="col-md-6 section selection-controls">
                 <!-- Specific tools -->
-                <!--textEditorBox------------>
-                 <div class="form-horizontal" id="textEditorBox">
-
-                     <div class="form-group">
-                       <label class="col-sm-1 control-label">Text:</label>
-                        <div class="col-sm-4">
-                            <div class="btn-group">
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
-                                <label class="btn btn-default" for="leftText">
-                                    <i class="fa fa-align-left"></i>
-                                </label>
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="centerText" value="textAlignCenter" data-change="alignSelected" checked>
-                                <label class="btn btn-default" for="centerText">
-                                    <i class="fa fa-align-center"></i>
-                                </label>
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="rightText" value="rightText" data-change="alignSelected">
-                                <label class="btn btn-default" for="rightText">
-                                    <i class="fa fa-align-right"></i>
-                                </label>
+                <div class="wrapper">
+                    <!-- textEditorBox -->
+                    <div class="form-horizontal selection" id="textSelection">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Text:</label>
+                            <div class="col-sm-10">
+                                <div class="btn-group">
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
+                                    <label class="btn btn-default" for="leftText">
+                                        <i class="fa fa-align-left"></i>
+                                    </label>
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="centerText" value="textAlignCenter" data-change="alignSelected" checked>
+                                    <label class="btn btn-default" for="centerText">
+                                        <i class="fa fa-align-center"></i>
+                                    </label>
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="rightText" value="rightText" data-change="alignSelected">
+                                    <label class="btn btn-default" for="rightText">
+                                        <i class="fa fa-align-right"></i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-7"></div>
-                     </div>
-                       <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <div class="col-sm-4">
-                            <div class="btn-group">
-                                <input type="radio" class="radioBtn" name="fontColor" id="black" value="black" data-change="changeColor" checked disabled>
-                                <label class="btn btn-default" for="black">
-                                    Black
-                                </label>
-                                <input type="radio" class="radioBtn" name="fontColor" id="white" value="white" data-change="changeColor" disabled>
-                                <label class="btn btn-default" for="white">
-                                    White
-                                </label>
+                        <div class="form-group">
+                            <div class="col-sm-10 col-sm-offset-2">
+                                <div class="btn-group">
+                                    <input type="radio" class="radioBtn" name="fontColor" id="black" value="black" data-change="changeColor" checked>
+                                    <label class="btn btn-default" for="black">
+                                        Black
+                                    </label>
+                                    <input type="radio" class="radioBtn" name="fontColor" id="white" value="white" data-change="changeColor">
+                                    <label class="btn btn-default" for="white">
+                                        White
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-7"></div>
-                     </div>
-                </div>
-                <!-------imageEditorBox------------------------>
-                 <div class="form-horizontal" id="imageEditorBox">
-
-                     <div class="form-group">
-                       <label class="col-sm-1 control-label">Image:</label>
-                        <div class="col-sm-4">
-                            <div class="btn-group">
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
-                                <label class="btn btn-default" for="leftText">
-                                    <i class="fa fa-align-left"></i>
-                                </label>
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="centerText" value="textAlignCenter" data-change="alignSelected" checked>
-                                <label class="btn btn-default" for="centerText">
-                                    <i class="fa fa-align-center"></i>
-                                </label>
-                                <input type="checkbox" class="uRadioBtn" name="textAlignment" id="rightText" value="rightText" data-change="alignSelected">
-                                <label class="btn btn-default" for="rightText">
-                                    <i class="fa fa-align-right"></i>
-                                </label>
+                    </div>
+                    <!-- imageEditorBox -->
+                    <div class="form-horizontal selection" id="imageSelection">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Image:</label>
+                            <div class="col-sm-10">
+                                <div class="btn-group">
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
+                                    <label class="btn btn-default" for="leftText">
+                                        <i class="fa fa-align-left"></i>
+                                    </label>
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="centerText" value="textAlignCenter" data-change="alignSelected" checked>
+                                    <label class="btn btn-default" for="centerText">
+                                        <i class="fa fa-align-center"></i>
+                                    </label>
+                                    <input type="checkbox" class="uRadioBtn" name="textAlignment" id="rightText" value="rightText" data-change="alignSelected">
+                                    <label class="btn btn-default" for="rightText">
+                                        <i class="fa fa-align-right"></i>
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-7"></div>
-                     </div>
-                       <div class="form-group">
-                        <div class="col-sm-1"></div>
-                        <div class="col-sm-4">
-                            <div class="btn-group">
-                                <input type="radio" class="radioBtn" name="fontColor" id="black" value="black" data-change="changeColor" checked disabled>
-                                <label class="btn btn-default" for="black">
-                                    Black
-                                </label>
-                                <input type="radio" class="radioBtn" name="fontColor" id="white" value="white" data-change="changeColor" disabled>
-                                <label class="btn btn-default" for="white">
-                                    White
-                                </label>
+                        <div class="form-group">
+                            <div class="col-sm-10 col-sm-offset-2">
+                                <div class="btn-group">
+                                    <input type="radio" class="radioBtn" name="fontColor" id="black" value="black" data-change="changeColor" checked>
+                                    <label class="btn btn-default" for="black">
+                                        Black
+                                    </label>
+                                    <input type="radio" class="radioBtn" name="fontColor" id="white" value="white" data-change="changeColor">
+                                    <label class="btn btn-default" for="white">
+                                        White
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-sm-7"></div>
-                     </div>
+                    </div>
                 </div>
             </section>
         </div>

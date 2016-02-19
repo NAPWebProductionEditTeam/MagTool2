@@ -7,11 +7,16 @@
 @import "components/form";
 @import "components/load";
 @import "components/btn";
-@import "components/tabBox";
+@import "components/selection";
+
 .clearfix {
     @include clearfix;
-}
 
+}
+.wrapper {
+    position: relative;
+    @include clearfix;
+}
 label[for] {
     cursor: pointer;
 }
