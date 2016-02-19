@@ -39,9 +39,9 @@
             var $this = app.Page.get().find('.ui-selected');
             $this.removeClass('black white');
 
-            if (color == 'white') {
+            if (color === 'white') {
                 $this.addClass('white');
-            } else if(color == 'black') {
+            } else if (color === 'black') {
                 $this.addClass('black');
             }
 
