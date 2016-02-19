@@ -3,10 +3,11 @@
     width: 100%;
     opacity: 0;
     pointer-events: none;
-    transition: opacity .3s;
+    transition: opacity .3s ease .3s;
 
     @include option(active) {
         opacity: 1;
         pointer-events: auto;
+        transition: opacity .3s;
     }
 }

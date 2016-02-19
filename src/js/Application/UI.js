@@ -1,6 +1,6 @@
 (function(window, $, app, CssEvents) {
     function UI() {
-        var $mt, $notify, $mainControls, $pageControls, $selectionControls;
+        var $mt, $notify, $mainControls, $pageControls, $selectionSection, $selectionControls;
         
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
@@ -32,6 +32,14 @@
             }
             
             return $pageControls;
+        };
+        
+        this.getSelectionSection = function() {
+            if (typeof $selectionSection === 'undefined') {
+                $selectionSection = this.getUI().find('.selection-controls');
+            }
+            
+            return $selectionSection;
         };
         
         this.getSelectionControls = function() {

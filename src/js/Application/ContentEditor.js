@@ -41,12 +41,14 @@
             $selection.each(function() {
                 var $this = $(this);
                 
-                if ($this.find('img')) {
+                if ($this.find('img').length) {
                     type = type === 'text' ? 'mixed' : 'image';
                 } else {
                     type = type === 'image' ? 'mixed' : 'text';
                 }
             });
+            
+            return type;
         };
         
         /**
@@ -78,6 +80,15 @@
                 filter: '.draggable, .editable, .resizable',
                 selected: function(e, ui) {
                     addSelected(ui.selected);
+                    
+                    app.UI.getSelectionSection().find('.selection').removeClass('--active');
+                    
+                    var type = app.ContentEditor.getSelectionType();
+                    var $selectionEditor = $('#' + type + 'Selection');
+                    
+                    if ($selectionEditor.length) {
+                        $selectionEditor.addClass('--active');
+                    }
                 },
                 unselected: function(e, ui) {
                     $selected = $selected.not(ui.unselected);
@@ -113,7 +124,7 @@
         this.getSelectedElements = function() {
             return app.Page.get().find('.ui-selected');
         };
-
+        
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             
