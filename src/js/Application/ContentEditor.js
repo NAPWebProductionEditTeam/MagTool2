@@ -91,6 +91,10 @@
             }
         };
         
+        this.getSelectedElements = function() {
+            return app.Page.get().find('.ui-selected');
+        };
+
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             

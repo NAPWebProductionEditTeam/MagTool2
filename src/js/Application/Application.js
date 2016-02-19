@@ -187,6 +187,6 @@ var MagTool = MagTool || {};
     
     registerAction('alignSelected', function(alignment) {
         
-        app.Align.align(alignment);
+        app.TextEditor.align(alignment);
     }, false, true);
 })(window, $, MagTool);
