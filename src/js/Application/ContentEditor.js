@@ -89,6 +89,8 @@
                     if ($selectionEditor.length) {
                         $selectionEditor.addClass('--active');
                     }
+
+                    app.TextEditor.detectSelectedAlignment();
                 },
                 unselected: function(e, ui) {
                     $selected = $selected.not(ui.unselected);
