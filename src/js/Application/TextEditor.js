@@ -38,9 +38,10 @@
         this.changeColor = function(color) {
             var $this = app.Page.get().find('.ui-selected');
             $this.removeClass('black white');
-            if(color=='white'){
+
+            if (color == 'white') {
                 $this.addClass('white');
-            }else{
+            } else if(color == 'black') {
                 $this.addClass('black');
             }
 
