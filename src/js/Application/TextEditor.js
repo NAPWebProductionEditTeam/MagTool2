@@ -35,10 +35,12 @@
             }
         };
 
-        this.changeColor = function(c) {
+        this.changeColor = function(color) {
             var $this = app.Page.get().find('.ui-selected');
             $this.removeClass('black white');
-            if
+            if(color=='white'){
+                $this.addClass('white');
+            }else
 
         };
     }
