@@ -1,8 +1,10 @@
-#textEditorBox {
-    display: none;
-}
+@include component(tabBox) {
+        #textEditorBox {
+        display: none;
+    }
 
-#imageEditorBox {
-    display: block;
-}
+    #imageEditorBox {
+        display: block;
+    }
 
+}
