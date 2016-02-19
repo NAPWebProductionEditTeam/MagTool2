@@ -6,7 +6,7 @@ var MagTool = MagTool || {};
     app.$body = $('body');
     
     var resolveAction = function($el) {
-        var actionName = $el.data('action');
+        var actionName = $el.data('action') || $el.data('change');
         var action = app[actionName];
         
         var actionNone = function() {};
@@ -47,22 +47,26 @@ var MagTool = MagTool || {};
         app.UI.getUI().find('input[data-change]').on('change', function() {
             var value;
             var $this = $(this);
+            var $group = $([]);
             var action = resolveAction($this);
             
-            if ($this.is('.uRadioBtn')) {
+            if ($this.is('.uRadioBtn') || $this.is('[type="checkbox"]') || $this.is('[type="radio"]')) {
                 var name = $this.attr('name');
+                $group = app.UI.getUI().find('input[name="' + name + '"]');
+            }
+            
+            if ($this.is('.uRadioBtn')) {
+                $group.not($this).prop('checked', false);
                 
-                app.UI.getUI().find('input[name="' + name + '"]').not($this).prop('checked', false);
-                
-                value = $this.val();
+                value = $group.filter(':checked').val();
             } else if ($this.is('[type="checkbox"]')) {
                 value = [];
                 
-                $this.filter(':checked').each(function() {
+                $group.filter(':checked').each(function() {
                     value.push($(this).val());
                 });
             } else if ($this.is('[type="radio"]')) {
-                value = $this.filter(':checked').val();
+                value = $group.filter(':checked').val();
             } else {
                 value = $this.val();
             }
@@ -186,12 +190,10 @@ var MagTool = MagTool || {};
     }, false, true);
     
     registerAction('alignSelected', function(alignment) {
-        
         app.TextEditor.align(alignment);
-    }, false, true);
-
+    }, true, true);
+    
     registerAction('changeColor', function(color) {
-
         app.TextEditor.changeColor(color);
-    }, false, true);
+    }, true, true);
 })(window, $, MagTool);

@@ -1,9 +1,12 @@
 (function(window, $, app) {
     function TextEditor() {
         this.detectSelectedAlignment = function() {
-            var $selected = app.Page.get().find('.ui-selected');
+            var $selected = app.ContentEditor.getSelection();
+            var $selectionControls = app.UI.getSelectionControls();
             var alignment = $selected.attr('class').replace(/.*?(\w*)text(?:align(\w+))?.*/i, '$1$2').toLowerCase();
-
+            
+            $selectionControls.filter('[name="textAlignment"]').prop('checked', false);
+            
             switch (alignment) {
                 case 'center':
                     $('#centerText').prop('checked', true);
@@ -16,37 +19,37 @@
                     break;
             }
         };
-
+        
         this.align = function(alignment) {
-            var $this = app.Page.get().find('.ui-selected');
-
-            $this.removeClass('leftText rightText textAlignCenter');
-
+            var $selected = app.ContentEditor.getSelection();
+            
+            $selected.removeClass('leftText rightText textAlignCenter');
+            
             switch (alignment) {
                 case 'textAlignCenter':
-                    $this.addClass('textAlignCenter');
+                    $selected.addClass('textAlignCenter');
                     break;
                 case 'rightText':
-                    $this.addClass('rightText');
+                    $selected.addClass('rightText');
                     break;
                 case 'leftText':
-                    $this.addClass('leftText');
+                    $selected.addClass('leftText');
                     break;
             }
         };
-
+        
         this.changeColor = function(color) {
-            var $this = app.Page.get().find('.ui-selected');
-            $this.removeClass('black white');
-
+            var $selected = app.ContentEditor.getSelection();
+            
+            $selected.removeClass('black white');
+            
             if (color === 'white') {
-                $this.addClass('white');
+                $selected.addClass('white');
             } else if (color === 'black') {
-                $this.addClass('black');
+                $selected.addClass('black');
             }
-
         };
     }
-
+    
     app.modules.TextEditor = TextEditor;
 })(window, jQuery, MagTool);

@@ -32,7 +32,7 @@
         
         this.getSelection = function() {
             return app.Page.get().find('.ui-selected');
-        }
+        };
         
         this.getSelectionType = function() {
             var $selection = this.getSelection();
