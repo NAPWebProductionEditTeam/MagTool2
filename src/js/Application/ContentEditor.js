@@ -36,19 +36,25 @@
         
         this.getSelectionType = function() {
             var $selection = this.getSelection();
-            var type = '';
+            var types = [];
             
             $selection.each(function() {
                 var $this = $(this);
                 
                 if ($this.find('img').length) {
-                    type = type === 'text' ? 'mixed' : 'image';
+                    types.push('image');
                 } else {
-                    type = type === 'image' ? 'mixed' : 'text';
+                    types.push('text');
                 }
             });
             
-            return type;
+            types = $.unique(types);
+            
+            if (types.length === 1) {
+                return types[0];
+            }
+            
+            return 'mixed';
         };
         
         /**
