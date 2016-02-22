@@ -44,7 +44,7 @@ var MagTool = MagTool || {};
             action();
         });
         
-        app.UI.getUI().find('input[data-change]').on('change', function() {
+        app.UI.getUI().find('input[data-change]').on('change paste', function() {
             var value;
             var $this = $(this);
             var $group = $([]);
@@ -157,6 +157,7 @@ var MagTool = MagTool || {};
         window.open(url, '_blank');
     }, true);
     
+    // Credits
     registerAction('toggleCreditsPosition', function() {
         app.Credits.togglePosition();
     }, false, true);
@@ -181,6 +182,7 @@ var MagTool = MagTool || {};
         }
     }, false, true);
     
+    // Slugs
     registerAction('moveSlug', function(position) {
         app.Slug.move(position);
     }, false, true);
@@ -189,11 +191,25 @@ var MagTool = MagTool || {};
         app.Slug.change(type);
     }, false, true);
     
+    // Text Editor
     registerAction('alignSelected', function(alignment) {
         app.TextEditor.align(alignment);
     }, true, true);
     
     registerAction('changeColor', function(color) {
         app.TextEditor.changeColor(color);
+    }, true, true);
+    
+    // Image Editor
+    registerAction('changeSrc', function(src) {
+        app.ImageEditor.changeSrc(src);
+    }, true, true);
+    
+    registerAction('changeWidth', function(w) {
+        app.ImageEditor.changeWidth(w);
+    }, true, true);
+    
+    registerAction('changeHeight', function(h) {
+        app.ImageEditor.changeWidth(h);
     }, true, true);
 })(window, $, MagTool);
