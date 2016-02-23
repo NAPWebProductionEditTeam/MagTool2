@@ -2,11 +2,11 @@
     function ImageEditor() {
         
         this.detectImageUrl = function() {
-
-            var imgUrl = app.ContentEditor.getSelection().find('img').attr('src');
-            app.UI.getUI().find('#imageURL').attr('src', imgUrl);
-
-            return app.UI.getUI().find('#imageURL').attr('src', imgUrl);
+            var $selected = app.ContentEditor.getSelection();
+            var $selectionControls = app.UI.getSelectionControls();
+            var currentUrl = $selected.find('img').attr('src');
+            var newURL = $selectionControls.find('#imageURL').val();
+            newURL = currentUrl;
 
         };
 
