@@ -16,5 +16,5 @@
 //         }
     }
     
-    app.modules.TextEditor = ImageEditor;
+    app.modules.ImageEditor = ImageEditor;
 })(window, jQuery, MagTool);
