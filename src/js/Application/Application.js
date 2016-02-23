@@ -201,7 +201,7 @@ var MagTool = MagTool || {};
     }, true, true);
     
     // Image Editor
-    registerAction('changeSrc', function(src) {
+    registerAction('changeUrl', function(src) {
         app.ImageEditor.changeSrc(src);
     }, true, true);
     
