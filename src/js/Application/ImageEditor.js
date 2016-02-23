@@ -9,11 +9,11 @@
             return app.UI.getUI().find('#imageURL').attr('src',imgUrl);
 
         }
-         this.changeUrl = function (url){
-             var url= app.UI.getUI().find('#imageURL').val();
-             var app.Page.getContent()
-
-         }
+//         this.changeUrl = function (url){
+//             var url= app.UI.getUI().find('#imageURL').val();
+//             var app.Page.getContent()
+//
+//         }
     }
     
     app.modules.TextEditor = ImageEditor;
