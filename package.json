@@ -26,6 +26,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jscs": "^2.7.0",
     "grunt-notify": "^0.4.3",
-    "grunt-sass": "^1.1.0"
+    "grunt-sass": "^1.1.0",
+    "jscs": "^2.10.1"
   }
 }
