@@ -43,6 +43,8 @@
                 
                 if ($this.find('img').length) {
                     types.push('image');
+                } else if ($this.filter('[class*="creditsWhole"]').length) {
+                    types.push('credits');
                 } else {
                     types.push('text');
                 }
@@ -63,7 +65,7 @@
         var $selectable, $selectables, $draggables, $resizables;
         var $selected = $([]);
         
-        var select = function($el) {
+        this.select = function($el) {
             $el.addClass('ui-selecting');
             $selectable.selectable('instance')._mouseStop(null);
         };
