@@ -3,9 +3,10 @@
         
 
         this.detectImageUrl =function (){
-            var url= app.UI.getUI().find('#imageURL').val();
+
             var imgUrl= app.ContentEditor.getSelection().find('img').attr('src');
-            url=imgUrl;
+            app.UI.getUI().find('#imageURL').attr('src',imgUrl);
+            return app.UI.getUI().find('#imageURL').attr('src',imgUrl);
 
         }
          this.changeUrl = function (url){
