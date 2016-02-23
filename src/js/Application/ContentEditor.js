@@ -84,6 +84,7 @@
             
             $selectable.selectable({
                 filter: '.draggable, .editable, .resizable',
+                cancel: '[class*=credits]',
                 selected: function(e, ui) {
                     addSelected(ui.selected);
                     
@@ -95,7 +96,7 @@
                     if ($selectionEditor.length) {
                         $selectionEditor.addClass('--active');
                     }
-
+                    
                     app.TextEditor.detectSelectedAlignment();
                 },
                 unselected: function(e, ui) {
@@ -395,6 +396,8 @@
             
             $editing = $el;
         };
+        
+        window.startEdit = startEditing;
         
         var stopEditing = function() {
             if (! $editing) {
