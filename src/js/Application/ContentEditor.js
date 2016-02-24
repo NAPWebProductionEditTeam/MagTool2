@@ -43,6 +43,8 @@
                 
                 if ($this.find('img').length) {
                     types.push('image');
+                } else if ($this.filter('[class*="creditsWhole"]').length) {
+                    types.push('credits');
                 } else {
                     types.push('text');
                 }
@@ -63,7 +65,7 @@
         var $selectable, $selectables, $draggables, $resizables;
         var $selected = $([]);
         
-        var select = function($el) {
+        this.select = function($el) {
             $el.addClass('ui-selecting');
             $selectable.selectable('instance')._mouseStop(null);
         };
@@ -79,12 +81,14 @@
         };
         
         this.makeSelectable = function() {
+            var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
+            
             $selectable = app.Page.getContent();
-            $selectables = $selectable.find('.draggable, .editable, .resizable');
+            $selectables = $selectable.find(selectableSelector);
             
             $selectable.selectable({
-                filter: '.draggable, .editable, .resizable',
-                cancel: '[class*=credits]',
+                filter: selectableSelector,
+                cancel: '[class*="creditsHolder"]',
                 selected: function(e, ui) {
                     addSelected(ui.selected);
                     

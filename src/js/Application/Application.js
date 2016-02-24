@@ -44,7 +44,7 @@ var MagTool = MagTool || {};
             action();
         });
         
-        app.UI.getUI().find('input[data-change]').on('change paste', function() {
+        app.UI.getUI().find('input[data-change], textarea[data-change]').on('change paste', function() {
             var value;
             var $this = $(this);
             var $group = $([]);
@@ -173,14 +173,18 @@ var MagTool = MagTool || {};
         
         if (app.Credits.isVisible()) {
             $toggle.attr('title', 'Hide credits');
-            
             $toggle.find('.fa').removeClass('fa-eye').addClass('fa-eye-slash');
+            
+            app.ContentEditor.select(app.Credits.getCredits());
         } else {
             $toggle.attr('title', 'Show credits');
-            
             $toggle.find('.fa').removeClass('fa-eye-slash').addClass('fa-eye');
         }
     }, false, true);
+    
+    registerAction('updateCredits', function(text) {
+        app.Credits.update(text);
+    }, true, true);
     
     // Slugs
     registerAction('moveSlug', function(position) {
