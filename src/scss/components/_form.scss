@@ -3,8 +3,13 @@ label {
 }
 #IMGW {
     margin-top: 5px;
-    text-align:
+    padding: 6px 12px;
 }
+#IMGH {
+    margin-top: 5px;
+    padding: 6px 12px;
+}
+
 
 @include component(radioBtn, uRadioBtn) {
     display: none;
