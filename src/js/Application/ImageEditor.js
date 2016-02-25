@@ -9,8 +9,13 @@
             var imgW = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
 
-            currentW = currentW == imgW ? 'auto' : currentW;
-            currentH = currentH == imgH ? 'auto' : currentH;
+            if (typeof currentW === 'undefined' || currentW == imgW) {
+                currentW = 'auto';
+            }
+
+            if (typeof currentH === 'undefined' || currentH == imgH) {
+                currentH = 'auto';
+            }
 
             app.UI.getSelectionSection().find('#IMGH').text(imgH);
             app.UI.getSelectionSection().find('#IMGW').text(imgW);
