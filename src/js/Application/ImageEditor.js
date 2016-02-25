@@ -8,8 +8,8 @@
             var currentH = $selected.find('img').attr('height');
             var imgw = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
-            $selectionControls.filter('#IMGH').val(imgH);
-            $selectionControls.filter('#IMGw').val(imgw);
+            app.UI.getSelectionSection().find('#IMGH').val(imgH);
+            app.UI.getSelectionSection().find('#IMGW').val(imgw);
             $selectionControls.filter('#imageURL').val(currentUrl);
             $selectionControls.filter('#imageWidth').val(currentW);
             $selectionControls.filter('#imageHeight').val(currentH);
