@@ -21,7 +21,17 @@
 
             if (url !== currentUrl) {
                 $selected.find('img').attr('src', url);
-                ImageEditor.detectImage();
+            }
+        };
+
+        this.changeSize = function(w, h) {
+            var $selected = app.ContentEditor.getSelection();
+            var currentW = $selected.find('img').attr('width');
+            var CurrentH = $selected.find('img').attr('height');
+
+            if (w !== currentW || h !== currentH) {
+                $selected.find('img').attr('width', w);
+                $selected.find('img').attr('height', h);
             }
         };
     }
