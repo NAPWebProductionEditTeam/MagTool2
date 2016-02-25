@@ -1,21 +1,29 @@
 (function(window, $, app) {
     function ImageEditor() {
-        
-        this.detectImageUrl = function() {
-
-            var imgUrl = app.ContentEditor.getSelection().find('img').attr('src');
-            app.UI.getUI().find('#imageURL').attr('src', imgUrl);
-
-            return app.UI.getUI().find('#imageURL').attr('src', imgUrl);
-
+        this.detectImage = function() {
+            var $selected = app.ContentEditor.getSelection();
+            var $selectionControls = app.UI.getSelectionControls();
+            var currentUrl = $selected.find('img').attr('src');
+            var currentW = $selected.find('img').attr('width');
+            var currentH = $selected.find('img').attr('height');
+            var imgw = $selected.find('img').prop('naturalWidth');
+            var imgH = $selected.find('img').prop('naturalHeight');
+            $selectionControls.filter('#IMGH').val(imgH);
+            $selectionControls.filter('#IMGw').val(imgw);
+            $selectionControls.filter('#imageURL').val(currentUrl);
+            $selectionControls.filter('#imageWidth').val(currentW);
+            $selectionControls.filter('#imageHeight').val(currentH);
         };
 
-        //         this.changeUrl = function (url){
-        //             var url= app.UI.getUI().find('#imageURL').val();
-        //             var app.Page.getContent()
-        //
-        //         }
+        this.changeUrl = function(url) {
+            var $selected = app.ContentEditor.getSelection();
+            var currentUrl = $selected.find('img').attr('src');
+
+            if (url !== currentUrl) {
+                $selected.find('img').attr('src', url);
+            }
+        };
     }
-    
+
     app.modules.ImageEditor = ImageEditor;
 })(window, jQuery, MagTool);
