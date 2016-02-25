@@ -1,6 +1,7 @@
 <div id="magtoolComponents" class="mtOverride">
     <div class="magtool hasZ hide +z-depth-1" id="magtool">
         <div class="container">
+            <!-- Edit/Save etc. -->
             <section class="col-md-2 text-right section main-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -37,7 +38,8 @@
                     </div>
                 </div>
             </section>
-            <section class="col-md-4 section page-controls">
+            <!-- Edit Page specific elements -->
+            <section class="col-md-3 section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Slug:</label>
@@ -85,6 +87,33 @@
                     </div>
                 </div>
             </section>
+            <!-- Create new Element Tools -->
+            <section class="col-md-1 text-right section main-controls">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <button type="button" class="btn btn-default btn-block text-center" data-action="new-text">
+                                <i class="fa fa-fw fa-header"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <button type="button" class="btn btn-default btn-block text-center" data-action="new-image">
+                                <i class="fa fa-fw fa-image"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-11 col-sm-offset-1">
+                            <button type="button" class="btn btn-default btn-block text-center" data-action="new-cta">
+                                <i class="fa fa-fw fa-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Element Specific Tools -->
             <section class="col-md-6 section selection-controls">
                 <!-- Specific tools -->
                 <div class="wrapper">
