@@ -71,14 +71,6 @@
         this.btnGroupLoaded = function(group) {
             $('#' + group).removeClass('--loading');
         };
-        
-        this.enable = function($controls) {
-            $controls.prop('disabled', true);
-        };
-        
-        this.disable = function($controls) {
-            $controls.prop('disabled', false);
-        };
     }
     
     app.modules.UI = UI;

@@ -1,0 +1,8 @@
+@include component(page-controls) {
+    transition: opacity .3s;
+    
+    @include option(hide) {
+        opacity: 0;
+        pointer-events: none;
+    }
+}

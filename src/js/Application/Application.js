@@ -1,8 +1,9 @@
 var MagTool = MagTool || {};
 
-(function(window, $, app) {
+(function(window, $, app, Mousetrap) {
     app.modules = {};
     
+    app.$doc = $(window.document);
     app.$body = $('body');
     
     var resolveAction = function($el) {
@@ -38,12 +39,14 @@ var MagTool = MagTool || {};
      * Bind actions.
      */
     app.registerBindings = function() {
+        // Click bindings
         app.UI.getUI().on('click', '[data-action]', function() {
             var action = resolveAction($(this));
             
             action();
         });
         
+        // Change bindings
         app.UI.getUI().find('input[data-change], textarea[data-change]').on('change paste', function() {
             var value;
             var $this = $(this);
@@ -73,6 +76,9 @@ var MagTool = MagTool || {};
             
             action(value);
         });
+        
+        // Key bindings
+        
     };
     
     /**
@@ -216,4 +222,4 @@ var MagTool = MagTool || {};
     registerAction('changeHeight', function(h) {
         app.ImageEditor.changeWidth(h);
     }, true, true);
-})(window, $, MagTool);
+})(window, $, MagTool, Mousetrap);

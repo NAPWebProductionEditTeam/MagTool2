@@ -4,7 +4,7 @@
         for (var module in app.modules) {
             app[module] = new app.modules[module]();
         }
-
+        
         /**
          * Show MagTool.
          */
@@ -28,7 +28,7 @@
         // Register binds
         app.registerBindings();
         
-        $(window.document).on('click', '.btn, :button, :submit, :reset', function() {
+        app.$doc.on('click', '.btn, :button, :submit, :reset', function() {
             $(this).blur();
         });
     });
