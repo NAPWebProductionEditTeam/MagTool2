@@ -6,11 +6,12 @@ var MagTool = MagTool || {};
     app.$doc = $(window.document);
     app.$body = $('body');
     
-    var resolveAction = function($el) {
-        var actionName = $el.data('action') || $el.data('change');
+    var resolveAction = function(actionName, params) {
         var action = app[actionName];
         
-        var actionNone = function() {};
+        if (typeof params === 'undefined') {
+            params = [];
+        }
         
         if (action) {
             if (
@@ -18,11 +19,9 @@ var MagTool = MagTool || {};
                 app.ContentEditor.isEditing() && action.whenEditing ||
                 ! app.ContentEditor.isEditing() && ! action.whenEditing
             ) {
-                return action;
+                return action.apply(app, params);
             }
         }
-        
-        return actionNone;
     };
     
     var registerAction = function(name, action, always, whenEditing) {
@@ -41,9 +40,7 @@ var MagTool = MagTool || {};
     app.registerBindings = function() {
         // Click bindings
         app.UI.getUI().on('click', '[data-action]', function() {
-            var action = resolveAction($(this));
-            
-            action();
+            resolveAction($(this).data('action'));
         });
         
         // Change bindings
@@ -51,7 +48,6 @@ var MagTool = MagTool || {};
             var value;
             var $this = $(this);
             var $group = $([]);
-            var action = resolveAction($this);
             
             if ($this.is('.uRadioBtn') || $this.is('[type="checkbox"]') || $this.is('[type="radio"]')) {
                 var name = $this.attr('name');
@@ -74,11 +70,112 @@ var MagTool = MagTool || {};
                 value = $this.val();
             }
             
-            action(value);
+            resolveAction($this.data('change'), [value]);
+        });
+    };
+    
+    /**
+     * Bind key events to actions.
+     */
+    app.registerKeyBindings = function() {
+        // First find existing key events on the body.
+        var originalKeyEvents = $.grep(
+            $._data(window.document, 'events').keyup || [],
+            function(e) {
+                return typeof e.selector === 'undefined';
+            }
+        );
+        
+        // Let's store them so we can unbind / rebind them later.
+        app.$doc.data('originalKeyEvents', {
+            bound: true,
+            handlers: originalKeyEvents
         });
         
-        // Key bindings
+        // Time to bind our own key events then.
+        Mousetrap.bind('mod+e', function() {
+            resolveAction('edit');
+        });
         
+        Mousetrap.bind('mod+s', function() {
+            // save page
+        });
+        
+        Mousetrap.bind('mod+i', function() {
+            // open image mapping
+        });
+        
+        Mousetrap.bind('up', function() {
+            // move 1 tick up (span-x --> span-x-a)
+        });
+        
+        Mousetrap.bind('shift+up', function() {
+            // move 4 ticks up (span-x --> span-(x + 1))
+        });
+        
+        Mousetrap.bind('right', function() {
+            //
+        });
+        
+        Mousetrap.bind('shift+right', function() {
+            //
+        });
+        
+        Mousetrap.bind('down', function() {
+            //
+        });
+        
+        Mousetrap.bind('shift+down', function() {
+            //
+        });
+        
+        Mousetrap.bind('left', function() {
+            //
+        });
+        
+        Mousetrap.bind('shift+left', function() {
+            //
+        });
+        
+        Mousetrap.bind('c', function() {
+            // select credits
+        });
+        
+        Mousetrap.bind('tab', function() {
+            // select next ui-selectee
+        });
+        
+        Mousetrap.bind('shift+tab', function() {
+            // select prev ui-selectee
+        });
+        
+        Mousetrap.bind('enter', function() {
+            // start editing selected
+        });
+        
+        Mousetrap.bind('mod+enter', function() {
+            // stop editing selected
+        });
+    };
+    
+    app.bindOriginalKeyEvents = function() {
+        var events = app.$doc.data('originalKeyEvents');
+        
+        if (! events.bound) {
+            $.each(events.handlers, function(handler) {
+                app.$doc.on('keyup', null, handler);
+            });
+        }
+    };
+    
+    app.unbindOriginalKeyEvents = function() {
+        var events = app.$doc.data('originalKeyEvents');
+        
+        if (events.bound) {
+            $.each(events.handlers, function(handler) {
+                app.$doc.off('keyup', null, handler);
+            });
+        }
     };
     
     /**
@@ -91,6 +188,7 @@ var MagTool = MagTool || {};
         
         app.Server.edit(pageId).done(function(data) {
             if (data.response.indexOf('is locked for editing') > -1) {
+                app.unbindOriginalKeyEvents();
                 app.ContentEditor.startEdit();
                 
                 app.UI.showBtn('editSave', 'save');
@@ -111,7 +209,7 @@ var MagTool = MagTool || {};
     registerAction('unlock', function() {
         var pageId = app.Page.getId();
         
-        app.UI.btnGroupLoading('editSave');
+        app.UI.btnGroupLoading('lock');
         
         app.Server.unlock(pageId).done(function() {
             console.log('page unlocked');
@@ -122,7 +220,7 @@ var MagTool = MagTool || {};
             
             // NOTIFY: Unlock error, e
         }).always(function() {
-            app.UI.btnGroupLoaded('editSave');
+            app.UI.btnGroupLoaded('lock');
         });
     }, false, false);
     
@@ -140,13 +238,15 @@ var MagTool = MagTool || {};
         console.log('<<<< END SCRIPT.HTML CONTENT >>>>');
         
         app.Server.save(pageId, credits, contents).done(function() {
-            console.log('Saved successfully');
+            app.bindOriginalKeyEvents();
+            app.ContentEditor.stopEdit();
             
-            // change tool ui --> saved
+            app.UI.showBtn('editSave', 'edit');
+            
+            // NOTIFY: saved
         }).fail(function() {
-            console.log('Save error');
             
-            // change tool ui --> error
+            // NOTIFY: Save error, e
         });
     }, false, true);
     

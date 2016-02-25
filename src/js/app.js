@@ -27,6 +27,7 @@
         
         // Register binds
         app.registerBindings();
+        app.registerKeyBindings();
         
         app.$doc.on('click', '.btn, :button, :submit, :reset', function() {
             $(this).blur();
