@@ -89,20 +89,12 @@
                 cancel: '[class*="creditsHolder"]',
                 selected: function(e, ui) {
                     addSelected(ui.selected);
-                    
-                    app.UI.getSelectionSection().find('.selection').removeClass('--active');
-                    
-                    var type = app.ContentEditor.getSelectionType();
-                    var $selectionEditor = $('#' + type + 'Selection');
-                    
-                    if ($selectionEditor.length) {
-                        $selectionEditor.addClass('--active');
-                    }
-                    
-                    app.TextEditor.detectSelectedAlignment();
                 },
                 unselected: function(e, ui) {
                     $selected = $selected.not(ui.unselected);
+                },
+                stop: function() {
+                    app.resolveAction('updateUI');
                 }
             });
             

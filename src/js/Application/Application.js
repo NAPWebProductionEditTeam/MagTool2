@@ -6,7 +6,7 @@ var MagTool = MagTool || {};
     app.$doc = $(window.document);
     app.$body = $('body');
     
-    var resolveAction = function(actionName, params) {
+    var resolveAction = app.resolveAction = function(actionName, params) {
         var action = app[actionName];
         
         if (typeof params === 'undefined') {
@@ -98,11 +98,11 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('mod+s', function() {
-            // save page
+            resolveAction('save');
         });
         
         Mousetrap.bind('mod+i', function() {
-            // open image mapping
+            resolveAction('map_image');
         });
         
         Mousetrap.bind('up', function() {
@@ -262,6 +262,26 @@ var MagTool = MagTool || {};
         
         window.open(url, '_blank');
     }, true);
+    
+    registerAction('updateUI', function() {
+        var type = app.ContentEditor.getSelectionType();
+        var $selectionEditor = $('#' + type + 'Selection');
+        
+        app.UI.getSelectionSection().find('.selection').removeClass('--active');
+        
+        if ($selectionEditor.length) {
+            $selectionEditor.addClass('--active');
+        }
+        
+        switch (type) {
+            case 'text':
+                app.TextEditor.detectSelectedAlignment();
+                break;
+            case 'image':
+                app.ImageEditor.detectImage();
+                break;
+        }
+    }, false, true);
     
     // Credits
     registerAction('toggleCreditsPosition', function() {
