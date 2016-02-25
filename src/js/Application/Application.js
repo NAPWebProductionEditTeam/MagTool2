@@ -285,17 +285,17 @@ var MagTool = MagTool || {};
     
     // New Text Element
     registerAction('new-text', function() {
-        app.NewElement.newElement("text");
+        app.NewElement.newText();
     }, false, true);
 
     // New Image Element
     registerAction('new-image', function() {
-        app.NewElement.newElement("image");
+        app.NewElement.newImage();
     }, false, true);
 
     // New CTA Element
     registerAction('new-cta', function() {
-        app.NewElement.newElement("cta");
+        app.NewElement.newCTA();
     }, false, true);
     
     // Credits
