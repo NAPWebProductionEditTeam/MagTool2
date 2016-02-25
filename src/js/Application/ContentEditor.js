@@ -121,7 +121,7 @@
                     $selected = $([]);
                 }
                 
-                select($this);
+                app.ContentEditor.select($this);
             });
         };
         
@@ -348,7 +348,7 @@
         
         var startEditing = function($el) {
             deselect($selectables);
-            select($el);
+            app.ContentEditor.select($el);
             
             if ($el.find('.dropcap3')) {
                 var $dropcap = $el.find('.dropcap3');
@@ -427,7 +427,7 @@
             app.ContentEditor.makeSelectable();
             app.ContentEditor.makeEditable();
             
-            select($el);
+            app.ContentEditor.select($el);
         };
         
         this.makeEditable = function() {
