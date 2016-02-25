@@ -8,8 +8,8 @@
             var currentH = $selected.find('img').attr('height');
             var imgw = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
-            app.UI.getSelectionSection().find('#IMGH').val(imgH);
-            app.UI.getSelectionSection().find('#IMGW').val(imgw);
+            app.UI.getSelectionSection().find('#IMGH').text(imgH);
+            app.UI.getSelectionSection().find('#IMGW').text(imgw);
             $selectionControls.filter('#imageURL').val(currentUrl);
             $selectionControls.filter('#imageWidth').val(currentW);
             $selectionControls.filter('#imageHeight').val(currentH);
@@ -21,6 +21,17 @@
 
             if (url !== currentUrl) {
                 $selected.find('img').attr('src', url);
+            }
+        };
+
+        this.changeSize = function(w, h) {
+            var $selected = app.ContentEditor.getSelection();
+            var currentW = $selected.find('img').attr('width');
+            var CurrentH = $selected.find('img').attr('height');
+
+            if (w !== currentW || h !== currentH) {
+                $selected.find('img').attr('width', w);
+                $selected.find('img').attr('height', h);
             }
         };
     }

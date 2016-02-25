@@ -315,11 +315,7 @@ var MagTool = MagTool || {};
         app.ImageEditor.changeSrc(src);
     }, true, true);
     
-    registerAction('changeWidth', function(w) {
-        app.ImageEditor.changeWidth(w);
-    }, true, true);
-    
-    registerAction('changeHeight', function(h) {
-        app.ImageEditor.changeWidth(h);
+    registerAction('changeSize', function(w, h) {
+        app.ImageEditor.changeSize(w, h);
     }, true, true);
 })(window, $, MagTool, Mousetrap);
