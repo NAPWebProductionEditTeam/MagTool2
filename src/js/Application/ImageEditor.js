@@ -21,6 +21,7 @@
 
             if (url !== currentUrl) {
                 $selected.find('img').attr('src', url);
+                ImageEditor.detectImage();
             }
         };
     }
