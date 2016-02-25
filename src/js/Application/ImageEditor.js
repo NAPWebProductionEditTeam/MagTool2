@@ -8,11 +8,11 @@
             var currentH = $selected.find('img').attr('height');
             var imgw = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
-                $selectionControls.filter('#IMGH').val(imgH);
-                $selectionControls.filter('#IMGH').val(imgH);
-                $selectionControls.filter('#imageURL').val(currentUrl);
-                $selectionControls.filter('#imageWidth').val(currentW);
-                $selectionControls.filter('#imageHeight').val(currentH);
+            $selectionControls.filter('#IMGH').val(imgH);
+            $selectionControls.filter('#IMGH').val(imgH);
+            $selectionControls.filter('#imageURL').val(currentUrl);
+            $selectionControls.filter('#imageWidth').val(currentW);
+            $selectionControls.filter('#imageHeight').val(currentH);
         };
 
         this.changeUrl = function(url) {
@@ -24,5 +24,6 @@
             }
         };
     }
+
     app.modules.ImageEditor = ImageEditor;
 })(window, jQuery, MagTool);
