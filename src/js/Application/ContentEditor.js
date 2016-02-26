@@ -44,6 +44,10 @@
             var $selection = this.getSelection();
             var types = [];
             
+            if (! $selection.length) {
+                return 'none';
+            }
+            
             $selection.each(function() {
                 var $this = $(this);
                 
@@ -105,7 +109,7 @@
             if ($el.length) {
                 $el.click(function(e) {
                     var $this = $(this);
-
+                    
                     // win ctrl || OS X cmd || shift
                     if (e.ctrlKey || e.metaKey || e.shiftKey) {
                         if ($this.hasClass('ui-selected')) {
@@ -115,7 +119,7 @@
                         $selectable.find('.ui-selected').removeClass('ui-selected');
                         $selected = $([]);
                     }
-
+                    
                     app.ContentEditor.select($this);
                 });
             }
@@ -187,23 +191,23 @@
                     cursor: "move",
                     start: function(e, ui) {
                         var $this = $(this);
-
+                        
                         stopEditing($this);
-
+                        
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
                                 var $this = $(this);
-
+                                
                                 $this.data('offset', $this.position());
                             });
-
+                            
                             window.$selected = $selected;
                         } else {
                             $selected = $([]);
                             $this.data('offset', $this.position());
                             app.Page.getContent().find('.ui-selected').removeClass('ui-selected');
                         }
-
+                        
                         addSelected($this);
                     },
                     drag: function(e, ui) {
@@ -212,10 +216,10 @@
                             top: ui.position.top - $this.data('offset').top,
                             left: ui.position.left - $this.data('offset').left,
                         };
-
+                        
                         $selected.not($this).filter('.draggable').each(function() {
                             var $this = $(this);
-
+                            
                             $this.addClass('ui-draggable-dragging').css({top: $this.data('offset').top + drag.top, left: $this.data('offset').left + drag.left});
                         });
                     },
@@ -223,28 +227,28 @@
                         $selected.each(function() {
                             var $this = $(this);
                             var top = parseInt($this.css('top'));
-
+                            
                             if ($this.is('[class*=push-down]')) {
                                 var push_down = Math.round(top / 16);
-
+                                
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpush-down\S+/g) || []).join(' ');
                                 });
-
+                                
                                 $this.addClass('push-down-' + push_down);
                             } else {
                                 var bottom = 624 - top - $this.outerHeight();
                                 var pull_up = Math.round(bottom / 16);
-
+                                
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpull-up\S+/g) || []).join(' ');
                                 });
-
+                                
                                 $this.addClass('pull-up-' + pull_up);
                             }
-
+                            
                             changeXPos($this);
-                        }).removeClass('ui-draggable-dragging');
+                        }).removeClass('ui-draggable-dragging').removeAttr('style');
                     },
                     grid: [19, 16]
                 });
@@ -277,6 +281,8 @@
         
         this.move = function(axis, ticks) {
             var $selection = this.getSelection();
+            var maxCols = 50.75;
+            var maxRows = 39.75;
             
             if (typeof ticks === 'undefined') {
                 ticks = .25;
@@ -298,11 +304,10 @@
                             .replace('-c', '.75')
                         );
                     
-                    if (dir === 'down') {
-                        ticks = -ticks;
-                    }
+                    result = dir === 'down' ? (current - ticks) : (current + ticks);
+                    result = Math.min(result, maxRows);
+                    result = Math.max(result, 0);
                     
-                    result = current + ticks;
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(up|down)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
                     
@@ -311,17 +316,16 @@
                     dir = $el.attr('class').replace(/.*(?:push|pull)-(left|right)-.*/, '$1');
                     current = parseFloat(
                         $el.attr('class')
-                        .replace(/.*(?:push|pull)-(?:left|right)-(\d+(?:-[a-c])?).*/, '$1')
-                        .replace('-a', '.25')
-                        .replace('-b', '.5')
-                        .replace('-c', '.75')
-                    );
+                            .replace(/.*(?:push|pull)-(?:left|right)-(\d+(?:-[a-c])?).*/, '$1')
+                            .replace('-a', '.25')
+                            .replace('-b', '.5')
+                            .replace('-c', '.75')
+                        );
                     
-                    if (dir === 'left') {
-                        ticks = -ticks;
-                    }
+                    result = dir === 'left' ? (current - ticks) : (current + ticks);
+                    result = Math.min(result, maxCols);
+                    result = Math.max(result, 0);
                     
-                    result = current + ticks;
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(left|right)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
                     
