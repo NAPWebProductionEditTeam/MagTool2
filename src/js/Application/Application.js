@@ -72,6 +72,11 @@ var MagTool = MagTool || {};
             
             resolveAction($this.data('change'), [value]);
         });
+        
+        // Notify close
+        app.UI.getNotification().find('.fa-close').click(function() {
+            app.UI.getNotification().removeClass('--open');
+        });
     };
     
     /**
