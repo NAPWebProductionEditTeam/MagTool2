@@ -20,9 +20,7 @@
             app.ContentEditor.deselectAll();
             
             // If the new element is text or CTA make it editable
-            if ($element.hasClass('editable') || $element.hasClass('btnShopThe')) {
-                app.ContentEditor.applyEdit($element);
-            }
+            app.ContentEditor.applyEdit($element);
             
             // Select the new Element
             app.ContentEditor.select($element);
