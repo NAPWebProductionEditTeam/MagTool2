@@ -1,13 +1,14 @@
 (function(window, $, app) {
     function ImageEditor() {
-        this.detectImage = function() {
+        this.detectImage = function($img) {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
-            var currentUrl = $selected.find('img').attr('src');
-            var currentW = $selected.find('img').attr('width');
-            var currentH = $selected.find('img').attr('height');
-            var imgW = $selected.find('img').prop('naturalWidth');
-            var imgH = $selected.find('img').prop('naturalHeight');
+            $img = $selected.find('img');
+            var currentUrl = $img.attr('src').replace('@2x', '');
+            var currentW = $img.attr('width');
+            var currentH = $img.attr('height');
+            var imgW = $img.prop('naturalWidth');
+            var imgH = $img.prop('naturalHeight');
 
             if (typeof currentW === 'undefined' || currentW == imgW) {
                 currentW = 'auto';
@@ -27,30 +28,42 @@
         this.changeUrl = function(url) {
             var $selected = app.ContentEditor.getSelection();
             var currentUrl = $selected.find('img').attr('src');
-            app.UI.getSelectionSection().find('#imageURL').keypress(function(e) {
-                if (e.which == 13) {
-                    if (url !== currentUrl) {
-                        var $img = $selected.find('img');
-                        $img.attr('src', url);
-                        $img.removeAttr('width height');
-                        $img.load(function() {
-                            app.ImageEditor.detectImage();
-                        });
-                    }
-                }
-            });
+
+            if (url !== currentUrl) {
+                var $currentImg = $selected.find('img');
+                var $img = $currentImg.clone().wrap('<p/>');
+
+                $img.removeAttr('width height');
+                $img.attr('src', url);
+                var url2x = url.replace(/(.*)(\..*)$/, '$1@2x$2');
+
+                var imghtml = $img.parent.html().replace(/(data-img-src@2x=")[^"]+(")/, '$1' + url2x + '$2');
+                $currentImg.replaceWith(imghtml);
+
+                $currentImg.load(function() {
+                    app.ImageEditor.detectImage(this);
+                });
+            }
         };
 
         this.changeSize = function(w, h) {
+            console.log(w, h);
+
             var $selected = app.ContentEditor.getSelection();
             var currentW = $selected.find('img').attr('width');
             var currentH = $selected.find('img').attr('height');
+            var imgW = $selected.find('img').prop('naturalWidth');
+            var imgH = $selected.find('img').prop('naturalHeight');
 
-            if (w !== currentW) {
+            if (w == imgW || w === '') {
+                $selected.find('img').removeAttr('width');
+            } else if (w !== currentW) {
                 $selected.find('img').attr('width', w);
             }
 
-            if (h !== currentH) {
+            if (h == imgH || h === '') {
+                $selected.find('img').removeAttr('height');
+            } else if (h !== currentH) {
                 $selected.find('img').attr('height', h);
             }
         };
