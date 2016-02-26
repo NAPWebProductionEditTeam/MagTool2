@@ -1,5 +1,6 @@
 (function(window, Math, $, app, Medium) {
     var parseInt = window.parseInt;
+    var parseFloat = window.parseFloat;
     var document = window.document;
     
     function ContentEditor() {
@@ -272,6 +273,61 @@
         
         this.removeDraggable = function($el) {
             $draggables.filter('.ui-draggable').draggable('destroy');
+        };
+        
+        this.move = function(axis, ticks) {
+            var $selection = this.getSelection();
+            
+            if (typeof ticks === 'undefined') {
+                ticks = .25;
+            } else {
+                ticks = ticks / 4;
+            }
+            
+            $selection.each(function() {
+                var $el = $(this);
+                var dir, current, result, affix, newClass;
+                
+                if (axis === 'y') {
+                    dir = $el.attr('class').replace(/.*(?:push|pull)-(up|down)-.*/, '$1');
+                    current = parseFloat(
+                        $el.attr('class')
+                            .replace(/.*(?:push|pull)-(?:up|down)-(\d+(?:-[a-c])?).*/, '$1')
+                            .replace('-a', '.25')
+                            .replace('-b', '.5')
+                            .replace('-c', '.75')
+                        );
+                    
+                    if (dir === 'down') {
+                        ticks = -ticks;
+                    }
+                    
+                    result = current + ticks;
+                    affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
+                    newClass = $el.attr('class').replace(/(push|pull)-(up|down)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
+                    
+                    $el.attr('class', newClass);
+                } else {
+                    dir = $el.attr('class').replace(/.*(?:push|pull)-(left|right)-.*/, '$1');
+                    current = parseFloat(
+                        $el.attr('class')
+                        .replace(/.*(?:push|pull)-(?:left|right)-(\d+(?:-[a-c])?).*/, '$1')
+                        .replace('-a', '.25')
+                        .replace('-b', '.5')
+                        .replace('-c', '.75')
+                    );
+                    
+                    if (dir === 'left') {
+                        ticks = -ticks;
+                    }
+                    
+                    result = current + ticks;
+                    affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
+                    newClass = $el.attr('class').replace(/(push|pull)-(left|right)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
+                    
+                    $el.attr('class', newClass);
+                }
+            });
         };
         
         this.applyResizable = function($el) {

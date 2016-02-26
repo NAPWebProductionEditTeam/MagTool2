@@ -20,6 +20,7 @@ module.exports = function(grunt) {
             files: ['Gruntfile.js', 'src/**/*.js'],
             options: {
                 // options here to override JSHint defaults
+                '-W008': true,
                 globals: {
                     jQuery: true
                 }

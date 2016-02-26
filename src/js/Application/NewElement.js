@@ -6,17 +6,18 @@
         // If a slug exists, add the new element after the slug, else add it to the top of the page
         var addToDom = function($element) {
             app.ContentEditor.deselectAll();
+            var $selectable = app.Page.getContent();
+            
             var $slug = app.Slug.findSlug();
             
             if ($slug.length) {
-                console.log("Placing after slug");
                 $slug.after($element);
             } else {
-                console.log("placing at top of page");
                 $element.prependTo(app.Page.getContent());
             }
             
             app.ContentEditor.applyEdit($element);
+            app.ContentEditor.select($element);
         };
         
         // Create New Text Element
