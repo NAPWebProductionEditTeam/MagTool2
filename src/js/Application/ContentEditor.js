@@ -5,12 +5,19 @@
     
     function ContentEditor() {
         var editing = false;
+        var $img_map;
         
         /**
          * Editor status.
          */
         this.startEdit = function() {
+            var map = app.Page.getContent().find('map');
+            
+            $img_map = map.clone(true, true);
+            map.remove();
+            
             editing = true;
+            app.Page.get().addClass('mt-editing');
             
             this.makeDraggable();
             this.makeResizable();
@@ -29,7 +36,11 @@
             this.removeResizable();
             this.removeDraggable();
             
+            app.Page.getContent().append($img_map);
+            $img_map = null;
+            
             editing = false;
+            app.Page.get().removeClass('mt-editing');
         };
         
         this.isEditing = function() {
