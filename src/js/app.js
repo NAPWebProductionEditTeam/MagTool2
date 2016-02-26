@@ -23,7 +23,10 @@
         app.Slug.detectSlugProperties();
         
         // Fade in
-        app.UI.getUI().removeClass('hide');
+        $(app.$doc).ready(function() {
+            app.UI.getUI().removeClass('--hide');
+            app.UI.getNotification().removeClass('+hide');
+        });
         
         // Register binds
         app.registerBindings();

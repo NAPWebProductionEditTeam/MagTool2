@@ -115,36 +115,40 @@ var MagTool = MagTool || {};
             resolveAction('map_image');
         });
         
-        Mousetrap.bind('up', function() {
-            // move 1 tick up (span-x --> span-x-a)
+        Mousetrap.bind('up', function(e) {
+            e.preventDefault();
+
+            app.ContentEditor.move('y', 1);
         });
         
         Mousetrap.bind('shift+up', function() {
-            // move 4 ticks up (span-x --> span-(x + 1))
+            app.ContentEditor.move('y', 4);
         });
         
         Mousetrap.bind('right', function() {
-            //
+            app.ContentEditor.move('x', 1);
         });
         
         Mousetrap.bind('shift+right', function() {
-            //
+            app.ContentEditor.move('x', 4);
         });
         
-        Mousetrap.bind('down', function() {
-            //
+        Mousetrap.bind('down', function(e) {
+            e.preventDefault();
+
+            app.ContentEditor.move('y', -1);
         });
         
         Mousetrap.bind('shift+down', function() {
-            //
+            app.ContentEditor.move('y', -4);
         });
         
         Mousetrap.bind('left', function() {
-            //
+            app.ContentEditor.move('x', -1);
         });
         
         Mousetrap.bind('shift+left', function() {
-            //
+            app.ContentEditor.move('x', -4);
         });
         
         Mousetrap.bind('c', function() {
@@ -335,7 +339,7 @@ var MagTool = MagTool || {};
     
     registerAction('updateCredits', function(text) {
         app.Credits.update(text);
-    }, true, true);
+    }, false, true);
     
     // Slugs
     registerAction('moveSlug', function(position) {
@@ -349,18 +353,18 @@ var MagTool = MagTool || {};
     // Text Editor
     registerAction('alignSelected', function(alignment) {
         app.TextEditor.align(alignment);
-    }, true, true);
+    }, false, true);
     
     registerAction('changeColor', function(color) {
         app.TextEditor.changeColor(color);
-    }, true, true);
+    }, false, true);
     
     // Image Editor
     registerAction('changeUrl', function(src) {
         app.ImageEditor.changeUrl(src);
-    }, true, true);
+    }, false, true);
     
     registerAction('changeSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
-    }, true, true);
+    }, false, true);
 })(window, $, MagTool, Mousetrap);

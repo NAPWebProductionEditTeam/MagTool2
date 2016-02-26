@@ -20,6 +20,7 @@ module.exports = function(grunt) {
             files: ['Gruntfile.js', 'src/**/*.js'],
             options: {
                 // options here to override JSHint defaults
+                '-W008': true,
                 globals: {
                     jQuery: true
                 }
@@ -28,8 +29,7 @@ module.exports = function(grunt) {
         jscs: {
             files: ['Gruntfile.js', 'src/**/*.js'],
             options: {
-                config: 'jscs.json',
-                fix: true
+                config: 'jscs.json'
             }
         },
         uglify: {
