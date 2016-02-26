@@ -27,16 +27,18 @@
         this.changeUrl = function(url) {
             var $selected = app.ContentEditor.getSelection();
             var currentUrl = $selected.find('img').attr('src');
-            app.UI.getSelectionSection().find('#imageURL').k
-
-            if (url !== currentUrl) {
-                var $img = $selected.find('img');
-                $img.attr('src', url);
-                $img.removeAttr('width height');
-                $img.load(function() {
-                    app.ImageEditor.detectImage();
-                });
-            }
+            app.UI.getSelectionSection().find('#imageURL').keypress(function(e) {
+                if (e.which == 13) {
+                    if (url !== currentUrl) {
+                        var $img = $selected.find('img');
+                        $img.attr('src', url);
+                        $img.removeAttr('width height');
+                        $img.load(function() {
+                            app.ImageEditor.detectImage();
+                        });
+                    }
+                }
+            });
         };
 
         this.changeSize = function(w, h) {
