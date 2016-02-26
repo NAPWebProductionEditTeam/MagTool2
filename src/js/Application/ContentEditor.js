@@ -14,6 +14,13 @@
             this.makeDraggable();
             this.makeResizable();
             this.makeSelectable();
+            this.makeEditable();
+        };
+        
+        this.applyEdit = function($el) {
+            this.applyDraggable($el);
+            this.applyResizable($el);
+            this.applySelectable($el);
         };
         
         this.stopEdit = function() {
@@ -60,17 +67,30 @@
         /**
          * Content interactions.
          */
-        var $selectable, $selectables, $draggables, $resizables;
-        var $selected = $([]);
+        var $selectable, $selected, $selectables, $draggables, $resizables, $editables;
+        $selected = $selectables = $draggables = $resizables = $editables = $([]);
+        
+        var triggerSelectable = function() {
+            var selectable = $selectable.selectable('instance');
+            
+            if (selectable) {
+                $selectable.selectable('instance')._mouseStop(null);
+            }
+        };
         
         this.select = function($el) {
             $el.addClass('ui-selecting');
-            $selectable.selectable('instance')._mouseStop(null);
+            triggerSelectable();
+        };
+        
+        this.deselectAll = function() {
+            $selected.removeClass('ui-selected');
+            triggerSelectable();
         };
         
         var deselect = function($el) {
             $el.removeClass('ui-selected');
-            $selectable.selectable('instance')._mouseStop(null);
+            triggerSelectable();
         };
         
         var addSelected = function(el) {
@@ -78,11 +98,32 @@
             $(el).addClass('ui-selected');
         };
         
+        this.applySelectable = function($el) {
+            $selectables.add($el);
+            
+            if ($el.length) {
+                $el.click(function(e) {
+                    var $this = $(this);
+
+                    // win ctrl || OS X cmd || shift
+                    if (e.ctrlKey || e.metaKey || e.shiftKey) {
+                        if ($this.hasClass('ui-selected')) {
+                            return deselect($this);
+                        }
+                    } else {
+                        $selectable.find('.ui-selected').removeClass('ui-selected');
+                        $selected = $([]);
+                    }
+
+                    app.ContentEditor.select($this);
+                });
+            }
+        };
+        
         this.makeSelectable = function() {
             var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
             
             $selectable = app.Page.getContent();
-            $selectables = $selectable.find(selectableSelector);
             
             $selectable.selectable({
                 filter: selectableSelector,
@@ -98,21 +139,7 @@
                 }
             });
             
-            $selectables.click(function(e) {
-                var $this = $(this);
-                
-                // win ctrl || OS X cmd || shift
-                if (e.ctrlKey || e.metaKey || e.shiftKey) {
-                    if ($this.hasClass('ui-selected')) {
-                        return deselect($this);
-                    }
-                } else {
-                    $selectable.find('.ui-selected').removeClass('ui-selected');
-                    $selected = $([]);
-                }
-                
-                app.ContentEditor.select($this);
-            });
+            this.applySelectable($selectable.find(selectableSelector));
         };
         
         this.removeSelectable = function() {
@@ -151,74 +178,80 @@
             }
         };
         
-        this.makeDraggable = function() {
-            $draggables = app.Page.getContent().find('.draggable');
+        this.applyDraggable = function($el) {
+            $draggables.add($el);
             
-            $draggables.draggable({
-                cursor: "move",
-                start: function(e, ui) {
-                    var $this = $(this);
-                    
-                    stopEditing($this);
-                    
-                    if ($this.hasClass('ui-selected')) {
-                        $selected = $selected.filter('.draggable').each(function() {
-                            var $this = $(this);
-                            
-                            $this.data('offset', $this.position());
-                        });
-                        
-                        window.$selected = $selected;
-                    } else {
-                        $selected = $([]);
-                        $this.data('offset', $this.position());
-                        app.Page.getContent().find('.ui-selected').removeClass('ui-selected');
-                    }
-                    
-                    addSelected($this);
-                },
-                drag: function(e, ui) {
-                    var $this = $(this);
-                    var drag = {
-                        top: ui.position.top - $this.data('offset').top,
-                        left: ui.position.left - $this.data('offset').left,
-                    };
-                    
-                    $selected.not($this).filter('.draggable').each(function() {
+            if ($el.length) {
+                $el.draggable({
+                    cursor: "move",
+                    start: function(e, ui) {
                         var $this = $(this);
-                        
-                        $this.addClass('ui-draggable-dragging').css({top: $this.data('offset').top + drag.top, left: $this.data('offset').left + drag.left});
-                    });
-                },
-                stop: function(e, ui) {
-                    $selected.each(function() {
-                        var $this = $(this);
-                        var top = parseInt($this.css('top'));
-                        
-                        if ($this.is('[class*=push-down]')) {
-                            var push_down = Math.round(top / 16);
-                            
-                            $this.removeClass(function(index, css) {
-                                return (css.match(/\bpush-down\S+/g) || []).join(' ');
+
+                        stopEditing($this);
+
+                        if ($this.hasClass('ui-selected')) {
+                            $selected = $selected.filter('.draggable').each(function() {
+                                var $this = $(this);
+
+                                $this.data('offset', $this.position());
                             });
-                            
-                            $this.addClass('push-down-' + push_down);
+
+                            window.$selected = $selected;
                         } else {
-                            var bottom = 624 - top - $this.outerHeight();
-                            var pull_up = Math.round(bottom / 16);
-                            
-                            $this.removeClass(function(index, css) {
-                                return (css.match(/\bpull-up\S+/g) || []).join(' ');
-                            });
-                            
-                            $this.addClass('pull-up-' + pull_up);
+                            $selected = $([]);
+                            $this.data('offset', $this.position());
+                            app.Page.getContent().find('.ui-selected').removeClass('ui-selected');
                         }
-                        
-                        changeXPos($this);
-                    }).removeClass('ui-draggable-dragging');
-                },
-                grid: [19, 16]
-            });
+
+                        addSelected($this);
+                    },
+                    drag: function(e, ui) {
+                        var $this = $(this);
+                        var drag = {
+                            top: ui.position.top - $this.data('offset').top,
+                            left: ui.position.left - $this.data('offset').left,
+                        };
+
+                        $selected.not($this).filter('.draggable').each(function() {
+                            var $this = $(this);
+
+                            $this.addClass('ui-draggable-dragging').css({top: $this.data('offset').top + drag.top, left: $this.data('offset').left + drag.left});
+                        });
+                    },
+                    stop: function(e, ui) {
+                        $selected.each(function() {
+                            var $this = $(this);
+                            var top = parseInt($this.css('top'));
+
+                            if ($this.is('[class*=push-down]')) {
+                                var push_down = Math.round(top / 16);
+
+                                $this.removeClass(function(index, css) {
+                                    return (css.match(/\bpush-down\S+/g) || []).join(' ');
+                                });
+
+                                $this.addClass('push-down-' + push_down);
+                            } else {
+                                var bottom = 624 - top - $this.outerHeight();
+                                var pull_up = Math.round(bottom / 16);
+
+                                $this.removeClass(function(index, css) {
+                                    return (css.match(/\bpull-up\S+/g) || []).join(' ');
+                                });
+
+                                $this.addClass('pull-up-' + pull_up);
+                            }
+
+                            changeXPos($this);
+                        }).removeClass('ui-draggable-dragging');
+                    },
+                    grid: [19, 16]
+                });
+            }
+        };
+        
+        this.makeDraggable = function() {
+            this.applyDraggable(app.Page.getContent().find('.draggable'));
         };
         
         this.enableDraggable = function($el) {
@@ -241,11 +274,11 @@
             $draggables.filter('.ui-draggable').draggable('destroy');
         };
         
-        this.makeResizable = function() {
-            $resizables = app.Page.getContent().find('.resizable');
+        this.applyResizable = function($el) {
+            $resizables.add($el);
             
-            if ($resizables.length) {
-                $resizables.resizable({
+            if ($el.length) {
+                $el.resizable({
                     handles: 'e, w',
                     grid: [19, 10],
                     start: function() {
@@ -267,10 +300,14 @@
                         
                         changeXPos($this);
                         
-                        $resizables.removeAttr("style");
+                        $this.removeAttr("style");
                     }
                 });
             }
+        };
+        
+        this.makeResizable = function() {
+            this.applyResizable(app.Page.getContent().find('.resizable'));
         };
         
         this.enableResizable = function($el) {
@@ -420,17 +457,28 @@
             app.ContentEditor.select($el);
         };
         
-        this.makeEditable = function() {
-            $('.editable').dblclick(function(e) {
+        this.applyEditable = function($el) {
+            console.log('apply edi');
+            $editables.add($el);
+            
+            $el.dblclick(function(e) {
                 var $this = $(this);
-                
+                console.log("CLICK OCCUREEDEJSFHSDGKDSJG");
+
                 // If we are currently editing a different element,
                 // stop editing it.
-                stopEditing($this);
+                if ($editing) {
+                    stopEditing($editing);
+                }
                 
                 $this.off('dblclick');
                 startEditing($this);
             });
+        };
+        
+        this.makeEditable = function() {
+            console.log('make edi');
+            this.applyEditable(app.Page.getContent().find('.editable'));
         };
         
         this.removeEditable = function() {
