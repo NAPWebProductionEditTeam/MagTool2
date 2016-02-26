@@ -15,7 +15,7 @@
     display: none;
 }
 
-.magtool {
+@include component(magtool) {
     position: fixed;
     top: 0;
     left: 0;
@@ -26,7 +26,7 @@
     transition: opacity .3s;
     z-index: 9999990;
     
-    &.hide {
+    @include option(hide) {
         opacity: 0;
     }
     

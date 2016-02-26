@@ -1,3 +1,7 @@
+@include tweak('+hide') {
+    display: none;
+}
+
 @include tweak(z-depth-0, z-depth-1, z-depth-1-half, z-depth-2, z-depth-3, z-depth-4) {
     @include option(hoverable) {
         transition: box-shadow .2s;

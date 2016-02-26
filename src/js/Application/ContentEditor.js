@@ -5,19 +5,26 @@
     
     function ContentEditor() {
         var editing = false;
+        var $img_map;
         
         /**
          * Editor status.
          */
         this.startEdit = function() {
+            var map = app.Page.getContent().find('map');
+
+            $img_map = map.clone(true, true);
+            map.remove();
+
             editing = true;
+            app.Page.get().addClass('mt-editing');
             
             this.makeDraggable();
             this.makeResizable();
             this.makeSelectable();
             this.makeEditable();
         };
-        
+
         this.applyEdit = function($el) {
             this.applyDraggable($el);
             this.applyResizable($el);
@@ -29,7 +36,11 @@
             this.removeResizable();
             this.removeDraggable();
             
+            app.Page.getContent().append($img_map);
+            $img_map = null;
+
             editing = false;
+            app.Page.get().removeClass('mt-editing');
         };
         
         this.isEditing = function() {
@@ -44,6 +55,10 @@
             var $selection = this.getSelection();
             var types = [];
             
+            if (! $selection.length) {
+                return 'none';
+            }
+
             $selection.each(function() {
                 var $this = $(this);
                 
@@ -70,10 +85,10 @@
          */
         var $selectable, $selected, $selectables, $draggables, $resizables, $editables;
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
-        
+
         var triggerSelectable = function() {
             var selectable = $selectable.selectable('instance');
-            
+
             if (selectable) {
                 $selectable.selectable('instance')._mouseStop(null);
             }
@@ -83,7 +98,7 @@
             $el.addClass('ui-selecting');
             triggerSelectable();
         };
-        
+
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
             triggerSelectable();
@@ -101,7 +116,7 @@
         
         this.applySelectable = function($el) {
             $selectables.add($el);
-            
+
             if ($el.length) {
                 $el.click(function(e) {
                     var $this = $(this);
@@ -120,7 +135,7 @@
                 });
             }
         };
-        
+
         this.makeSelectable = function() {
             var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
             
@@ -187,23 +202,23 @@
                     cursor: "move",
                     start: function(e, ui) {
                         var $this = $(this);
-
+                        
                         stopEditing($this);
-
+                        
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
                                 var $this = $(this);
 
                                 $this.data('offset', $this.position());
                             });
-
+                            
                             window.$selected = $selected;
                         } else {
                             $selected = $([]);
                             $this.data('offset', $this.position());
                             app.Page.getContent().find('.ui-selected').removeClass('ui-selected');
                         }
-
+                        
                         addSelected($this);
                     },
                     drag: function(e, ui) {
@@ -244,13 +259,13 @@
                             }
 
                             changeXPos($this);
-                        }).removeClass('ui-draggable-dragging');
+                        }).removeClass('ui-draggable-dragging').removeAttr('style');
                     },
                     grid: [19, 16]
                 });
             }
         };
-        
+
         this.makeDraggable = function() {
             this.applyDraggable(app.Page.getContent().find('.draggable'));
         };
@@ -277,17 +292,19 @@
         
         this.move = function(axis, ticks) {
             var $selection = this.getSelection();
-            
+            var maxCols = 50.75;
+            var maxRows = 39.75;
+
             if (typeof ticks === 'undefined') {
                 ticks = .25;
             } else {
                 ticks = ticks / 4;
             }
-            
+
             $selection.each(function() {
                 var $el = $(this);
                 var dir, current, result, affix, newClass;
-                
+
                 if (axis === 'y') {
                     dir = $el.attr('class').replace(/.*(?:push|pull)-(up|down)-.*/, '$1');
                     current = parseFloat(
@@ -297,39 +314,37 @@
                             .replace('-b', '.5')
                             .replace('-c', '.75')
                         );
-                    
-                    if (dir === 'down') {
-                        ticks = -ticks;
-                    }
-                    
-                    result = current + ticks;
+
+                    result = dir === 'down' ? (current - ticks) : (current + ticks);
+                    result = Math.min(result, maxRows);
+                    result = Math.max(result, 0);
+
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(up|down)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
-                    
+
                     $el.attr('class', newClass);
                 } else {
                     dir = $el.attr('class').replace(/.*(?:push|pull)-(left|right)-.*/, '$1');
                     current = parseFloat(
                         $el.attr('class')
-                        .replace(/.*(?:push|pull)-(?:left|right)-(\d+(?:-[a-c])?).*/, '$1')
-                        .replace('-a', '.25')
-                        .replace('-b', '.5')
-                        .replace('-c', '.75')
-                    );
-                    
-                    if (dir === 'left') {
-                        ticks = -ticks;
-                    }
-                    
-                    result = current + ticks;
+                            .replace(/.*(?:push|pull)-(?:left|right)-(\d+(?:-[a-c])?).*/, '$1')
+                            .replace('-a', '.25')
+                            .replace('-b', '.5')
+                            .replace('-c', '.75')
+                        );
+
+                    result = dir === 'left' ? (current - ticks) : (current + ticks);
+                    result = Math.min(result, maxCols);
+                    result = Math.max(result, 0);
+
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(left|right)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
-                    
+
                     $el.attr('class', newClass);
                 }
             });
         };
-        
+
         this.applyResizable = function($el) {
             $resizables.add($el);
             
@@ -365,7 +380,7 @@
         this.makeResizable = function() {
             this.applyResizable(app.Page.getContent().find('.resizable'));
         };
-        
+
         this.enableResizable = function($el) {
             if (typeof $el !== 'undefined') {
                 return $el.resizable('enable');
@@ -516,7 +531,7 @@
         this.applyEditable = function($el) {
             console.log('apply edi');
             $editables.add($el);
-            
+
             $el.dblclick(function(e) {
                 var $this = $(this);
                 console.log("CLICK OCCUREEDEJSFHSDGKDSJG");
@@ -536,7 +551,7 @@
             console.log('make edi');
             this.applyEditable(app.Page.getContent().find('.editable'));
         };
-        
+
         this.removeEditable = function() {
             window.getSelection().collapseToStart();
             editor.destroy();

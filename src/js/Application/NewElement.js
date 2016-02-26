@@ -6,10 +6,10 @@
         // Add the new element to the DOM
         var addToDom = function($element) {
             var $selectable = app.Page.getContent();
-            
+
             // If a slug exists, add the new element after the slug, else add it to the top of the page
             var $slug = app.Slug.findSlug();
-            
+
             if ($slug.length) {
                 $slug.after($element);
             } else {

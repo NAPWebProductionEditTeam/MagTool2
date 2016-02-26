@@ -1,5 +1,5 @@
 <div id="magtoolComponents" class="mtOverride">
-    <div class="magtool hasZ hide +z-depth-1" id="magtool">
+    <div class="magtool hasZ --hide +z-depth-1" id="magtool">
         <div class="container">
             <!-- Edit/Save etc. -->
             <section class="col-md-2 text-right section main-controls">
@@ -170,11 +170,11 @@
                                     Size
                                 </label>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control" id="imageWidth" placeholder="100">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" placeholder="100" data-change="changeSize">
                                     <span id="IMGW">100</span>
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control" id="imageHeight" placeholder="auto" value="auto">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeSize">
                                     <span id="IMGH">100</span>
                                 </div>
                             </div>
@@ -200,7 +200,7 @@
         </div>
     </div>
     
-    <div class="notification hasZ +z-depth-2" id="notify">
+    <div class="notification hasZ +z-depth-2 +hide" id="notify">
         <i class="fa fa-lg fa-fw fa-bell pull-left"></i>
         <div class="notification/content">
             <header class="notification/header">
