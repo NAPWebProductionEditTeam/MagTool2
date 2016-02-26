@@ -17,7 +17,7 @@
                 $element.prependTo(app.Page.getContent());
             }
 
-            app.ContentEditor.deselect($selectable);
+
             app.ContentEditor.select($element);
         };
         
