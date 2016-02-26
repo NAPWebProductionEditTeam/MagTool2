@@ -49,7 +49,7 @@ var MagTool = MagTool || {};
             var $this = $(this);
             var $group = $([]);
             
-            if ($this.is('.uRadioBtn') || $this.is('[type="checkbox"]') || $this.is('[type="radio"]')) {
+            if ($this.is('.uRadioBtn') || $this.is('.multi-input') || $this.is('[type="checkbox"]') || $this.is('[type="radio"]')) {
                 var name = $this.attr('name');
                 $group = app.UI.getUI().find('input[name="' + name + '"]');
             }
@@ -58,6 +58,12 @@ var MagTool = MagTool || {};
                 $group.not($this).prop('checked', false);
                 
                 value = $group.filter(':checked').val();
+            } else if ($this.is('.multi-input')) {
+                value = [];
+
+                $group.each(function() {
+                    value.push($(this).val());
+                });
             } else if ($this.is('[type="checkbox"]')) {
                 value = [];
                 
@@ -70,7 +76,11 @@ var MagTool = MagTool || {};
                 value = $this.val();
             }
             
-            resolveAction($this.data('change'), [value]);
+            if (! (value instanceof Array)) {
+                value = [value];
+            }
+
+            resolveAction($this.data('change'), value);
         });
     };
     
@@ -107,7 +117,7 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('up', function(e) {
             e.preventDefault();
-            
+
             app.ContentEditor.move('y', 1);
         });
         
@@ -125,7 +135,7 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('down', function(e) {
             e.preventDefault();
-            
+
             app.ContentEditor.move('y', -1);
         });
         
@@ -351,7 +361,7 @@ var MagTool = MagTool || {};
     
     // Image Editor
     registerAction('changeUrl', function(src) {
-        app.ImageEditor.changeSrc(src);
+        app.ImageEditor.changeUrl(src);
     }, false, true);
     
     registerAction('changeSize', function(w, h) {
