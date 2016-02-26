@@ -1,4 +1,7 @@
 (function(window, $, app, CssEvents) {
+    var setTimeout = window.setTimeout;
+    var clearTimeout = window.clearTimeout;
+    
     function UI() {
         var $mt, $notify, $mainControls, $pageControls, $selectionSection, $selectionControls;
         
@@ -70,6 +73,36 @@
         
         this.btnGroupLoaded = function(group) {
             $('#' + group).removeClass('--loading');
+        };
+        
+        var notifyTimer;
+        
+        this.notify = function(title, body, time) {
+            var $notify = this.getNotification();
+            
+            if (notifyTimer) {
+                clearTimeout(notifyTimer);
+            }
+            
+            if (typeof body === 'undefined' || body === null) {
+                body = '';
+            }
+            
+            if (typeof time === 'undefined' || time === null) {
+                time = 5000;
+            }
+            
+            $notify.find('header').text(title);
+            $notify.find('main').text(body);
+            $notify.addClass('--open');
+            
+            if (time > 0) {
+                notifyTimer = setTimeout(function() {
+                    $notify.removeClass('--open');
+                }, time);
+            } else {
+                notifyTimer = null;
+            }
         };
     }
     
