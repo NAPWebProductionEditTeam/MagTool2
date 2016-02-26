@@ -287,6 +287,21 @@ var MagTool = MagTool || {};
         }
     }, false, true);
     
+    // New Text Element
+    registerAction('new-text', function() {
+        app.NewElement.newText();
+    }, false, true);
+
+    // New Image Element
+    registerAction('new-image', function() {
+        app.NewElement.newImage();
+    }, false, true);
+
+    // New CTA Element
+    registerAction('new-cta', function() {
+        app.NewElement.newCTA();
+    }, false, true);
+    
     // Credits
     registerAction('toggleCreditsPosition', function() {
         app.Credits.togglePosition();

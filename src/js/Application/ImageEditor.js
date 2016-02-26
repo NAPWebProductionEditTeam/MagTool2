@@ -30,7 +30,6 @@
 
             if (url !== currentUrl) {
                 var $img = $selected.find('img');
-
                 $img.attr('src', url);
                 $img.removeAttr('width height');
                 $img.load(function() {
