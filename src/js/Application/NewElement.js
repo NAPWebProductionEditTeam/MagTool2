@@ -17,7 +17,6 @@
                 $element.prependTo(app.Page.getContent());
             }
 
-
             app.ContentEditor.select($element);
         };
         

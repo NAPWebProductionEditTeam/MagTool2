@@ -27,6 +27,7 @@
         this.changeUrl = function(url) {
             var $selected = app.ContentEditor.getSelection();
             var currentUrl = $selected.find('img').attr('src');
+            app.UI.getSelectionSection().find('#imageURL').k
 
             if (url !== currentUrl) {
                 var $img = $selected.find('img');
