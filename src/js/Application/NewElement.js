@@ -31,14 +31,22 @@
         
         // Create New Image Element
         this.newImage = function() {
-            console.log("Creating image element");
-            var $imageElement = '<div class="draggable editable resizable span-9 textAlignCenter push-down-18 push-right-18"><img src="" data-img-src@2x="" alt="" title="" height="200" width="200"></div>';
-            addToDom($imageElement);
+            var $newDiv = $('<div/>', {
+                class: 'span-12 textAlignCenter push-down-18 push-right-18 resizable draggable ui-selectee'
+            });
+            var $image = $('<img src="" data-img-src@2x="" alt="" title="">', {
+                src: 'https://placeholdit.imgix.net/~text?txtsize=19&txt=200×200&w=200&h=200',
+                alt: 'net-a-porter',
+                'data-img-src@2x': ''
+            });
+            addToDom($image.appendTo($newDiv));
         };
         
         // Create New CTA Element
         this.newCTA = function() {
-            console.log("Creating CTA element");
+            var $newDiv = $('<div/>', {
+                class: 'span-12 textAlignCenter push-down-18 push-right-18 editable resizable draggable ui-selectee'
+            });
             var $ctaElement = '<div class="draggable editable resizable textAlignCenter span-11 btnShopThe pull-up-1-a push-right-37-c"><a data-magtool="ntk" href="${CtaLinkXML[\'ntk\'].@url}">SHOP THE SELECTION</a></div>';
             addToDom($ctaElement);
         };
