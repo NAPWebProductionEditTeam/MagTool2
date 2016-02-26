@@ -329,7 +329,7 @@ var MagTool = MagTool || {};
     
     registerAction('updateCredits', function(text) {
         app.Credits.update(text);
-    }, true, true);
+    }, false, true);
     
     // Slugs
     registerAction('moveSlug', function(position) {
@@ -343,18 +343,18 @@ var MagTool = MagTool || {};
     // Text Editor
     registerAction('alignSelected', function(alignment) {
         app.TextEditor.align(alignment);
-    }, true, true);
+    }, false, true);
     
     registerAction('changeColor', function(color) {
         app.TextEditor.changeColor(color);
-    }, true, true);
+    }, false, true);
     
     // Image Editor
     registerAction('changeUrl', function(src) {
         app.ImageEditor.changeSrc(src);
-    }, true, true);
+    }, false, true);
     
     registerAction('changeSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
-    }, true, true);
+    }, false, true);
 })(window, $, MagTool, Mousetrap);
