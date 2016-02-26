@@ -202,9 +202,7 @@ var MagTool = MagTool || {};
                 
                 app.UI.showBtn('editSave', 'save');
             } else {
-                console.log('Page is being edited');
-                
-                // NOTIFY: Page Locked!
+                app.UI.notify();
             }
         }).fail(function() {
             console.log('receiving errors');
