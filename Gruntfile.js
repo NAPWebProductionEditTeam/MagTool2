@@ -29,7 +29,8 @@ module.exports = function(grunt) {
         jscs: {
             files: ['Gruntfile.js', 'src/**/*.js'],
             options: {
-                config: 'jscs.json'
+                config: 'jscs.json',
+                fix: true
             }
         },
         uglify: {
@@ -110,7 +111,10 @@ module.exports = function(grunt) {
             sass: {
                 files: ['src/scss/**/*.scss'],
                 tasks: ['sass:build', 'notify:sass']
-            }
+            },
+            options: {
+                spawn: false,
+            },
         },
         notify: {
             concat: {
@@ -147,4 +151,16 @@ module.exports = function(grunt) {
     
     grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify']);
     grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify']);
+    
+    var changedFiles = Object.create(null);
+    var onChange = grunt.util._.debounce(function() {
+        grunt.config('jshint.files', Object.keys(changedFiles));
+        grunt.config('jscs.files', Object.keys(changedFiles));
+        changedFiles = Object.create(null);
+    }, 200);
+    
+    grunt.event.on('watch', function(action, filepath) {
+        changedFiles[filepath] = action;
+        onChange();
+    });
 };
