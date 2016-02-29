@@ -1,28 +1,33 @@
 (function(window, $, app) {
     function ImageEditor() {
-        this.detectImage = function($img) {
+        this.detectImage = function(img) {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
-            $img = $selected.find('img');
+            var $img = $selected.find('img');
             var currentUrl = $img.attr('src').replace('@2x', '');
             var currentW = $img.attr('width');
             var currentH = $img.attr('height');
-            var imgW = $img.prop('naturalWidth');
-            var imgH = $img.prop('naturalHeight');
 
-            if (typeof currentW === 'undefined' || currentW == imgW) {
-                currentW = 'auto';
-            }
+            img = $('<img/>').attr('src', currentUrl).load(function() {
+                var $this = $(this);
+                var imgW = $this.prop('naturalWidth');
+                var imgH = $this.prop('naturalHeight');
+                app.UI.getSelectionSection().find('#IMGH').text(imgH);
+                app.UI.getSelectionSection().find('#IMGW').text(imgW);
 
-            if (typeof currentH === 'undefined' || currentH == imgH) {
-                currentH = 'auto';
-            }
+                if (typeof currentW === 'undefined' || currentW == imgW) {
+                    currentW = 'auto';
+                }
 
-            app.UI.getSelectionSection().find('#IMGH').text(imgH);
-            app.UI.getSelectionSection().find('#IMGW').text(imgW);
+                if (typeof currentH === 'undefined' || currentH == imgH) {
+                    currentH = 'auto';
+                }
+
+                $selectionControls.filter('#imageWidth').val(currentW);
+                $selectionControls.filter('#imageHeight').val(currentH);
+            });
+
             $selectionControls.filter('#imageURL').val(currentUrl);
-            $selectionControls.filter('#imageWidth').val(currentW);
-            $selectionControls.filter('#imageHeight').val(currentH);
         };
 
         this.changeUrl = function(url) {
@@ -32,16 +37,16 @@
             if (url !== currentUrl) {
                 var $currentImg = $selected.find('img');
                 var $img = $currentImg.clone().wrap('<p/>');
-
                 $img.removeAttr('width height');
                 $img.attr('src', url);
                 var url2x = url.replace(/(.*)(\..*)$/, '$1@2x$2');
 
-                var imghtml = $img.parent.html().replace(/(data-img-src@2x=")[^"]+(")/, '$1' + url2x + '$2');
+                var imghtml = $img.parent().html().replace(/(data-img-src@2x=")[^"]+(")/, '$1' + url2x + '$2');
                 $currentImg.replaceWith(imghtml);
 
                 $currentImg.load(function() {
                     app.ImageEditor.detectImage(this);
+                    console.log(this);
                 });
             }
         };
