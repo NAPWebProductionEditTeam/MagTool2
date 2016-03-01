@@ -17,7 +17,7 @@
             }
             
             // Deselect all other elements
-            app.ContentEditor.deselectAll();
+            app.ContentEditor.deselect();
             
             // If the new element is text or CTA make it editable
             app.ContentEditor.applyEdit($element);
