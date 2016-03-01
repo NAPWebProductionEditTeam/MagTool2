@@ -1,14 +1,14 @@
 (function(window, $, app) {
     function ImageEditor() {
-        this.detectImage = function(img) {
+        this.detectImage = function($img) {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
-            var $img = $selected.find('img');
+            $img = $selected.find('img');
             var currentUrl = $img.attr('src').replace('@2x', '');
             var currentW = $img.attr('width');
             var currentH = $img.attr('height');
 
-            img = $('<img/>').attr('src', currentUrl).load(function() {
+            $('<img/>').attr('src', currentUrl).load(function() {
                 var $this = $(this);
                 var imgW = $this.prop('naturalWidth');
                 var imgH = $this.prop('naturalHeight');
@@ -42,12 +42,9 @@
                 var url2x = url.replace(/(.*)(\..*)$/, '$1@2x$2');
 
                 var imghtml = $img.parent().html().replace(/(data-img-src@2x=")[^"]+(")/, '$1' + url2x + '$2');
-                $currentImg.replaceWith(imghtml);
+                var img = $currentImg.replaceWith(imghtml);
+                app.ImageEditor.detectImage(img);
 
-                $currentImg.load(function() {
-                    app.ImageEditor.detectImage(this);
-                    console.log(this);
-                });
             }
         };
 
