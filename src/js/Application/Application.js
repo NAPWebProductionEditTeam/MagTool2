@@ -298,6 +298,9 @@ var MagTool = MagTool || {};
             case 'image':
                 app.ImageEditor.detectImage();
                 break;
+            case 'cta':
+                app.TextEditor.detectCta();
+                break;
         }
     }, false, true);
     
