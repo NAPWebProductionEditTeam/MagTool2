@@ -218,12 +218,10 @@ var MagTool = MagTool || {};
                 
                 app.UI.showBtn('editSave', 'save');
             } else {
-                app.UI.notify();
+                app.UI.notify('Page Locked', 'The page is currently being edited.');
             }
         }).fail(function() {
-            console.log('receiving errors');
-            
-            // NOTIFY: Error locking, e
+            app.UI.notify('Failed Locking Page.', '## ERROR MESSAGE ##');
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
         });
@@ -235,13 +233,9 @@ var MagTool = MagTool || {};
         app.UI.btnGroupLoading('lock');
         
         app.Server.unlock(pageId).done(function() {
-            console.log('page unlocked');
-            
-            // NOTIFY: Page unlocked
+            app.UI.notify('Page Unlocked.');
         }).fail(function() {
-            console.log('couldnt unlock');
-            
-            // NOTIFY: Unlock error, e
+            app.UI.notify('Failed Unlocking Page.', '## ERROR MESSAGE ##');
         }).always(function() {
             app.UI.btnGroupLoaded('lock');
         });
@@ -268,7 +262,7 @@ var MagTool = MagTool || {};
             
             app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.');
         }).fail(function() {
-            app.UI.notify('Error Saving Page.', 'error message');
+            app.UI.notify('Error Saving Page.', '## ERROR MESSAGE ##');
         });
     }, false, true);
     
