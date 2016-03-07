@@ -20,6 +20,10 @@
             return this.get().data('id');
         };
         
+        this.getNumber = function() {
+            return this.get().data('page-number');
+        }
+        
         this.getTitle = function() {
             return this.get().data('feature-title');
         };

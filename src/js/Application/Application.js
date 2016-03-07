@@ -122,7 +122,7 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('up', function(e) {
             e.preventDefault();
-
+            
             app.ContentEditor.move('y', 1);
         });
         
@@ -140,7 +140,7 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('down', function(e) {
             e.preventDefault();
-
+            
             app.ContentEditor.move('y', -1);
         });
         
@@ -154,6 +154,12 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('shift+left', function() {
             app.ContentEditor.move('x', -4);
+        });
+        
+        Mousetrap.bind(['backspace', 'del'], function(e) {
+            e.preventDefault();
+            
+            app.ContentEditor.remove(app.ContentEditor.getSelectedElements());
         });
         
         Mousetrap.bind('c', function() {
@@ -260,10 +266,9 @@ var MagTool = MagTool || {};
             
             app.UI.showBtn('editSave', 'edit');
             
-            // NOTIFY: saved
+            app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.');
         }).fail(function() {
-            
-            // NOTIFY: Save error, e
+            app.UI.notify('Error Saving Page.', 'error message');
         });
     }, false, true);
     

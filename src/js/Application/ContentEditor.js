@@ -103,6 +103,10 @@
             triggerSelectable();
         };
         
+        this.remove = function($el) {
+            $el.remove();
+        };
+        
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
             triggerSelectable();
