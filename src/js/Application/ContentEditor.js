@@ -66,6 +66,8 @@
                 
                 if ($this.find('img').length) {
                     types.push('image');
+                } else if ($this.find('.btnShopThe').length) {
+                    types.push('cta');
                 } else if ($this.filter('[class*="creditsWhole"]').length) {
                     types.push('credits');
                 } else {
