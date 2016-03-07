@@ -12,10 +12,10 @@
          */
         this.startEdit = function() {
             var map = app.Page.getContent().find('map');
-
+            
             $img_map = map.clone(true, true);
             map.remove();
-
+            
             editing = true;
             app.Page.get().addClass('mt-editing');
             
@@ -24,21 +24,23 @@
             this.makeSelectable();
             this.makeEditable();
         };
-
-        this.applyEdit = function($el) {
+        
+        this.applyInteractions = function($el) {
             this.applyDraggable($el);
             this.applyResizable($el);
             this.applySelectable($el);
+            this.applyEditable($el);
         };
         
         this.stopEdit = function() {
             this.removeSelectable();
             this.removeResizable();
             this.removeDraggable();
+            this.removeEditable();
             
             app.Page.getContent().append($img_map);
             $img_map = null;
-
+            
             editing = false;
             app.Page.get().removeClass('mt-editing');
         };
@@ -58,7 +60,7 @@
             if (! $selection.length) {
                 return 'none';
             }
-
+            
             $selection.each(function() {
                 var $this = $(this);
                 
@@ -85,12 +87,12 @@
          */
         var $selectable, $selected, $selectables, $draggables, $resizables, $editables;
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
-
+        
         var triggerSelectable = function() {
             var selectable = $selectable.selectable('instance');
-
+            
             if (selectable) {
-                $selectable.selectable('instance')._mouseStop(null);
+                selectable._mouseStop(null);
             }
         };
         
@@ -98,7 +100,7 @@
             $el.addClass('ui-selecting');
             triggerSelectable();
         };
-
+        
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
             triggerSelectable();
@@ -114,13 +116,17 @@
             $(el).addClass('ui-selected');
         };
         
-        this.applySelectable = function($el) {
+        this.applySelectable = function($el, refresh) {
+            if (typeof refresh === 'undefined') {
+                refresh = true;
+            }
+            
             $selectables.add($el);
-
+            
             if ($el.length) {
                 $el.click(function(e) {
                     var $this = $(this);
-
+                    
                     // win ctrl || OS X cmd || shift
                     if (e.ctrlKey || e.metaKey || e.shiftKey) {
                         if ($this.hasClass('ui-selected')) {
@@ -130,12 +136,16 @@
                         $selectable.find('.ui-selected').removeClass('ui-selected');
                         $selected = $([]);
                     }
-
+                    
                     app.ContentEditor.select($this);
                 });
             }
+            
+            if (refresh) {
+                $selectable.selectable('refresh');
+            }
         };
-
+        
         this.makeSelectable = function() {
             var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
             
@@ -155,7 +165,7 @@
                 }
             });
             
-            this.applySelectable($selectable.find(selectableSelector));
+            this.applySelectable($selectable.find(selectableSelector), false);
         };
         
         this.removeSelectable = function() {
@@ -208,7 +218,7 @@
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
                                 var $this = $(this);
-
+                                
                                 $this.data('offset', $this.position());
                             });
                             
@@ -227,10 +237,10 @@
                             top: ui.position.top - $this.data('offset').top,
                             left: ui.position.left - $this.data('offset').left,
                         };
-
+                        
                         $selected.not($this).filter('.draggable').each(function() {
                             var $this = $(this);
-
+                            
                             $this.addClass('ui-draggable-dragging').css({top: $this.data('offset').top + drag.top, left: $this.data('offset').left + drag.left});
                         });
                     },
@@ -238,26 +248,26 @@
                         $selected.each(function() {
                             var $this = $(this);
                             var top = parseInt($this.css('top'));
-
+                            
                             if ($this.is('[class*=push-down]')) {
                                 var push_down = Math.round(top / 16);
-
+                                
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpush-down\S+/g) || []).join(' ');
                                 });
-
+                                
                                 $this.addClass('push-down-' + push_down);
                             } else {
                                 var bottom = 624 - top - $this.outerHeight();
                                 var pull_up = Math.round(bottom / 16);
-
+                                
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpull-up\S+/g) || []).join(' ');
                                 });
-
+                                
                                 $this.addClass('pull-up-' + pull_up);
                             }
-
+                            
                             changeXPos($this);
                         }).removeClass('ui-draggable-dragging').removeAttr('style');
                     },
@@ -265,7 +275,7 @@
                 });
             }
         };
-
+        
         this.makeDraggable = function() {
             this.applyDraggable(app.Page.getContent().find('.draggable'));
         };
@@ -294,17 +304,17 @@
             var $selection = this.getSelection();
             var maxCols = 50.75;
             var maxRows = 39.75;
-
+            
             if (typeof ticks === 'undefined') {
                 ticks = .25;
             } else {
                 ticks = ticks / 4;
             }
-
+            
             $selection.each(function() {
                 var $el = $(this);
                 var dir, current, result, affix, newClass;
-
+                
                 if (axis === 'y') {
                     dir = $el.attr('class').replace(/.*(?:push|pull)-(up|down)-.*/, '$1');
                     current = parseFloat(
@@ -314,14 +324,14 @@
                             .replace('-b', '.5')
                             .replace('-c', '.75')
                         );
-
+                    
                     result = dir === 'down' ? (current - ticks) : (current + ticks);
                     result = Math.min(result, maxRows);
                     result = Math.max(result, 0);
-
+                    
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(up|down)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
-
+                    
                     $el.attr('class', newClass);
                 } else {
                     dir = $el.attr('class').replace(/.*(?:push|pull)-(left|right)-.*/, '$1');
@@ -332,19 +342,19 @@
                             .replace('-b', '.5')
                             .replace('-c', '.75')
                         );
-
+                    
                     result = dir === 'left' ? (current - ticks) : (current + ticks);
                     result = Math.min(result, maxCols);
                     result = Math.max(result, 0);
-
+                    
                     affix = result.toString().replace('.25', '-a').replace('.5', '-b').replace('.75', '-c');
                     newClass = $el.attr('class').replace(/(push|pull)-(left|right)-\d+(?:-[a-c])?/, '$1-$2-' + affix);
-
+                    
                     $el.attr('class', newClass);
                 }
             });
         };
-
+        
         this.applyResizable = function($el) {
             $resizables.add($el);
             
@@ -380,7 +390,7 @@
         this.makeResizable = function() {
             this.applyResizable(app.Page.getContent().find('.resizable'));
         };
-
+        
         this.enableResizable = function($el) {
             if (typeof $el !== 'undefined') {
                 return $el.resizable('enable');
@@ -529,13 +539,11 @@
         };
         
         this.applyEditable = function($el) {
-            console.log('apply edi');
             $editables.add($el);
-
+            
             $el.dblclick(function(e) {
                 var $this = $(this);
-                console.log("CLICK OCCUREEDEJSFHSDGKDSJG");
-
+                
                 // If we are currently editing a different element,
                 // stop editing it.
                 if ($editing) {
@@ -548,10 +556,9 @@
         };
         
         this.makeEditable = function() {
-            console.log('make edi');
             this.applyEditable(app.Page.getContent().find('.editable'));
         };
-
+        
         this.removeEditable = function() {
             window.getSelection().collapseToStart();
             editor.destroy();

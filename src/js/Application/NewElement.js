@@ -19,8 +19,8 @@
             // Deselect all other elements
             app.ContentEditor.deselectAll();
             
-            // If the new element is text or CTA make it editable
-            app.ContentEditor.applyEdit($element);
+            // Apply edit interactions to the new element.
+            app.ContentEditor.applyInteractions($element);
             
             // Select the new Element
             app.ContentEditor.select($element);
@@ -51,6 +51,8 @@
             var $newDiv = $('<div/>', {
                 class: 'btnShopThe span-12 textAlignCenter push-down-18 push-right-18 editable resizable draggable ui-selectee'
             });
+
+            // --> create new element and then .appenTo($newDiv)
             $newDiv.append('<a data-magtool="ntk" href="${CtaLinkXML[\'ntk\'].@url}">SHOP THE SELECTION</a>');
             addToDom($newDiv);
         };
