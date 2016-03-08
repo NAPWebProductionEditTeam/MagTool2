@@ -4,10 +4,11 @@
 
 @import "components/container";
 @import "components/section";
+@import "components/page-controls";
+@import "components/selection";
 @import "components/form";
 @import "components/load";
 @import "components/btn";
-@import "components/selection";
 
 .clearfix {
     @include clearfix;
