@@ -4,7 +4,7 @@
     function NewElement() {
         
         // Add the new element to the DOM
-        this.addToDom = function($elements) {
+        var addToDom = function($elements) {
             var $content = app.Page.getContent();
 
             // If a slug exists, add the new element after the slug, else add it to the top of the page
