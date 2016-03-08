@@ -3,7 +3,7 @@
     var clearTimeout = window.clearTimeout;
     
     function UI() {
-        var $mt, $notify, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
+        var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
         
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
@@ -19,6 +19,14 @@
             }
             
             return $notify;
+        };
+        
+        this.getAllControls = function() {
+            if (typeof $controls === 'undefined') {
+                $controls = this.getUI().find(':input');
+            }
+            
+            return $controls;
         };
         
         this.getMainControlsSection = function() {

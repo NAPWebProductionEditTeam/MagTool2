@@ -161,6 +161,9 @@
             $selectable.selectable({
                 filter: selectableSelector,
                 cancel: '[class*="creditsHolder"]',
+                start: function() {
+                    app.UI.getAllControls().blur();
+                },
                 selected: function(e, ui) {
                     addSelected(ui.selected);
                 },
