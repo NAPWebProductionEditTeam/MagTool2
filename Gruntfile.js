@@ -169,6 +169,8 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify']);
     grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify']);
     
+    grunt.registerTask('update', ['exec']);
+    
     var changedFiles = Object.create(null);
     var onChange = grunt.util._.debounce(function() {
         var files = grunt.file.match(['Gruntfile.js', 'src/**/*.js'], Object.keys(changedFiles));
