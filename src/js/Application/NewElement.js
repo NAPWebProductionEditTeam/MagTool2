@@ -4,26 +4,26 @@
     function NewElement() {
         
         // Add the new element to the DOM
-        var addToDom = function($element) {
-            var $selectable = app.Page.getContent();
+        this.addToDom = function($elements) {
+            var $content = app.Page.getContent();
 
             // If a slug exists, add the new element after the slug, else add it to the top of the page
             var $slug = app.Slug.findSlug();
 
             if ($slug.length) {
-                $slug.after($element);
+                $slug.after($elements);
             } else {
-                $element.prependTo(app.Page.getContent());
+                $elements.prependTo($content);
             }
             
             // Deselect all other elements
             app.ContentEditor.deselectAll();
             
             // Apply edit interactions to the new element.
-            app.ContentEditor.applyInteractions($element);
+            app.ContentEditor.applyInteractions($elements);
             
             // Select the new Element
-            app.ContentEditor.select($element);
+            app.ContentEditor.select($elements);
         };
         
         // Create New Text Element

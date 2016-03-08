@@ -6,7 +6,7 @@ module.exports = function(grunt) {
                 src: [
                     'bower_components/medium-editor/dist/js/medium-editor.js',
                     'bower_components/MediumButton/src/MediumButton.js',
-                    'vendor/mousetrap/mousetrap.js',
+                    'bower_components/medium-editor/mousetrap.js',
                     'src/js/jQuery/**',
                     'src/js/lib/**',
                     'src/js/Application/Application.js',
@@ -112,9 +112,25 @@ module.exports = function(grunt) {
                 files: ['src/scss/**/*.scss'],
                 tasks: ['sass:build', 'notify:sass']
             },
+            bower: {
+                files: ['bower.json'],
+                tasks: ['exec:bower_update']
+            },
+            npm: {
+                files: ['package.json'],
+                tasks: ['exec:npm_update']
+            },
             options: {
                 spawn: false,
             },
+        },
+        exec: {
+            bower_update: {
+                cmd: 'bower update'
+            },
+            npm_update: {
+                cmd: 'npm update'
+            }
         },
         notify: {
             concat: {
@@ -140,6 +156,7 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
+    grunt.loadNpmTasks('grunt-exec');
     
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
