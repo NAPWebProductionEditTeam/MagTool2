@@ -3,7 +3,7 @@
     var clearTimeout = window.clearTimeout;
     
     function UI() {
-        var $mt, $notify, $mainControls, $pageControls, $selectionSection, $selectionControls;
+        var $mt, $notify, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
         
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
@@ -21,17 +21,33 @@
             return $notify;
         };
         
+        this.getMainControlsSection = function() {
+            if (typeof $mainControlsSection === 'undefined') {
+                $mainControlsSection = this.getUI().find('.main-controls');
+            }
+            
+            return $mainControlsSection;
+        };
+        
         this.getMainControls = function() {
             if (typeof $mainControls === 'undefined') {
-                $mainControls = this.getUI().find('.main-controls :input');
+                $mainControls = this.getMainControlsSection().find(':input');
             }
             
             return $mainControls;
         };
         
+        this.getPageControlsSection = function() {
+            if (typeof $pageControlsSection === 'undefined') {
+                $pageControlsSection = this.getUI().find('.page-controls');
+            }
+            
+            return $pageControlsSection;
+        };
+        
         this.getPageControls = function() {
             if (typeof $pageControls === 'undefined') {
-                $pageControls = this.getUI().find('.page-controls :input');
+                $pageControls = this.getPageControlsSection().find(':input');
             }
             
             return $pageControls;
@@ -73,6 +89,14 @@
         
         this.btnGroupLoaded = function(group) {
             $('#' + group).removeClass('--loading');
+        };
+        
+        this.showEditTools = function() {
+            this.getUI().find('.page-controls').addClass('--show');
+        };
+        
+        this.hideEditTools = function() {
+            this.getUI().find('.page-controls').removeClass('--show');
         };
         
         var notifyTimer;
