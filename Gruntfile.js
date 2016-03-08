@@ -101,7 +101,7 @@ module.exports = function(grunt) {
         },
         watch: {
             js: {
-                files: ['<%= jshint.files %>'],
+                files: ['Gruntfile.js', 'src/**/*.js'],
                 tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
             },
             tpl: {
@@ -171,8 +171,10 @@ module.exports = function(grunt) {
     
     var changedFiles = Object.create(null);
     var onChange = grunt.util._.debounce(function() {
-        grunt.config('jshint.files', Object.keys(changedFiles));
-        grunt.config('jscs.files', Object.keys(changedFiles));
+        var files = grunt.file.match(['Gruntfile.js', 'src/**/*.js'], Object.keys(changedFiles));
+        
+        grunt.config('jshint.files', files);
+        grunt.config('jscs.files', files);
         changedFiles = Object.create(null);
     }, 200);
     
