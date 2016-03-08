@@ -106,7 +106,7 @@ module.exports = function(grunt) {
             },
             tpl: {
                 files: ['src/tpl/**'],
-                tasks: ['copy:build']
+                tasks: ['copy:build', 'notify:copy']
             },
             sass: {
                 files: ['src/scss/**/*.scss'],
@@ -150,6 +150,24 @@ module.exports = function(grunt) {
                     title: 'Sass Complete',
                     message: 'Sass files compiled'
                 }
+            },
+            copy: {
+                options: {
+                    title: 'Templates Copied',
+                    message: 'Template files copied'
+                }
+            },
+            build: {
+                options: {
+                    title: 'Build complete',
+                    message: 'The grunt build was successfull'
+                }
+            },
+            dist: {
+                options: {
+                    title: 'Distribution complete',
+                    message: 'The grunt distribution build was successfull'
+                }
             }
         }
     });
@@ -166,8 +184,8 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-sass');
     
-    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify']);
+    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify:build']);
+    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     
