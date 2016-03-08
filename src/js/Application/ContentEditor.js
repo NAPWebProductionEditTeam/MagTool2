@@ -109,6 +109,7 @@
         
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
+            $selected = $([]);
             triggerSelectable();
         };
         
