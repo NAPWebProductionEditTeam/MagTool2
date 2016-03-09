@@ -5,6 +5,19 @@
     function UI() {
         var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
         
+        this.show = function() {
+            this.getUI().removeClass('--hide');
+            this.getNotification().removeClass('+hide');
+            
+            // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
+            if (! app.reloading) {
+                var mtHeight = this.getUI().outerHeight();
+                
+                app.$body.css({'padding-top': mtHeight});
+                $(window).scrollTop($(window).scrollTop() + mtHeight);
+            }
+        }
+        
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
                 $mt = $('#magtool');

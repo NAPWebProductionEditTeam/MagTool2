@@ -1,4 +1,4 @@
-(function(window, $, app) {
+(function(window, $, app, CssEvents) {
     var suffix = '?v=' + app.version;
     var fa = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
     var css = 'css/app.css';
@@ -30,12 +30,21 @@
     };
     
     var reload = function() {
-        app.UI.getUI().addClass('hide');
+        var faded = $.Deferred();
+        
+        app.UI.getUI().addClass('--hide').on(CssEvents.transitionEvent(), function() {
+            $(this).off(CssEvents.transitionEvent());
+            
+            $('#magtoolComponents').remove();
+            faded.resolve();
+        });
+        
         app.UI.getNotification().removeClass('--open');
         
-        app.getVersion(function() {
-            $('#magtoolComponents').remove();
-            
+        $.when(
+            faded,
+            app.getVersion()
+        ).done(function() {
             window.MagTool = {
                 base_uri: app.base_uri,
                 getVersion: app.getVersion,
@@ -51,4 +60,4 @@
         load: load,
         reload: reload
     };
-})(window, $, MagTool);
+})(window, $, MagTool, CssEvents);

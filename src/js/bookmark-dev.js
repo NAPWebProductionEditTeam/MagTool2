@@ -11,10 +11,12 @@ var MagTool = MagTool || {};
     app.ENV = 'development';
     
     app.getVersion = function(callback) {
-        $.get(git_commit).done(function(data) {
+        return $.get(git_commit).done(function(data) {
             app.version = data.object.sha;
             
-            callback();
+            if (typeof callback === 'function') {
+                callback();
+            }
         });
     };
     
