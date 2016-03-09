@@ -92,6 +92,22 @@
         var $selectable, $selected, $selectables, $draggables, $resizables, $editables;
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
         
+        var callWidgetFunction = function($elements, widget, func, args) {
+            if (typeof args === 'undefined') {
+                args = [];
+            }
+            
+            args.unshift(func);
+            
+            $elements.each(function() {
+                var $this = $(this);
+                
+                if (typeof $this[widget]('instance') !== 'undefined') {
+                    $this[widget].apply($this, args);
+                }
+            });
+        };
+        
         var triggerSelectable = function() {
             var selectable = $selectable.selectable('instance');
             
@@ -130,7 +146,7 @@
                 refresh = true;
             }
             
-            $selectables.add($el);
+            $selectables = $selectables.add($el);
             
             if ($el.length) {
                 $el.click(function(e) {
@@ -217,7 +233,7 @@
         };
         
         this.applyDraggable = function($el) {
-            $draggables.add($el);
+            $draggables = $draggables.add($el);
             
             if ($el.length) {
                 $el.draggable({
@@ -297,7 +313,7 @@
                 return $el.draggable('enable');
             }
             
-            $draggables.filter('.ui-draggable').draggable('enable');
+            callWidgetFunction($draggables, 'draggable', 'enable');
         };
         
         this.disableDraggable = function($el) {
@@ -305,11 +321,11 @@
                 return $el.draggable('disable');
             }
             
-            $draggables.filter('.ui-draggable').draggable('disable');
+            callWidgetFunction($draggables, 'draggable', 'disable');
         };
         
         this.removeDraggable = function($el) {
-            $draggables.filter('.ui-draggable').draggable('destroy');
+            callWidgetFunction($draggables, 'draggable', 'destroy');
         };
         
         this.move = function(axis, ticks) {
@@ -368,7 +384,7 @@
         };
         
         this.applyResizable = function($el) {
-            $resizables.add($el);
+            $resizables = $resizables.add($el);
             
             if ($el.length) {
                 $el.resizable({
@@ -408,7 +424,7 @@
                 return $el.resizable('enable');
             }
             
-            $resizables.filter('.ui-resizable').resizable('enable');
+            callWidgetFunction($resizables, 'resizable', 'enable');
         };
         
         this.disableResizable = function($el) {
@@ -416,11 +432,11 @@
                 return $el.resizable('disable');
             }
             
-            $resizables.filter('.ui-resizable').resizable('disable');
+            callWidgetFunction($resizables, 'resizable', 'disable');
         };
         
         this.removeResizable = function() {
-            $resizables.filter('.ui-resizable').resizable('destroy');
+            callWidgetFunction($resizables, 'resizable', 'destroy');
         };
         
         var editor, $editing;
@@ -529,8 +545,12 @@
             }
             
             var $el = $editing;
+            var selection = window.getSelection();
             
-            window.getSelection().collapseToStart();
+            if (! selection.isCollapsed) {
+                selection.collapseToStart();
+            }
+            
             editor.destroy();
             $editing = null;
             
@@ -551,7 +571,7 @@
         };
         
         this.applyEditable = function($el) {
-            $editables.add($el);
+            $editables = $editables.add($el);
             
             $el.dblclick(function(e) {
                 var $this = $(this);
@@ -572,10 +592,17 @@
         };
         
         this.removeEditable = function() {
-            window.getSelection().collapseToStart();
-            editor.destroy();
-            $editing = null;
+            var selection = window.getSelection();
             
+            if (! selection.isCollapsed) {
+                selection.collapseToStart();
+            }
+            
+            if (typeof editor !== 'undefined') {
+                editor.destroy();
+            }
+            
+            $editing = null;
             $('.editable').off('dblclick');
             $('.editable').off('blur');
         };
