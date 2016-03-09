@@ -113,6 +113,7 @@
         };
         
         this.showEditTools = function() {
+            app.Slug.detectSlugProperties();
             this.getUI().find('.page-controls').addClass('--show');
         };
         

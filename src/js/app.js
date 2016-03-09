@@ -12,9 +12,6 @@
         // trigger repaint
         app.UI.getUI().offset();
         
-        // Set slug property controllers to match the current slug
-        app.Slug.detectSlugProperties();
-        
         // Fade in
         app.$doc.ready(function() {
             if (window.document.readyState === 'complete') {
