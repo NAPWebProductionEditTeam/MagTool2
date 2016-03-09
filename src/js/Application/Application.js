@@ -292,13 +292,13 @@ var MagTool = MagTool || {};
         switch (type) {
             case 'text':
                 app.TextEditor.detectSelectedAlignment();
-                app.TextEditor.detectSelectedCta();
+                app.TextEditor.detectSelectedClass();
                 break;
             case 'image':
                 app.ImageEditor.detectImage();
                 break;
             case 'cta':
-                app.TextEditor.detectCta();
+                app.CtaEditor.detectSelectedCta();
                 break;
         }
     }, false, true);
@@ -367,7 +367,7 @@ var MagTool = MagTool || {};
     
     // CTA Editor
     registerAction('changeCta', function(cta) {
-        app.TextEditor.changeCta(cta);
+        app.CtaEditor.changeCta(cta);
     }, false, true);
 
     // Image Editor

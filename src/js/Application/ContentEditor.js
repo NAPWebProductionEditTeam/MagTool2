@@ -66,7 +66,7 @@
                 
                 if ($this.find('img').length) {
                     types.push('image');
-                } else if ($this.find('.btnShopThe').length) {
+                } else if ($this.is('.btnShopThe')) {
                     types.push('cta');
                 } else if ($this.filter('[class*="creditsWhole"]').length) {
                     types.push('credits');
