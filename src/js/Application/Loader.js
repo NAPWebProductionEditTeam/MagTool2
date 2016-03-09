@@ -38,11 +38,11 @@
             $('#magtoolComponents').remove();
             faded.resolve();
         });
-
+        
         app.ContentEditor.stopEdit();
         app.bindOriginalKeyEvents();
         app.UI.getNotification().removeClass('--open');
-
+        
         $.when(
             faded,
             app.getVersion()

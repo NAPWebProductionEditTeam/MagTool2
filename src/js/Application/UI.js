@@ -6,20 +6,21 @@
         var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
         
         this.show = function() {
-            // trigger repaint
-            this.getUI().offset();
-            this.getNotification().offset();
-            
-            $('#magtoolComponents').removeClass('+hide');
-            this.getUI().removeClass('--hide');
-            
-            // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
-            if (! app.reloading) {
-                var mtHeight = this.getUI().outerHeight();
+            // dirty but that's the only way I could get it to work 100% of the time.
+            setTimeout(function() {
+                var repaint = app.UI.getUI().get(0).offset;
                 
-                app.$body.css({'padding-top': mtHeight});
-                $(window).scrollTop($(window).scrollTop() + mtHeight);
-            }
+                $('#magtoolComponents').removeClass('+hide');
+                app.UI.getUI().removeClass('--hide');
+                
+                // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
+                if (! app.reloading) {
+                    var mtHeight = app.UI.getUI().outerHeight();
+                    
+                    app.$body.css({'padding-top': mtHeight});
+                    $(window).scrollTop($(window).scrollTop() + mtHeight);
+                }
+            }, 0);
         };
         
         this.getUI = function() {

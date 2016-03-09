@@ -11,13 +11,7 @@
         
         // Fade in
         app.$doc.ready(function() {
-            if (window.document.readyState === 'complete') {
-                app.UI.show();
-            } else {
-                $(window).load(function() {
-                    app.UI.show();
-                });
-            }
+            app.UI.show();
         });
         
         // Register binds
