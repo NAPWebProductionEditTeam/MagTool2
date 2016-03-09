@@ -9,9 +9,6 @@
          * Show MagTool.
          */
         
-        // trigger repaint
-        app.UI.getUI().offset();
-
         // Fade in
         app.$doc.ready(function() {
             if (window.document.readyState === 'complete') {

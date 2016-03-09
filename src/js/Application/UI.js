@@ -4,15 +4,19 @@
     
     function UI() {
         var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
-
+        
         this.show = function() {
+            // trigger repaint
+            this.getUI().offset();
+            this.getNotification().offset();
+            
+            $('#magtoolComponents').removeClass('+hide');
             this.getUI().removeClass('--hide');
-            this.getNotification().removeClass('+hide');
-
+            
             // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
             if (! app.reloading) {
                 var mtHeight = this.getUI().outerHeight();
-
+                
                 app.$body.css({'padding-top': mtHeight});
                 $(window).scrollTop($(window).scrollTop() + mtHeight);
             }
@@ -38,18 +42,18 @@
             if (typeof $controls === 'undefined') {
                 $controls = this.getUI().find(':input');
             }
-
+            
             return $controls;
         };
-
+        
         this.getMainControlsSection = function() {
             if (typeof $mainControlsSection === 'undefined') {
                 $mainControlsSection = this.getUI().find('.main-controls');
             }
-
+            
             return $mainControlsSection;
         };
-
+        
         this.getMainControls = function() {
             if (typeof $mainControls === 'undefined') {
                 $mainControls = this.getMainControlsSection().find(':input');
@@ -62,10 +66,10 @@
             if (typeof $pageControlsSection === 'undefined') {
                 $pageControlsSection = this.getUI().find('.page-controls');
             }
-
+            
             return $pageControlsSection;
         };
-
+        
         this.getPageControls = function() {
             if (typeof $pageControls === 'undefined') {
                 $pageControls = this.getPageControlsSection().find(':input');

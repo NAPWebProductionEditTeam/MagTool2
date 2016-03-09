@@ -109,6 +109,7 @@
         };
         
         var triggerSelectable = function() {
+            
             var selectable = $selectable.selectable('instance');
             
             if (selectable) {
@@ -197,11 +198,13 @@
         };
         
         this.removeSelectable = function() {
-            deselect($selectables);
-            $selectables.off('click');
-            
-            if ($selectable.is('.ui-selectable')) {
-                $selectable.selectable('destroy');
+            if (typeof $selectable !== 'undefined') {
+                deselect($selectables);
+                $selectables.off('click');
+                
+                if ($selectable.is('.ui-selectable')) {
+                    $selectable.selectable('destroy');
+                }
             }
         };
         
