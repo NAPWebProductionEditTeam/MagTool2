@@ -195,10 +195,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-sass');
     
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
-
+    
     grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
     grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
-
+    
     grunt.registerTask('update', ['exec']);
     
     var changedFiles = Object.create(null);
