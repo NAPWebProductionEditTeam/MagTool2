@@ -12,8 +12,8 @@
                 var $this = $(this);
                 var imgW = $this.prop('naturalWidth');
                 var imgH = $this.prop('naturalHeight');
-                app.UI.getSelectionSection().find('#IMGH').text(imgH);
-                app.UI.getSelectionSection().find('#IMGW').text(imgW);
+                app.UI.getSelectionSection().find('#naturalHeight').text(imgH);
+                app.UI.getSelectionSection().find('#naturalWidth').text(imgW);
 
                 if (typeof currentW === 'undefined' || currentW == imgW) {
                     currentW = 'auto';

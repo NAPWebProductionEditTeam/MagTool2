@@ -66,7 +66,9 @@
                 
                 if ($this.find('img').length) {
                     types.push('image');
-                } else if ($this.is('.btnShopThe')) {
+                } else if ($this.filter('.videoHolder').length) {
+                    types.push('video');
+                } else if ($this.is('.btnShopThe') || $this.find('.btnShopThe').length) {
                     types.push('cta');
                 } else if ($this.filter('[class*="creditsWhole"]').length) {
                     types.push('credits');
@@ -109,6 +111,7 @@
         
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
+            $selected = $([]);
             triggerSelectable();
         };
         
@@ -160,6 +163,9 @@
             $selectable.selectable({
                 filter: selectableSelector,
                 cancel: '[class*="creditsHolder"]',
+                start: function() {
+                    app.UI.getAllControls().blur();
+                },
                 selected: function(e, ui) {
                     addSelected(ui.selected);
                 },

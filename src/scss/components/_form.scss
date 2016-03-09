@@ -1,15 +1,10 @@
 label {
     line-height: 1.42857143;
 }
-#IMGW {
-    margin-top: 5px;
-    padding: 6px 12px;
-}
-#IMGH {
-    margin-top: 5px;
-    padding: 6px 12px;
-}
 
+.help-block {
+	padding: 0 12px;
+}
 
 @include component(radioBtn, uRadioBtn) {
     display: none;

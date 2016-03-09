@@ -215,6 +215,7 @@ var MagTool = MagTool || {};
             if (data.response.indexOf('is locked for editing') > -1) {
                 app.unbindOriginalKeyEvents();
                 app.ContentEditor.startEdit();
+                app.UI.showEditTools();
                 
                 app.UI.showBtn('editSave', 'save');
             } else {
@@ -257,6 +258,7 @@ var MagTool = MagTool || {};
         app.Server.save(pageId, credits, contents).done(function() {
             app.bindOriginalKeyEvents();
             app.ContentEditor.stopEdit();
+            app.UI.hideEditTools();
             
             app.UI.showBtn('editSave', 'edit');
             

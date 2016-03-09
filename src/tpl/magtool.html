@@ -38,6 +38,7 @@
                     </div>
                 </div>
             </section>
+
             <!-- Edit Page specific elements -->
             <section class="col-md-3 section page-controls">
                 <div class="form-horizontal">
@@ -87,8 +88,9 @@
                     </div>
                 </div>
             </section>
+
             <!-- Create new Element Tools -->
-            <section class="col-md-1 text-right section main-controls">
+            <section class="col-md-1 text-right section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
                         <div class="col-sm-11 col-sm-offset-1">
@@ -113,12 +115,12 @@
                     </div>
                 </div>
             </section>
+
             <!-- Element Specific Tools -->
             <section class="col-md-6 section selection-controls">
-                <!-- Specific tools -->
                 <div class="wrapper">
                     <!-- textSelection -->
-                    <div class="form-horizontal selection --active" id="textSelection">
+                    <div class="form-horizontal selection" id="textSelection">
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Align:</label>
                             <div class="col-sm-4">
@@ -151,8 +153,7 @@
                                 </div>
                             </div>
                         </div>
-
-                         <div class="form-group">
+                        <div class="form-group">
                             <label class="col-sm-2 control-label">Vertical:</label>
                             <div class="col-sm-4">
                                 <div class="btn-group">
@@ -181,6 +182,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- imageSelection -->
                     <div class="form-horizontal selection" id="imageSelection">
                         <form class="form-horizontal">
@@ -198,15 +200,16 @@
                                 </label>
                                 <div class="col-sm-3">
                                     <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" placeholder="100" data-change="changeSize">
-                                    <span id="IMGW">100</span>
+                                    <p class="help-block" id="naturalWidth"></p>
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeSize">
-                                    <span id="IMGH">100</span>
+                                    <p class="help-block" id="naturalHeight"></p>
                                 </div>
                             </div>
                         </form>
                     </div>
+
                     <!-- creditsSelection -->
                     <div class="form-horizontal selection" id="creditsSelection">
                         <div class="form-group">
@@ -218,6 +221,7 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- CtaSelection -->
                     <div class="form-horizontal selection" id="ctaSelection">
                         <div class="form-group">
@@ -244,9 +248,12 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- mixedSelection -->
-                    <div class="form-horizontal selection" id="mixedSelection">
-                        <p>You have selected elements of multiple types.</p>
+                    <div class="selection" id="mixedSelection">
+                        <p class="lead">
+                            You have selected elements of multiple types.
+                        </p>
                     </div>
                 </div>
             </section>

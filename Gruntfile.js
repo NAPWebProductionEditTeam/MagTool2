@@ -69,49 +69,47 @@ module.exports = function(grunt) {
                 }
             }
         },
-        copy: {
+        htmlmin: {
+            options: {
+                collapseWhitespace: true,
+                collapseBooleanAttributes: true,
+                removeRedundantAttributes: true,
+                removeEmptyAttributes: true,
+                quoteCharacter: '"'
+            },
             build: {
                 files: [
                     {
                         expand: true,
-                        cwd: 'src/',
-                        src: ['tpl/**'],
+                        cwd: 'src',
+                        src: ['tpl/**.html'],
                         dest: 'build/',
                     }
                 ]
             },
             dist: {
-                static_mappings: {
-                    files: {
-                        'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
-                        'dist/css/app.css': ['<%= concat.build.dest %>']
-                    }
+                options: {
+                    removeComments: true
                 },
-                dynamic_mappings: {
-                    files: [
-                        {
-                            expand: true,
-                            cwd: 'src/',
-                            src: ['tpl/**'],
-                            dest: 'dist/',
-                        }
-                    ]
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'src',
+                        src: ['tpl/**.html'],
+                        dest: 'dist/',
+                    }
+                ]
+            }
+        },
+        copy: {
+            dist: {
+                files: {
+                    'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
+                    'dist/css/app.css': ['<%= concat.build.dest %>']
                 }
             }
         },
         watch: {
-            js: {
-                files: ['Gruntfile.js', 'src/**/*.js'],
-                tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
-            },
-            tpl: {
-                files: ['src/tpl/**'],
-                tasks: ['copy:build']
-            },
-            sass: {
-                files: ['src/scss/**/*.scss'],
-                tasks: ['sass:build', 'notify:sass']
-            },
             bower: {
                 files: ['bower.json'],
                 tasks: ['exec:bower_update']
@@ -119,6 +117,18 @@ module.exports = function(grunt) {
             npm: {
                 files: ['package.json'],
                 tasks: ['exec:npm_update']
+            },
+            js: {
+                files: ['Gruntfile.js', 'src/**/*.js'],
+                tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
+            },
+            tpl: {
+                files: ['src/tpl/**'],
+                tasks: ['htmlmin:build', 'notify:htmlmin']
+            },
+            sass: {
+                files: ['src/scss/**/*.scss'],
+                tasks: ['sass:build', 'notify:sass']
             },
             options: {
                 spawn: false,
@@ -150,6 +160,24 @@ module.exports = function(grunt) {
                     title: 'Sass Complete',
                     message: 'Sass files compiled'
                 }
+            },
+            htmlmin: {
+                options: {
+                    title: 'Templates Minified',
+                    message: 'Template files minified'
+                }
+            },
+            build: {
+                options: {
+                    title: 'Build complete',
+                    message: 'The grunt build was successfull'
+                }
+            },
+            dist: {
+                options: {
+                    title: 'Distribution complete',
+                    message: 'The grunt distribution build was successfull'
+                }
             }
         }
     });
@@ -166,8 +194,12 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-sass');
     
-    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify']);
+    grunt.loadNpmTasks('grunt-contrib-htmlmin');
+
+    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
+    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
+
+    grunt.registerTask('update', ['exec']);
     
     var changedFiles = Object.create(null);
     var onChange = grunt.util._.debounce(function() {

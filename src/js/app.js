@@ -11,21 +11,16 @@
         
         // trigger repaint
         app.UI.getUI().offset();
-        
-        // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
-        if (! app.reloading) {
-            var mtHeight = app.UI.getUI().outerHeight();
-            app.$body.css({'padding-top': mtHeight});
-            $(window).scrollTop($(window).scrollTop() + mtHeight);
-        }
-        
-        // Set slug property controllers to match the current slug
-        app.Slug.detectSlugProperties();
-        
+
         // Fade in
-        $(app.$doc).ready(function() {
-            app.UI.getUI().removeClass('--hide');
-            app.UI.getNotification().removeClass('+hide');
+        app.$doc.ready(function() {
+            if (window.document.readyState === 'complete') {
+                app.UI.show();
+            } else {
+                $(window).load(function() {
+                    app.UI.show();
+                });
+            }
         });
         
         // Register binds

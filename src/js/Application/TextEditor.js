@@ -57,17 +57,17 @@
             }
         };
         
-        this.changeVerticalClass = function (vertical){
+        this.changeVerticalClass = function(vertical) {
             var $selected = app.ContentEditor.getSelection();
             var currentClass = $selected.attr('class');
-            $selected.attr('class',currentClass.replace(/(push|pull)-(up|down)\S+/g,''));
-            if (vertical==='push-down') {
+            $selected.attr('class', currentClass.replace(/(push|pull)-(up|down)\S+/g, ''));
 
-                var newClass = vertical +
-                $selected.addClass()
+            if (vertical === 'push-down') {
+
+                var newClass = vertical + $selected.addClass();
 
             }
-        }
+        };
 
         this.changeColor = function(color) {
             var $selected = app.ContentEditor.getSelection();

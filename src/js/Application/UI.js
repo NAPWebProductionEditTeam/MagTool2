@@ -3,7 +3,20 @@
     var clearTimeout = window.clearTimeout;
     
     function UI() {
-        var $mt, $notify, $mainControls, $pageControls, $selectionSection, $selectionControls;
+        var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
+
+        this.show = function() {
+            this.getUI().removeClass('--hide');
+            this.getNotification().removeClass('+hide');
+
+            // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
+            if (! app.reloading) {
+                var mtHeight = this.getUI().outerHeight();
+
+                app.$body.css({'padding-top': mtHeight});
+                $(window).scrollTop($(window).scrollTop() + mtHeight);
+            }
+        };
         
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
@@ -21,17 +34,41 @@
             return $notify;
         };
         
+        this.getAllControls = function() {
+            if (typeof $controls === 'undefined') {
+                $controls = this.getUI().find(':input');
+            }
+
+            return $controls;
+        };
+
+        this.getMainControlsSection = function() {
+            if (typeof $mainControlsSection === 'undefined') {
+                $mainControlsSection = this.getUI().find('.main-controls');
+            }
+
+            return $mainControlsSection;
+        };
+
         this.getMainControls = function() {
             if (typeof $mainControls === 'undefined') {
-                $mainControls = this.getUI().find('.main-controls :input');
+                $mainControls = this.getMainControlsSection().find(':input');
             }
             
             return $mainControls;
         };
         
+        this.getPageControlsSection = function() {
+            if (typeof $pageControlsSection === 'undefined') {
+                $pageControlsSection = this.getUI().find('.page-controls');
+            }
+
+            return $pageControlsSection;
+        };
+
         this.getPageControls = function() {
             if (typeof $pageControls === 'undefined') {
-                $pageControls = this.getUI().find('.page-controls :input');
+                $pageControls = this.getPageControlsSection().find(':input');
             }
             
             return $pageControls;
@@ -75,6 +112,15 @@
             $('#' + group).removeClass('--loading');
         };
         
+        this.showEditTools = function() {
+            app.Slug.detectSlugProperties();
+            this.getUI().find('.page-controls').addClass('--show');
+        };
+
+        this.hideEditTools = function() {
+            this.getUI().find('.page-controls').removeClass('--show');
+        };
+
         var notifyTimer;
         
         this.notify = function(title, body, time) {
