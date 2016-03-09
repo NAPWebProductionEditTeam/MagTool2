@@ -69,33 +69,43 @@ module.exports = function(grunt) {
                 }
             }
         },
-        copy: {
+        htmlmin: {
+            options: {
+                collapseWhitespace: true,
+                collapseBooleanAttributes: true,
+                removeRedundantAttributes: true,
+                removeEmptyAttributes: true,
+                quoteCharacter: '"'
+            },
             build: {
                 files: [
                     {
                         expand: true,
-                        cwd: 'src/',
-                        src: ['tpl/**'],
+                        cwd: 'src',
+                        src: ['tpl/**.html'],
                         dest: 'build/',
                     }
                 ]
             },
             dist: {
-                static_mappings: {
-                    files: {
-                        'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
-                        'dist/css/app.css': ['<%= concat.build.dest %>']
-                    }
+                options: {
+                    removeComments: true
                 },
-                dynamic_mappings: {
-                    files: [
-                        {
-                            expand: true,
-                            cwd: 'src/',
-                            src: ['tpl/**'],
-                            dest: 'dist/',
-                        }
-                    ]
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'src',
+                        src: ['tpl/**.html'],
+                        dest: 'dist/',
+                    }
+                ]
+            }
+        },
+        copy: {
+            dist: {
+                files: {
+                    'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
+                    'dist/css/app.css': ['<%= concat.build.dest %>']
                 }
             }
         },
@@ -106,7 +116,7 @@ module.exports = function(grunt) {
             },
             tpl: {
                 files: ['src/tpl/**'],
-                tasks: ['copy:build', 'notify:copy']
+                tasks: ['htmlmin:build', 'notify:htmlmin']
             },
             sass: {
                 files: ['src/scss/**/*.scss'],
@@ -151,10 +161,10 @@ module.exports = function(grunt) {
                     message: 'Sass files compiled'
                 }
             },
-            copy: {
+            htmlmin: {
                 options: {
-                    title: 'Templates Copied',
-                    message: 'Template files copied'
+                    title: 'Templates Minified',
+                    message: 'Template files minified'
                 }
             },
             build: {
@@ -184,8 +194,10 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-sass');
     
-    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'copy:build', 'notify:build']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'copy', 'notify:dist']);
+    grunt.loadNpmTasks('grunt-contrib-htmlmin');
+    
+    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
+    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     
