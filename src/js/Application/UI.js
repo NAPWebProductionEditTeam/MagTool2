@@ -16,7 +16,7 @@
                 app.$body.css({'padding-top': mtHeight});
                 $(window).scrollTop($(window).scrollTop() + mtHeight);
             }
-        }
+        };
         
         this.getUI = function() {
             if (typeof $mt === 'undefined') {
