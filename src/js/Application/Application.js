@@ -419,6 +419,10 @@ var MagTool = MagTool || {};
         var type = app.ContentEditor.getSelectionType();
         var $selectionEditor = $('#' + type + 'Selection');
         
+        if (type !== 'credits') {
+            app.Credits.hide();
+        }
+        
         app.UI.getSelectionSection().find('.selection').removeClass('--active');
         
         if ($selectionEditor.length) {
@@ -513,5 +517,15 @@ var MagTool = MagTool || {};
     
     registerAction('changeSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
+    }, false, true);
+
+    // vertical Class change
+    registerAction('changeVerticalClass', function(vertical) {
+        app.TextEditor.changeVerticalClass(vertical);
+    }, false, true);
+
+    //
+    registerAction('changeHorizontalClass', function(horizontal) {
+        app.TextEditor.changeHorizontalClass(horizontal);
     }, false, true);
 })(window, $, MagTool, Mousetrap);

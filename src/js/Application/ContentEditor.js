@@ -337,7 +337,12 @@
                             var top = parseInt($this.css('top'));
                             
                             if ($this.is('[class*=push-down]')) {
-                                var push_down = Math.round(top / 16);
+                                var push_down = Math.round(top / 16).toString();
+                                push_down += (Math.round(top / 4) / 4).toString()
+                                    .replace(/^\d+/, '')
+                                    .replace('.25', '-a')
+                                    .replace('.5', '-b')
+                                    .replace('.75', '-c');
                                 
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpush-down\S+/g) || []).join(' ');
@@ -347,6 +352,11 @@
                             } else {
                                 var bottom = 624 - top - $this.outerHeight();
                                 var pull_up = Math.round(bottom / 16);
+                                pull_up += (Math.round(bottom / 4) / 4).toString()
+                                    .replace(/^\d+/, '')
+                                    .replace('.25', '-a')
+                                    .replace('.5', '-b')
+                                    .replace('.75', '-c');
                                 
                                 $this.removeClass(function(index, css) {
                                     return (css.match(/\bpull-up\S+/g) || []).join(' ');
@@ -358,7 +368,7 @@
                             changeXPos($this);
                         }).removeClass('ui-draggable-dragging').removeAttr('style');
                     },
-                    grid: [19, 16]
+                    grid: [19, 4]
                 });
             }
         };

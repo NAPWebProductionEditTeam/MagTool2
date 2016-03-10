@@ -59,6 +59,23 @@
             $editor.val(text);
         };
         
+        // Use this method to hide the 'creditsWhole' Block
+        this.toggleDisplay = function() {
+            console.log("Toggling");
+            var creditsWhole = getCreditsWhole();
+            creditsWhole.toggle(400);
+        };
+        
+        this.show = function() {
+            var creditsWhole = getCreditsWhole();
+            creditsWhole.show(400);
+        };
+        
+        this.hide = function() {
+            var creditsWhole = getCreditsWhole();
+            creditsWhole.hide(400);
+        };
+        
         this.update = function(text) {
             text = text.replace(/\n/g, '<br>');
             text = text.replace(/\s{2,}/g, ' ');
