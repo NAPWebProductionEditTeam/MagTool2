@@ -166,6 +166,7 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('c', function() {
             app.Credits.show();
+            app.ContentEditor.deselectAll();
             app.ContentEditor.select(app.Credits.getCredits());
         });
         
