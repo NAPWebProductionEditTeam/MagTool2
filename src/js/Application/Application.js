@@ -62,7 +62,7 @@ var MagTool = MagTool || {};
                 value = $group.filter(':checked').val();
             } else if ($this.is('.multi-input')) {
                 value = [];
-
+                
                 $group.each(function() {
                     value.push($(this).val());
                 });
@@ -81,7 +81,7 @@ var MagTool = MagTool || {};
             if (! (value instanceof Array)) {
                 value = [value];
             }
-
+            
             resolveAction($this.data('change'), value);
         });
         
@@ -220,47 +220,52 @@ var MagTool = MagTool || {};
      */
     var navigate = function(e) {
         if (app.ContentEditor.isEditing()) {
+            var confirm = 'You have unsaved changes, are you sure you want to continue?';
+            
             if (e.type === 'click') {
-                e.preventDefault();
-                
-                if (! confirm('You have unsaved changes, are you sure you want to continue?')) {
-                    return;
-                }
-                
                 var _this = this;
                 var $this = $(this);
                 
-                app.bindOriginalKeyEvents();
-                app.bindOriginalNavigationEvents();
-                app.ContentEditor.stopEdit();
+                e.preventDefault();
                 
-                app.UI.hideEditTools();
-                app.UI.showBtn('editSave', 'edit');
+                e.callback = function(e) {
+                    var events = $this.data('originalClickEvents');
+                    var handlers = [];
+                    
+                    if (typeof events !== 'undefined') {
+                        handlers = events.handlers;
+                    }
+                    
+                    app.bindOriginalKeyEvents();
+                    app.bindOriginalNavigationEvents();
+                    app.ContentEditor.stopEdit();
+                    
+                    app.UI.hideEditTools();
+                    app.UI.showBtn('editSave', 'edit');
+                    
+                    $this.off('click');
+                    
+                    $.each(handlers, function(i, handler) {
+                        handler.call(_this, e);
+                    });
+                };
                 
-                $this.off('click');
+                app.Modal.confirm(e, 'Unsaved Changes!', confirm);
                 
-                $.each($this.data('originalClickEvents').handlers, function(i, handler) {
-                    handler.call(_this, e);
-                });
-                
-                return;
+                return false;
             }
             
-            return 'You have unsaved changes, are you sure you want to continue?';
+            return confirm;
         }
     };
     
     var $navigation;
     
-    // TODO: Use same approach as key events with unbiund / bind orig evt
     app.registerNavigationBindings = function() {
-        // Just open this one in a blank.
-        $('#button-shop').attr('target', '_blank');
-        
         // Magazine navigation
         $navigation = $('.control, #button-content, #button-archive');
         
-        $navigation.off('click').each(function() {
+        $navigation.each(function() {
             var $this = $(this);
             var handlers;
             
@@ -286,13 +291,9 @@ var MagTool = MagTool || {};
     };
     
     app.bindOriginalNavigationEvents = function() {
-        console.log('bind orig!');
-        
         $navigation.off('click').each(function() {
             var $this = $(this);
             var events = $this.data('originalClickEvents');
-            console.log($this);
-            console.log(events);
             
             if (! events.bound) {
                 $this.data('originalClickEvents', {
@@ -301,13 +302,12 @@ var MagTool = MagTool || {};
                 });
                 
                 $.each(events.handlers, function(i, handler) {
-                    console.log($this);
-                    console.log(handler);
                     $this.click(handler);
                 });
             }
         });
         
+        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).off('click');
         $(window).off('beforeunload');
     };
     
@@ -324,6 +324,7 @@ var MagTool = MagTool || {};
             }
         }).click(navigate);
         
+        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).click(navigate);
         $(window).on('beforeunload', navigate);
     };
     
