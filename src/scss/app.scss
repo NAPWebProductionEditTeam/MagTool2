@@ -12,9 +12,10 @@ $mt-height: 162px;
 @import '../../bower_components/medium-editor/dist/css/medium-editor';
 @import '../../bower_components/medium-editor/dist/css/themes/default';
 
-.magtool {
+@import 'bootstrap';
+
+#magtoolComponents {
     @import 'core/normalize';
-	@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
     
     @import 'components';
 }
