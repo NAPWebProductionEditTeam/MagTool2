@@ -380,4 +380,14 @@ var MagTool = MagTool || {};
     registerAction('changeSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
     }, false, true);
+
+    // vertical Class change
+    registerAction('changeVerticalClass', function(vertical) {
+        app.TextEditor.changeVerticalClass(vertical);
+    }, false, true);
+
+    //
+    registerAction('changeHorizontalClass', function(horizontal) {
+        app.TextEditor.changeHorizontalClass(horizontal);
+    }, false, true);
 })(window, $, MagTool, Mousetrap);
