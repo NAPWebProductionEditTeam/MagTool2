@@ -54,6 +54,8 @@
                 version: app.version
             };
             
+            $('#mtCss, #fontAwesome').remove();
+            
             $.getScript(app.base_uri + 'js/MagazineTool.js?v=' + app.version);
         });
     };
