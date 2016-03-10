@@ -170,12 +170,16 @@ var MagTool = MagTool || {};
             app.ContentEditor.select(app.Credits.getCredits());
         });
         
-        Mousetrap.bind('tab', function() {
-            // select next ui-selectee
+        Mousetrap.bind('tab', function(e) {
+            e.preventDefault();
+            
+            app.ContentEditor.selectNext();
         });
         
-        Mousetrap.bind('shift+tab', function() {
-            // select prev ui-selectee
+        Mousetrap.bind('shift+tab', function(e) {
+            e.preventDefault();
+            
+            app.ContentEditor.selectPrev();
         });
         
         Mousetrap.bind('enter', function() {

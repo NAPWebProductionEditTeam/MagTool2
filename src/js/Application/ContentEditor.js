@@ -86,6 +86,33 @@
             return 'mixed';
         };
         
+        this.sort = function($elements) {
+            console.log($elements);
+            
+            return $elements.sort(function(a, b) {
+                a = $(a).offset();
+                b = $(b).offset();
+                
+                if (a.top == b.top) {
+                    if (a.left == b.left) {
+                        return 0;
+                    }
+                    
+                    if (a.left > b.left) {
+                        return 1;
+                    }
+                    
+                    return -1;
+                }
+                
+                if (a.top > b.top) {
+                    return 1;
+                }
+                
+                return -1;
+            });
+        };
+        
         /**
          * Content interactions.
          */
@@ -109,7 +136,6 @@
         };
         
         var triggerSelectable = function() {
-            
             var selectable = $selectable.selectable('instance');
             
             if (selectable) {
@@ -120,6 +146,36 @@
         this.select = function($el) {
             $el.addClass('ui-selecting');
             triggerSelectable();
+        };
+        
+        this.selectNext = function() {
+            var $tabbable = $selectables.not(app.Credits.getCredits());
+            var $last = this.getSelectedElements().last();
+            var index = $tabbable.index($last) + 1;
+            
+            if (index >= $tabbable.length) {
+                index = 0;
+            }
+            
+            var $select = $($tabbable.get(index));
+            
+            this.deselectAll();
+            this.select($select);
+        };
+        
+        this.selectPrev = function() {
+            var $tabbable = $selectables.not(app.Credits.getCredits());
+            var $first = this.getSelectedElements().first();
+            var index = $tabbable.index($first) - 1;
+            
+            if (index < 0) {
+                index = $tabbable.length - 1;
+            }
+            
+            var $select = $($tabbable.get(index));
+            
+            this.deselectAll();
+            this.select($select);
         };
         
         this.remove = function($el) {
@@ -138,7 +194,7 @@
         };
         
         var addSelected = function(el) {
-            $selected = $selected.add(el);
+            $selected = app.ContentEditor.sort($selected.add(el));
             $(el).addClass('ui-selected');
         };
         
@@ -147,7 +203,7 @@
                 refresh = true;
             }
             
-            $selectables = $selectables.add($el);
+            $selectables = app.ContentEditor.sort($selectables.add($el));
             
             if ($el.length) {
                 $el.click(function(e) {
@@ -209,7 +265,7 @@
         };
         
         this.getSelectedElements = function() {
-            return app.Page.get().find('.ui-selected');
+            return this.sort(app.Page.get().find('.ui-selected'));
         };
         
         var changeXPos = function($this) {
