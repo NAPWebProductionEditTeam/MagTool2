@@ -165,7 +165,8 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('c', function() {
-            // select credits
+            app.Credits.show();
+            app.ContentEditor.select(app.Credits.getCredits());
         });
         
         Mousetrap.bind('tab', function() {
