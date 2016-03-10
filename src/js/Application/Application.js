@@ -412,6 +412,10 @@ var MagTool = MagTool || {};
         var type = app.ContentEditor.getSelectionType();
         var $selectionEditor = $('#' + type + 'Selection');
         
+        if (type !== 'credits') {
+            app.Credits.hide();
+        }
+        
         app.UI.getSelectionSection().find('.selection').removeClass('--active');
         
         if ($selectionEditor.length) {
