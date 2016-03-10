@@ -3,6 +3,7 @@
     
     function Modal() {
         var $modal = $('#modal');
+        var $dialog = $modal.find('.modal-dialog');
         var $header = $modal.find('.modal-header');
         var $body = $modal.find('.modal-body');
         
@@ -12,8 +13,20 @@
         var $alert = $modal.find('[data-footer="alert"]');
         var $confirm = $modal.find('[data-footer="confirm"]');
         
+        var resized = false;
+        
         $modal.modal({
             show: false
+        });
+        
+        $modal.on('hidden.bs.modal', function() {
+            resized = false;
+        });
+
+        $modal.on('show.bs.modal', function() {
+            if (! resized) {
+                app.Modal.size();
+            }
         });
         
         var setContent = function(title, content) {
@@ -35,7 +48,7 @@
         this.confirm = function(e, title, content, ok, cancel) {
             title = Argument.default(title, false);
             content = Argument.default(content, false);
-            ok = Argument.default(ok, 'Confirm');
+            ok = Argument.default(ok, 'Continue');
             cancel = Argument.default(cancel, 'Cancel');
             
             var fire = ! e.isDefaultPrevented();
@@ -78,6 +91,9 @@
             
             // Show modal
             $modal.modal('show');
+            
+            // For chaining...
+            return this;
         };
         
         this.alert = function(title, content, ok) {
@@ -95,6 +111,30 @@
             
             // Show modal
             $modal.modal('show');
+            
+            // For chaining...
+            return this;
+        };
+        
+        this.size = function(size) {
+            $dialog.removeClass('modal-sm modal-lg');
+            resized = true;
+            
+            switch (size) {
+                case 's':
+                case 'sm':
+                case 'small':
+                    $dialog.addClass('modal-sm');
+                    break;
+                case 'l':
+                case 'lg':
+                case 'large':
+                    $dialog.addClass('modal-lg');
+                    break;
+            }
+            
+            // For chaining...
+            return this;
         };
     }
     
