@@ -12,12 +12,13 @@
 
 .clearfix {
     @include clearfix;
-
 }
+
 .wrapper {
     position: relative;
     @include clearfix;
 }
+
 label[for] {
     cursor: pointer;
 }

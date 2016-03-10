@@ -38,11 +38,11 @@
             $('#magtoolComponents').remove();
             faded.resolve();
         });
-
+        
         app.ContentEditor.stopEdit();
         app.bindOriginalKeyEvents();
         app.UI.getNotification().removeClass('--open');
-
+        
         $.when(
             faded,
             app.getVersion()
@@ -53,6 +53,8 @@
                 reloading: true,
                 version: app.version
             };
+            
+            $('#mtCss, #fontAwesome').remove();
             
             $.getScript(app.base_uri + 'js/MagazineTool.js?v=' + app.version);
         });

@@ -1,0 +1,24 @@
+.modal-backdrop {
+    background-color: rgba(#000, 0);
+    z-index: 9999998;
+}
+
+.modal {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-around;
+    pointer-events: none;
+    background-color: rgba(#000, .5);
+    z-index: 9999999;
+    
+    &.in {
+        pointer-events: auto;
+    }
+}
+
+#magtoolComponents {
+    .close {
+        font-size: inherit;
+        transition: opacity .2s;
+    }
+}

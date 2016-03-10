@@ -260,13 +260,34 @@
         </div>
     </div>
     
-    <div class="notification hasZ +z-depth-2 +hide" id="notify">
+    <div class="notification hasZ +z-depth-2" id="notify">
         <i class="fa fa-lg fa-fw fa-bell pull-left"></i>
         <div class="notification/content">
             <header class="notification/header"></header>
             <main class="notification/body"></main>
         </div>
         <i class="fa fa-close notification/close"></i>
+    </div>
+    
+    <div class="modal fade" id="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fa fa-close"></i></button>
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <p></p>
+                </div>
+                <div class="modal-footer" data-footer="alert">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal"></button>
+                </div>
+                <div class="modal-footer" data-footer="confirm">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"></button>
+                    <button type="button" class="btn btn-primary" data-confirm></button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div id="html"></div>

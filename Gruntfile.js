@@ -7,6 +7,7 @@ module.exports = function(grunt) {
                     'bower_components/medium-editor/dist/js/medium-editor.js',
                     'bower_components/MediumButton/src/MediumButton.js',
                     'bower_components/mousetrap-js/mousetrap.js',
+                    'bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js',
                     'src/js/jQuery/**',
                     'src/js/lib/**',
                     'src/js/Application/Application.js',
@@ -195,10 +196,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-sass');
     
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
-
+    
     grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
     grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
-
+    
     grunt.registerTask('update', ['exec']);
     
     var changedFiles = Object.create(null);

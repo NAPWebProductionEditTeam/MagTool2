@@ -1,6 +1,8 @@
 var MagTool = MagTool || {};
 
 (function(window, $, app, Mousetrap) {
+    var magazineBuilder = window.magazineBuilder;
+    
     app.modules = {};
     
     app.$doc = $(window.document);
@@ -60,7 +62,7 @@ var MagTool = MagTool || {};
                 value = $group.filter(':checked').val();
             } else if ($this.is('.multi-input')) {
                 value = [];
-
+                
                 $group.each(function() {
                     value.push($(this).val());
                 });
@@ -79,7 +81,7 @@ var MagTool = MagTool || {};
             if (! (value instanceof Array)) {
                 value = [value];
             }
-
+            
             resolveAction($this.data('change'), value);
         });
         
@@ -163,7 +165,9 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('c', function() {
-            // select credits
+            app.Credits.show();
+            app.ContentEditor.deselectAll();
+            app.ContentEditor.select(app.Credits.getCredits());
         });
         
         Mousetrap.bind('tab', function() {
@@ -187,7 +191,12 @@ var MagTool = MagTool || {};
         var events = app.$doc.data('originalKeyEvents');
         
         if (! events.bound) {
-            $.each(events.handlers, function(handler) {
+            app.$doc.data('originalKeyEvents', {
+                handlers: events.handlers,
+                bound: true
+            });
+            
+            $.each(events.handlers, function(i, handler) {
                 app.$doc.on('keyup', null, handler);
             });
         }
@@ -197,10 +206,128 @@ var MagTool = MagTool || {};
         var events = app.$doc.data('originalKeyEvents');
         
         if (events.bound) {
-            $.each(events.handlers, function(handler) {
+            app.$doc.data('originalKeyEvents', {
+                handlers: events.handlers,
+                bound: false
+            });
+            
+            $.each(events.handlers, function(i, handler) {
                 app.$doc.off('keyup', null, handler);
             });
         }
+    };
+    
+    /**
+     * Bind navigation.
+     */
+    var navigate = function(e) {
+        if (app.ContentEditor.isEditing()) {
+            var confirm = 'You have unsaved changes, are you sure you want to continue?';
+            
+            if (e.type === 'click') {
+                var _this = this;
+                var $this = $(this);
+                
+                e.preventDefault();
+                
+                e.callback = function(e) {
+                    var events = $this.data('originalClickEvents');
+                    var handlers = [];
+                    
+                    if (typeof events !== 'undefined') {
+                        handlers = events.handlers;
+                    }
+                    
+                    app.bindOriginalKeyEvents();
+                    app.bindOriginalNavigationEvents();
+                    app.ContentEditor.stopEdit();
+                    
+                    app.UI.hideEditTools();
+                    app.UI.showBtn('editSave', 'edit');
+                    
+                    $this.off('click');
+                    
+                    $.each(handlers, function(i, handler) {
+                        handler.call(_this, e);
+                    });
+                };
+                
+                app.Modal.confirm(e, 'Unsaved Changes!', confirm);
+                
+                return false;
+            }
+            
+            return confirm;
+        }
+    };
+    
+    var $navigation;
+    
+    app.registerNavigationBindings = function() {
+        // Magazine navigation
+        $navigation = $('.control, #button-content, #button-archive');
+        
+        $navigation.each(function() {
+            var $this = $(this);
+            var handlers;
+            
+            if ($this.is('.control.prev')) {
+                handlers = [magazineBuilder.goToPreviousPage];
+            } else if ($this.is('.control.next')) {
+                handlers = [magazineBuilder.goToNextPage];
+            } else if ($this.is('#button-content')) {
+                handlers = [magazineBuilder.loadContentsPage];
+            } else if ($this.is('#button-archive')) {
+                handlers = [
+                    function() {
+                        magazineBuilder.jumpToPage(magazineBuilder.get_NumberOfPages());
+                    }
+                ];
+            }
+            
+            $this.data('originalClickEvents', {
+                handlers: handlers,
+                bound: true
+            });
+        });
+    };
+    
+    app.bindOriginalNavigationEvents = function() {
+        $navigation.off('click').each(function() {
+            var $this = $(this);
+            var events = $this.data('originalClickEvents');
+            
+            if (! events.bound) {
+                $this.data('originalClickEvents', {
+                    handlers: events.handlers,
+                    bound: true
+                });
+                
+                $.each(events.handlers, function(i, handler) {
+                    $this.click(handler);
+                });
+            }
+        });
+        
+        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).off('click');
+        $(window).off('beforeunload');
+    };
+    
+    app.unbindOriginalNavigationEvents = function() {
+        $navigation.off('click').each(function() {
+            var $this = $(this);
+            var events = $this.data('originalClickEvents');
+            
+            if (events.bound) {
+                $this.data('originalClickEvents', {
+                    handlers: events.handlers,
+                    bound: false
+                });
+            }
+        }).click(navigate);
+        
+        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).click(navigate);
+        $(window).on('beforeunload', navigate);
     };
     
     /**
@@ -214,6 +341,8 @@ var MagTool = MagTool || {};
         app.Server.edit(pageId).done(function(data) {
             if (data.response.indexOf('is locked for editing') > -1) {
                 app.unbindOriginalKeyEvents();
+                app.unbindOriginalNavigationEvents();
+                
                 app.ContentEditor.startEdit();
                 app.UI.showEditTools();
                 
@@ -257,6 +386,7 @@ var MagTool = MagTool || {};
         
         app.Server.save(pageId, credits, contents).done(function() {
             app.bindOriginalKeyEvents();
+            app.bindOriginalNavigationEvents();
             app.ContentEditor.stopEdit();
             app.UI.hideEditTools();
             
@@ -284,6 +414,10 @@ var MagTool = MagTool || {};
     registerAction('updateUI', function() {
         var type = app.ContentEditor.getSelectionType();
         var $selectionEditor = $('#' + type + 'Selection');
+        
+        if (type !== 'credits') {
+            app.Credits.hide();
+        }
         
         app.UI.getSelectionSection().find('.selection').removeClass('--active');
         

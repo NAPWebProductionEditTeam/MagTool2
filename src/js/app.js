@@ -9,23 +9,15 @@
          * Show MagTool.
          */
         
-        // trigger repaint
-        app.UI.getUI().offset();
-
         // Fade in
         app.$doc.ready(function() {
-            if (window.document.readyState === 'complete') {
-                app.UI.show();
-            } else {
-                $(window).load(function() {
-                    app.UI.show();
-                });
-            }
+            app.UI.show();
         });
         
         // Register binds
         app.registerBindings();
         app.registerKeyBindings();
+        app.registerNavigationBindings();
         
         app.$doc.on('click', '.btn, :button, :submit, :reset', function() {
             $(this).blur();
