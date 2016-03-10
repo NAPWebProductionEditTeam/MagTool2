@@ -1,6 +1,8 @@
 var MagTool = MagTool || {};
 
 (function(window, $, app, Mousetrap) {
+    var magazineBuilder = window.magazineBuilder;
+    
     app.modules = {};
     
     app.$doc = $(window.document);
@@ -187,7 +189,12 @@ var MagTool = MagTool || {};
         var events = app.$doc.data('originalKeyEvents');
         
         if (! events.bound) {
-            $.each(events.handlers, function(handler) {
+            app.$doc.data('originalKeyEvents', {
+                handlers: events.handlers,
+                bound: true
+            });
+            
+            $.each(events.handlers, function(i, handler) {
                 app.$doc.on('keyup', null, handler);
             });
         }
@@ -197,10 +204,127 @@ var MagTool = MagTool || {};
         var events = app.$doc.data('originalKeyEvents');
         
         if (events.bound) {
-            $.each(events.handlers, function(handler) {
+            app.$doc.data('originalKeyEvents', {
+                handlers: events.handlers,
+                bound: false
+            });
+            
+            $.each(events.handlers, function(i, handler) {
                 app.$doc.off('keyup', null, handler);
             });
         }
+    };
+    
+    /**
+     * Bind navigation.
+     */
+    var navigate = function(e) {
+        if (app.ContentEditor.isEditing()) {
+            if (e.type === 'click') {
+                e.preventDefault();
+                
+                if (! confirm('You have unsaved changes, are you sure you want to continue?')) {
+                    return;
+                }
+                
+                var _this = this;
+                var $this = $(this);
+                
+                app.bindOriginalKeyEvents();
+                app.bindOriginalNavigationEvents();
+                app.ContentEditor.stopEdit();
+                
+                app.UI.hideEditTools();
+                app.UI.showBtn('editSave', 'edit');
+                
+                $this.off('click');
+                
+                $.each($this.data('originalClickEvents').handlers, function(i, handler) {
+                    handler.call(_this, e);
+                });
+                
+                return;
+            }
+            
+            return 'You have unsaved changes, are you sure you want to continue?';
+        }
+    };
+    
+    var $navigation;
+    
+    // TODO: Use same approach as key events with unbiund / bind orig evt
+    app.registerNavigationBindings = function() {
+        // Just open this one in a blank.
+        $('#button-shop').attr('target', '_blank');
+        
+        // Magazine navigation
+        $navigation = $('.control, #button-content, #button-archive');
+        
+        $navigation.off('click').each(function() {
+            var $this = $(this);
+            var handlers;
+            
+            if ($this.is('.control.prev')) {
+                handlers = [magazineBuilder.goToPreviousPage];
+            } else if ($this.is('.control.next')) {
+                handlers = [magazineBuilder.goToNextPage];
+            } else if ($this.is('#button-content')) {
+                handlers = [magazineBuilder.loadContentsPage];
+            } else if ($this.is('#button-archive')) {
+                handlers = [
+                    function() {
+                        magazineBuilder.jumpToPage(magazineBuilder.get_NumberOfPages());
+                    }
+                ];
+            }
+            
+            $this.data('originalClickEvents', {
+                handlers: handlers,
+                bound: true
+            });
+        });
+    };
+    
+    app.bindOriginalNavigationEvents = function() {
+        console.log('bind orig!');
+        
+        $navigation.off('click').each(function() {
+            var $this = $(this);
+            var events = $this.data('originalClickEvents');
+            console.log($this);
+            console.log(events);
+            
+            if (! events.bound) {
+                $this.data('originalClickEvents', {
+                    handlers: events.handlers,
+                    bound: true
+                });
+                
+                $.each(events.handlers, function(i, handler) {
+                    console.log($this);
+                    console.log(handler);
+                    $this.click(handler);
+                });
+            }
+        });
+        
+        $(window).off('beforeunload');
+    };
+    
+    app.unbindOriginalNavigationEvents = function() {
+        $navigation.off('click').each(function() {
+            var $this = $(this);
+            var events = $this.data('originalClickEvents');
+            
+            if (events.bound) {
+                $this.data('originalClickEvents', {
+                    handlers: events.handlers,
+                    bound: false
+                });
+            }
+        }).click(navigate);
+        
+        $(window).on('beforeunload', navigate);
     };
     
     /**
@@ -214,6 +338,8 @@ var MagTool = MagTool || {};
         app.Server.edit(pageId).done(function(data) {
             if (data.response.indexOf('is locked for editing') > -1) {
                 app.unbindOriginalKeyEvents();
+                app.unbindOriginalNavigationEvents();
+                
                 app.ContentEditor.startEdit();
                 app.UI.showEditTools();
                 
@@ -257,6 +383,7 @@ var MagTool = MagTool || {};
         
         app.Server.save(pageId, credits, contents).done(function() {
             app.bindOriginalKeyEvents();
+            app.bindOriginalNavigationEvents();
             app.ContentEditor.stopEdit();
             app.UI.hideEditTools();
             
