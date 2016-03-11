@@ -109,6 +109,9 @@ var MagTool = MagTool || {};
             handlers: originalKeyEvents
         });
         
+        // Reset Mousetrap in case any Mousetrap shortcuts are already bound.
+        Mousetrap.reset();
+        
         // Time to bind our own key events then.
         Mousetrap.bind('mod+e', function() {
             resolveAction('edit');
