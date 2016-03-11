@@ -118,8 +118,16 @@
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
         
         var callWidgetFunction = function($elements, widget, func, args) {
+            if (! $elements.length) {
+                return;
+            }
+            
             if (typeof args === 'undefined') {
                 args = [];
+            }
+            
+            if (func === 'instance') {
+                return $elements[widget]('instance');
             }
             
             args.unshift(func);
@@ -134,7 +142,7 @@
         };
         
         var triggerSelectable = function() {
-            var selectable = $selectable.selectable('instance');
+            var selectable = callWidgetFunction($selectable, 'selectable', 'instance');
             
             if (selectable) {
                 selectable._mouseStop(null);
@@ -149,7 +157,7 @@
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
             
-            if (this.getSelectedElements().filter($el).length === 0) {
+            if (this.getSelectedElements().filter($el).length) {
                 this.select($el);
             }
         };
@@ -230,7 +238,7 @@
             }
             
             if (refresh) {
-                $selectable.selectable('refresh');
+                callWidgetFunction($selectable, 'selectable', 'refresh');
             }
         };
         
@@ -264,9 +272,7 @@
                 app.ContentEditor.deselect($selectables);
                 $selectables.off('click');
                 
-                if ($selectable.is('.ui-selectable')) {
-                    $selectable.selectable('destroy');
-                }
+                callWidgetFunction($selectable, 'selectable', 'destroy');
             }
         };
         
@@ -459,10 +465,13 @@
         };
         
         this.applyResizable = function($el) {
+            var $filtered = $el.not('.videoHolder');
+            var $videos = $el.filter('.videoHolder');
+            
             $resizables = $resizables.add($el);
             
-            if ($el.length) {
-                $el.resizable({
+            if ($filtered.length) {
+                $filtered.resizable({
                     handles: 'e, w',
                     grid: [19, 10],
                     start: function() {
@@ -472,7 +481,7 @@
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
                         
-                        if ($(this).is('[class*=span]')) {
+                        if ($this.is('[class*=span]')) {
                             var span = Math.round(width / 19);
                             
                             $this.removeClass(function(index, css) {
@@ -485,6 +494,52 @@
                         changeXPos($this);
                         
                         $this.removeAttr("style");
+                    }
+                });
+            }
+            
+            if ($videos.length) {
+                $videos.resizable({
+                    handles: 'ne, se, sw, nw',
+                    grid: [19, 10],
+                    start: function() {
+                        app.ContentEditor.stopEditing();
+                    },
+                    resize: function() {
+                        var $this = $(this);
+                        
+                        if ($this.is('[class*=span]')) {
+                            var w = $this.width();
+                            var h = Math.ceil(w * (9 / 16));
+                            
+                            $this.height('').find('.videoLoader, .video-js').css({width: w, height: h});
+                        }
+                    },
+                    stop: function() {
+                        var $this = $(this);
+                        var width = parseInt($this.css('width'));
+                        
+                        if ($this.is('[class*=span]')) {
+                            var span = Math.round(width / 19);
+                            
+                            $this.removeClass(function(index, css) {
+                                return (css.match(/\bspan-\S+/g) || []).join(' ');
+                            });
+                            
+                            $this.addClass('span-' + span);
+                            
+                            var w = $this.width();
+                            var h = Math.ceil(w * (9 / 16));
+                            
+                            $this.find('.videoLoader, .video-js').css({width: w, height: h});
+                            
+                            var $videojs = $this.nextAll('script').first();
+                            $videojs.html($videojs.html().replace(/width: "\d+"/, 'width: "' + w + '"').replace(/height: "\d+"/, 'height: "' + h + '"'));
+                        }
+                        
+                        changeXPos($this);
+                        
+                        $this.removeAttr('style');
                     }
                 });
             }
@@ -558,7 +613,7 @@
         };
         
         this.startEditing = function($el) {
-            if ($el.length === 0) {
+            if (! $el.length) {
                 return;
             }
             
