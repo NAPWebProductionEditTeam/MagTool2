@@ -30,6 +30,17 @@ label {
     }
 }
 
+.btn-group {
+    @include component(radioBtn, uRadioBtn, checkbox) {
+        &:first-child {
+            + .btn {
+                border-bottom-left-radius: 4px !important;
+                border-top-left-radius: 4px !important;
+            }
+        }
+    }
+}
+
 .btn {
     position: relative;
     transition: color .3s, background-color .3s, border-color .3s;
