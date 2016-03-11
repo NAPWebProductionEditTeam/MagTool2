@@ -19,7 +19,7 @@
                     break;
             }
         };
-
+        
         this.align = function(alignment) {
             var $selected = app.ContentEditor.getSelection();
             
@@ -37,7 +37,7 @@
                     break;
             }
         };
-
+        
         this.changeColor = function(color) {
             var $selected = app.ContentEditor.getSelection();
             

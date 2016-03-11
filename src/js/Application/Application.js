@@ -111,7 +111,7 @@ var MagTool = MagTool || {};
         
         // Reset Mousetrap in case any Mousetrap shortcuts are already bound.
         Mousetrap.reset();
-
+        
         // Time to bind our own key events then.
         Mousetrap.bind('mod+e', function() {
             resolveAction('edit');
@@ -173,19 +173,19 @@ var MagTool = MagTool || {};
         
         Mousetrap.bind('tab', function(e) {
             e.preventDefault();
-
+            
             app.ContentEditor.selectNext();
         });
         
         Mousetrap.bind('shift+tab', function(e) {
             e.preventDefault();
-
+            
             app.ContentEditor.selectPrev();
         });
         
         Mousetrap.bind('enter', function(e) {
             e.preventDefault();
-
+            
             app.ContentEditor.startEditing(app.ContentEditor.getSelection().filter('.editable'));
         });
         
@@ -436,7 +436,6 @@ var MagTool = MagTool || {};
         
         if (type === 'text' || type === 'image' || type === 'video' || type === 'cta') {
             app.UI.getBottomSection().addClass('--active');
-
         } else {
             app.UI.getBottomSection().removeClass('--active');
         }
@@ -444,7 +443,7 @@ var MagTool = MagTool || {};
         if (['text', 'multiText', 'image', 'video', 'cta']) {
             app.Anchor.detectSelectedClass();
         }
-
+        
         switch (type) {
             case 'text':
             case 'multiText':
@@ -457,7 +456,7 @@ var MagTool = MagTool || {};
                 app.VideoEditor.detectId();
                 break;
             case 'credits':
-
+                
                 // detect cred
                 break;
             case 'cta':
@@ -466,17 +465,15 @@ var MagTool = MagTool || {};
         }
     }, false, true);
     
-    // New Text Element
+    // Create New Elements
     registerAction('new-text', function() {
         app.NewElement.newText();
     }, false, true);
-
-    // New Image Element
+    
     registerAction('new-image', function() {
         app.NewElement.newImage();
     }, false, true);
-
-    // New CTA Element
+    
     registerAction('new-cta', function() {
         app.NewElement.newCTA();
     }, false, true);
@@ -532,7 +529,7 @@ var MagTool = MagTool || {};
     registerAction('changeCta', function(cta) {
         app.CtaEditor.changeCta(cta);
     }, false, true);
-
+    
     // Image Editor
     registerAction('changeImageUrl', function(src) {
         app.ImageEditor.changeUrl(src);
@@ -541,18 +538,17 @@ var MagTool = MagTool || {};
     registerAction('changeImageSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
     }, false, true);
-
+    
     // Video Editor
     registerAction('changeVideoId', function(id) {
         app.VideoEditor.changeId(id);
     }, false, true);
-
-    // vertical Class change
+    
+    // Element Anchoring
     registerAction('changeVerticalAnchor', function(vertical) {
         app.Anchor.changeVerticalAnchor(vertical);
     }, false, true);
-
-    //
+    
     registerAction('changeHorizontalAnchor', function(horizontal) {
         app.Anchor.changeHorizontalAnchor(horizontal);
     }, false, true);

@@ -83,7 +83,7 @@
                 if ($selection.length === 1) {
                     return types[0];
                 }
-
+                
                 return 'multi' + types[0].ucfirst();
             }
             
@@ -94,27 +94,27 @@
             return $elements.sort(function(a, b) {
                 a = $(a).offset();
                 b = $(b).offset();
-
+                
                 if (a.top == b.top) {
                     if (a.left == b.left) {
                         return 0;
                     }
-
+                    
                     if (a.left > b.left) {
                         return 1;
                     }
-
+                    
                     return -1;
                 }
-
+                
                 if (a.top > b.top) {
                     return 1;
                 }
-
+                
                 return -1;
             });
         };
-
+        
         /**
          * Content interactions.
          */
@@ -125,7 +125,7 @@
             if (! $elements.length) {
                 return;
             }
-
+            
             if (typeof args === 'undefined') {
                 args = [];
             }
@@ -133,7 +133,7 @@
             if (func === 'instance') {
                 return $elements[widget]('instance');
             }
-
+            
             args.unshift(func);
             
             $elements.each(function() {
@@ -160,46 +160,46 @@
         
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
-
+            
             if (this.getSelection().filter($el).length) {
                 this.select($el);
             }
         };
-
+        
         this.selectNext = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
             var $last = this.getSelection().last();
             var index = $tabbable.index($last) + 1;
-
+            
             if (index >= $tabbable.length) {
                 index = 0;
             }
-
+            
             var $select = $($tabbable.get(index));
-
+            
             this.deselectAll();
             this.select($select);
         };
-
+        
         this.selectPrev = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
             var $first = this.getSelection().first();
             var index = $tabbable.index($first) - 1;
-
+            
             if (index < 0) {
                 index = $tabbable.length - 1;
             }
-
+            
             var $select = $($tabbable.get(index));
-
+            
             this.deselectAll();
             this.select($select);
         };
-
+        
         this.remove = function($el) {
             $el.remove();
         };
-
+        
         this.deselect = function($el) {
             $el.removeClass('ui-selected');
             triggerSelectable();
@@ -210,7 +210,7 @@
             $selected = $([]);
             triggerSelectable();
         };
-
+        
         var addSelected = function(el) {
             $selected = app.ContentEditor.sort($selected.add(el));
             $(el).addClass('ui-selected');
@@ -279,7 +279,7 @@
                 callWidgetFunction($selectable, 'selectable', 'destroy');
             }
         };
-
+        
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             
@@ -467,7 +467,7 @@
         this.applyResizable = function($el) {
             var $filtered = $el.not('.videoHolder');
             var $videos = $el.filter('.videoHolder');
-
+            
             $resizables = $resizables.add($el);
             
             if ($filtered.length) {
@@ -497,7 +497,7 @@
                     }
                 });
             }
-
+            
             if ($videos.length) {
                 $videos.resizable({
                     handles: 'ne, se, sw, nw',
@@ -507,35 +507,35 @@
                     },
                     resize: function() {
                         var $this = $(this);
-
+                        
                         if ($this.is('[class*=span]')) {
                             var w = $this.width();
                             var h = Math.ceil(w * (9 / 16));
-
+                            
                             $this.height('').find('.videoLoader, .video-js').css({width: w, height: h});
                         }
                     },
                     stop: function() {
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
-
+                        
                         changeXPos($this);
                         $this.removeAttr('style');
-
+                        
                         if ($this.is('[class*=span]')) {
                             var span = Math.round(width / 19);
-
+                            
                             $this.removeClass(function(index, css) {
                                 return (css.match(/\bspan-\S+/g) || []).join(' ');
                             });
-
+                            
                             $this.addClass('span-' + span);
-
+                            
                             var w = $this.width();
                             var h = Math.ceil(w * (9 / 16));
-
+                            
                             $this.find('.videoLoader, .video-js').css({width: w, height: h});
-
+                            
                             var $videojs = $this.nextAll('script').first();
                             $videojs.html($videojs.html().replace(/width: "\d+"/, 'width: "' + w + '"').replace(/height: "\d+"/, 'height: "' + h + '"'));
                         }
@@ -615,9 +615,9 @@
             if (! $el.length) {
                 return;
             }
-
+            
             $el = $el.first();
-
+            
             app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
