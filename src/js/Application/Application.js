@@ -165,9 +165,7 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('c', function() {
-            app.Credits.show();
-            app.ContentEditor.deselectAll();
-            app.ContentEditor.select(app.Credits.getCredits());
+            app.ContentEditor.selectOnly(app.Credits.getCredits());
         });
         
         Mousetrap.bind('tab', function(e) {
@@ -419,7 +417,13 @@ var MagTool = MagTool || {};
         var type = app.ContentEditor.getSelectionType();
         var $selectionEditor = $('#' + type + 'Selection');
         
-        if (type !== 'credits') {
+        console.log('u ui');
+        
+        if (app.ContentEditor.getSelectedElements().filter(app.Credits.getCredits()).length > 0) {
+            console.log('sh cre');
+            app.Credits.show();
+        } else {
+            console.log('hi cre');
             app.Credits.hide();
         }
         
@@ -436,6 +440,10 @@ var MagTool = MagTool || {};
                 break;
             case 'image':
                 app.ImageEditor.detectImage();
+                break;
+            case 'credits':
+
+                // detect cred
                 break;
             case 'cta':
                 app.CtaEditor.detectSelectedCta();

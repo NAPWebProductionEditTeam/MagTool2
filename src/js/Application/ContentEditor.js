@@ -87,8 +87,6 @@
         };
         
         this.sort = function($elements) {
-            console.log($elements);
-            
             return $elements.sort(function(a, b) {
                 a = $(a).offset();
                 b = $(b).offset();
@@ -148,6 +146,14 @@
             triggerSelectable();
         };
         
+        this.selectOnly = function($el) {
+            this.deselect($selected.not($el));
+            
+            if (this.getSelectedElements().filter($el).length === 0) {
+                this.select($el);
+            }
+        };
+        
         this.selectNext = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
             var $last = this.getSelectedElements().last();
@@ -181,15 +187,15 @@
         this.remove = function($el) {
             $el.remove();
         };
+
+        this.deselect = function($el) {
+            $el.removeClass('ui-selected');
+            triggerSelectable();
+        };
         
         this.deselectAll = function() {
             $selected.removeClass('ui-selected');
             $selected = $([]);
-            triggerSelectable();
-        };
-        
-        var deselect = function($el) {
-            $el.removeClass('ui-selected');
             triggerSelectable();
         };
         
@@ -212,7 +218,7 @@
                     // win ctrl || OS X cmd || shift
                     if (e.ctrlKey || e.metaKey || e.shiftKey) {
                         if ($this.hasClass('ui-selected')) {
-                            return deselect($this);
+                            return app.ContentEditor.deselect($this);
                         }
                     } else {
                         $selectable.find('.ui-selected').removeClass('ui-selected');
@@ -255,7 +261,7 @@
         
         this.removeSelectable = function() {
             if (typeof $selectable !== 'undefined') {
-                deselect($selectables);
+                app.ContentEditor.deselect($selectables);
                 $selectables.off('click');
                 
                 if ($selectable.is('.ui-selectable')) {
@@ -552,7 +558,7 @@
         };
         
         var startEditing = function($el) {
-            deselect($selectables);
+            app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
             if ($el.find('.dropcap3')) {

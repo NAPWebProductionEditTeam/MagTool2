@@ -1,22 +1,22 @@
 @include component(load) {
-  position: relative;
+    position: relative;
     display: inline-block;
-  margin: auto;
-  
-  @include option(mini-circle) {
-    width: 14px;
-    height: 14px;
-    border-radius: 14px;
-    background: #337ab7;
-    animation: .75s ease 0s infinite lmc_spin;
-  }
+    margin: auto;
+    
+    @include option(mini-circle) {
+        width: 14px;
+        height: 14px;
+        border-radius: 14px;
+        background: #337ab7;
+        animation: .75s ease 0s infinite lmc_spin;
+    }
 }
 
 @keyframes lmc_spin {
-  50% {
-    transform: rotateX(180deg);
-  }
-  100% {
-    transform: rotateX(180deg) rotateY(180deg);
-  }
+    50% {
+        transform: rotateX(180deg);
+    }
+    100% {
+        transform: rotateX(180deg) rotateY(180deg);
+    }
 }
