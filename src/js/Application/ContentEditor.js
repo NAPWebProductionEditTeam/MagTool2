@@ -68,7 +68,7 @@
                     types.push('image');
                 } else if ($this.filter('.videoHolder').length) {
                     types.push('video');
-                } else if ($this.is('.btnShopThe') || $this.find('.btnShopThe').length) {
+                } else if ($this.is('.btnShopThe') || $selected.is('.btnShopTheWhite')) {
                     types.push('cta');
                 } else if ($this.filter('[class*="creditsWhole"]').length) {
                     types.push('credits');
