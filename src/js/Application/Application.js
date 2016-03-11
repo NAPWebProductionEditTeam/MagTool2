@@ -440,17 +440,18 @@ var MagTool = MagTool || {};
         } else {
             app.UI.getBottomSection().removeClass('--active');
         }
+        
+        if (['text', 'multiText', 'image', 'video', 'cta']) {
+            app.Anchor.detectSelectedClass();
+        }
 
         switch (type) {
             case 'text':
             case 'multiText':
                 app.TextEditor.detectSelectedAlignment();
-                app.BottomEditor.detectSelectedClass();
-
                 break;
             case 'image':
                 app.ImageEditor.detectImage();
-                app.BottomEditor.detectSelectedClass();
                 break;
             case 'video':
                 app.VideoEditor.detectId();
@@ -461,10 +462,6 @@ var MagTool = MagTool || {};
                 break;
             case 'cta':
                 app.CtaEditor.detectSelectedCta();
-                app.BottomEditor.detectSelectedClass();
-                break;
-            case 'video':
-                app.BottomEditor.detectSelectedClass();
                 break;
         }
     }, false, true);
@@ -552,11 +549,11 @@ var MagTool = MagTool || {};
 
     // vertical Class change
     registerAction('changeVerticalAnchor', function(vertical) {
-        app.BottomEditor.changeVerticalAnchor(vertical);
+        app.Anchor.changeVerticalAnchor(vertical);
     }, false, true);
 
     //
     registerAction('changeHorizontalAnchor', function(horizontal) {
-        app.BottomEditor.changeHorizontalAnchor(horizontal);
+        app.Anchor.changeHorizontalAnchor(horizontal);
     }, false, true);
 })(window, $, MagTool, Mousetrap);

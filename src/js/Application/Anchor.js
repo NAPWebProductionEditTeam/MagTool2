@@ -1,87 +1,71 @@
 (function(window, $, app) {
-    function BottomEditor() {
+    function Anchor() {
         this.detectSelectedClass = function() {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getBottomSection();
-
+            
             if ($selected.is('[class*=push-down]')) {
-
                 $('#push-down').prop('checked', true);
             } else if ($selected.is('[class*=pull-up]')) {
-
                 $('#pull-up').prop('checked', true);
             }
-
+            
             if ($selected.is('[class*=push-right]')) {
                 $('#push-right').prop('checked', true);
             } else if ($selected.is('[class*=pull-left]')) {
                 $('#pull-left').prop('checked', true);
             }
         };
-
+        
         var verticalCountClass = function(posNumber) {
-            posNumber = Math.round(posNumber / 16).toString();
-            posNumber += (Math.round(posNumber / 4) / 4).toString()
-                    .replace(/^\d+/, '')
-                    .replace('.25', '-a')
-                    .replace('.5', '-b')
-                    .replace('.75', '-c');
-
-            return posNumber;
+            return Math.round(posNumber / 16).toString();
         };
-
+        
         this.changeVerticalAnchor = function(vertical) {
             var $selected = app.ContentEditor.getSelection();
+            var $parent = $selected.offsetParent();
             var currentClass = $selected.attr('class');
-            var elementHeight = parseInt($selected.outerHeight());
-            var currentPosB;
-            var currentPosT;
+            var top = $selected.offset().top - $parent.offset().top;
             var bottom;
-            var top;
-
+            
+            $selected.removeClass(function(index, css) {
+                return (css.match(/(push|pull)-(up|down)\S+/g) || []).join(' ');
+            });
+            
             if (vertical === 'push-down') {
-                currentPosB = parseInt($selected.css('bottom'));
-                top = 624 - currentPosB - elementHeight;
-                $selected.attr('class', currentClass.replace(/(push|pull)-(up|down)\S+/g, ''));
-                $selected.addClass('push-down' + '-' + verticalCountClass(top));
+                $selected.addClass('push-down-' + verticalCountClass(top));
             } else {
-                currentPosT = parseInt($selected.css('top'));
-                bottom = 624 - currentPosT - elementHeight;
-                $selected.attr('class', currentClass.replace(/(push|pull)-(up|down)\S+/g, ''));
-                $selected.addClass('pull-up' + '-' + verticalCountClass(bottom));
+                bottom = 624 - top - $selected.outerHeight();
+                $selected.addClass('pull-up-' + verticalCountClass(bottom));
             }
         };
-
+        
         var horizontalCountClass = function(posNumber) {
-            posNumber = Math.round(posNumber / 19).toString();
-            console.log(posNumber + 'posNumber');
-
-            return posNumber;
+            return Math.round(posNumber / 19).toString();
         };
-
+        
         this.changeHorizontalAnchor = function(horizontal) {
             var $selected = app.ContentEditor.getSelection();
             var currentClass = $selected.attr('class');
             var elementWidth = parseInt($selected.outerWidth());
-            var currentPosL;
-            var currentPosR;
+            var currentPosL = parseInt($selected.css('left'));
+            var currentPosR = parseInt($selected.css('right'));
             var left;
             var right;
-
+            
+            $selected.removeClass(function(index, css) {
+                return (css.match(/(push|pull)-(right|left)\S+/g) || []).join(' ');
+            });
+            
             if (horizontal === 'push-right') {
-                currentPosR = parseInt($selected.css('right'));
                 left = 950 - currentPosR - elementWidth;
-                $selected.attr('class', currentClass.replace(/(push|pull)-(right|left)\S+/g, ''));
                 $selected.addClass('push-right' + '-' + horizontalCountClass(left));
             } else {
-                currentPosL = parseInt($selected.css('left'));
                 right = 950 - currentPosL - elementWidth;
-                $selected.attr('class', currentClass.replace(/(push|pull)-(right|left)\S+/g, ''));
                 $selected.addClass('pull-left' + '-' + horizontalCountClass(right));
             }
         };
-
     }
-
-    app.modules.BottomEditor = BottomEditor;
+    
+    app.modules.Anchor = Anchor;
 })(window, jQuery, MagTool);
