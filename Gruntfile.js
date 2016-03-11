@@ -7,6 +7,7 @@ module.exports = function(grunt) {
                     'bower_components/medium-editor/dist/js/medium-editor.js',
                     'bower_components/MediumButton/src/MediumButton.js',
                     'bower_components/mousetrap-js/mousetrap.js',
+                    'bower_components/mousetrap-js/plugins/global-bind/mousetrap-global-bind.js',
                     'bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js',
                     'src/js/jQuery/**',
                     'src/js/lib/**',

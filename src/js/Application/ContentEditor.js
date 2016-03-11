@@ -50,7 +50,7 @@
         };
         
         this.getSelection = function() {
-            return app.Page.get().find('.ui-selected');
+            return this.sort(app.Page.get().find('.ui-selected'));
         };
         
         this.getSelectionType = function() {
@@ -80,12 +80,41 @@
             types = $.unique(types);
             
             if (types.length === 1) {
-                return types[0];
+                if ($selection.length === 1) {
+                    return types[0];
+                }
+
+                return 'multi' + types[0].ucfirst();
             }
             
             return 'mixed';
         };
         
+        this.sort = function($elements) {
+            return $elements.sort(function(a, b) {
+                a = $(a).offset();
+                b = $(b).offset();
+
+                if (a.top == b.top) {
+                    if (a.left == b.left) {
+                        return 0;
+                    }
+
+                    if (a.left > b.left) {
+                        return 1;
+                    }
+
+                    return -1;
+                }
+
+                if (a.top > b.top) {
+                    return 1;
+                }
+
+                return -1;
+            });
+        };
+
         /**
          * Content interactions.
          */
@@ -93,10 +122,18 @@
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
         
         var callWidgetFunction = function($elements, widget, func, args) {
+            if (! $elements.length) {
+                return;
+            }
+
             if (typeof args === 'undefined') {
                 args = [];
             }
             
+            if (func === 'instance') {
+                return $elements[widget]('instance');
+            }
+
             args.unshift(func);
             
             $elements.each(function() {
@@ -109,8 +146,7 @@
         };
         
         var triggerSelectable = function() {
-            
-            var selectable = $selectable.selectable('instance');
+            var selectable = callWidgetFunction($selectable, 'selectable', 'instance');
             
             if (selectable) {
                 selectable._mouseStop(null);
@@ -122,8 +158,51 @@
             triggerSelectable();
         };
         
+        this.selectOnly = function($el) {
+            this.deselect($selected.not($el));
+
+            if (this.getSelection().filter($el).length) {
+                this.select($el);
+            }
+        };
+
+        this.selectNext = function() {
+            var $tabbable = $selectables.not(app.Credits.getCredits());
+            var $last = this.getSelection().last();
+            var index = $tabbable.index($last) + 1;
+
+            if (index >= $tabbable.length) {
+                index = 0;
+            }
+
+            var $select = $($tabbable.get(index));
+
+            this.deselectAll();
+            this.select($select);
+        };
+
+        this.selectPrev = function() {
+            var $tabbable = $selectables.not(app.Credits.getCredits());
+            var $first = this.getSelection().first();
+            var index = $tabbable.index($first) - 1;
+
+            if (index < 0) {
+                index = $tabbable.length - 1;
+            }
+
+            var $select = $($tabbable.get(index));
+
+            this.deselectAll();
+            this.select($select);
+        };
+
         this.remove = function($el) {
             $el.remove();
+        };
+
+        this.deselect = function($el) {
+            $el.removeClass('ui-selected');
+            triggerSelectable();
         };
         
         this.deselectAll = function() {
@@ -131,14 +210,9 @@
             $selected = $([]);
             triggerSelectable();
         };
-        
-        var deselect = function($el) {
-            $el.removeClass('ui-selected');
-            triggerSelectable();
-        };
-        
+
         var addSelected = function(el) {
-            $selected = $selected.add(el);
+            $selected = app.ContentEditor.sort($selected.add(el));
             $(el).addClass('ui-selected');
         };
         
@@ -147,7 +221,7 @@
                 refresh = true;
             }
             
-            $selectables = $selectables.add($el);
+            $selectables = app.ContentEditor.sort($selectables.add($el));
             
             if ($el.length) {
                 $el.click(function(e) {
@@ -156,7 +230,7 @@
                     // win ctrl || OS X cmd || shift
                     if (e.ctrlKey || e.metaKey || e.shiftKey) {
                         if ($this.hasClass('ui-selected')) {
-                            return deselect($this);
+                            return app.ContentEditor.deselect($this);
                         }
                     } else {
                         $selectable.find('.ui-selected').removeClass('ui-selected');
@@ -168,7 +242,7 @@
             }
             
             if (refresh) {
-                $selectable.selectable('refresh');
+                callWidgetFunction($selectable, 'selectable', 'refresh');
             }
         };
         
@@ -199,19 +273,13 @@
         
         this.removeSelectable = function() {
             if (typeof $selectable !== 'undefined') {
-                deselect($selectables);
+                app.ContentEditor.deselect($selectables);
                 $selectables.off('click');
                 
-                if ($selectable.is('.ui-selectable')) {
-                    $selectable.selectable('destroy');
-                }
+                callWidgetFunction($selectable, 'selectable', 'destroy');
             }
         };
-        
-        this.getSelectedElements = function() {
-            return app.Page.get().find('.ui-selected');
-        };
-        
+
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             
@@ -244,7 +312,7 @@
                     start: function(e, ui) {
                         var $this = $(this);
                         
-                        stopEditing($this);
+                        app.ContentEditor.stopEditing();
                         
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
@@ -397,20 +465,23 @@
         };
         
         this.applyResizable = function($el) {
+            var $filtered = $el.not('.videoHolder');
+            var $videos = $el.filter('.videoHolder');
+
             $resizables = $resizables.add($el);
             
-            if ($el.length) {
-                $el.resizable({
+            if ($filtered.length) {
+                $filtered.resizable({
                     handles: 'e, w',
                     grid: [19, 10],
                     start: function() {
-                        stopEditing($(this));
+                        app.ContentEditor.stopEditing();
                     },
                     stop: function() {
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
                         
-                        if ($(this).is('[class*=span]')) {
+                        if ($this.is('[class*=span]')) {
                             var span = Math.round(width / 19);
                             
                             $this.removeClass(function(index, css) {
@@ -423,6 +494,51 @@
                         changeXPos($this);
                         
                         $this.removeAttr("style");
+                    }
+                });
+            }
+
+            if ($videos.length) {
+                $videos.resizable({
+                    handles: 'ne, se, sw, nw',
+                    grid: [19, 10],
+                    start: function() {
+                        app.ContentEditor.stopEditing();
+                    },
+                    resize: function() {
+                        var $this = $(this);
+
+                        if ($this.is('[class*=span]')) {
+                            var w = $this.width();
+                            var h = Math.ceil(w * (9 / 16));
+
+                            $this.height('').find('.videoLoader, .video-js').css({width: w, height: h});
+                        }
+                    },
+                    stop: function() {
+                        var $this = $(this);
+                        var width = parseInt($this.css('width'));
+
+                        changeXPos($this);
+                        $this.removeAttr('style');
+
+                        if ($this.is('[class*=span]')) {
+                            var span = Math.round(width / 19);
+
+                            $this.removeClass(function(index, css) {
+                                return (css.match(/\bspan-\S+/g) || []).join(' ');
+                            });
+
+                            $this.addClass('span-' + span);
+
+                            var w = $this.width();
+                            var h = Math.ceil(w * (9 / 16));
+
+                            $this.find('.videoLoader, .video-js').css({width: w, height: h});
+
+                            var $videojs = $this.nextAll('script').first();
+                            $videojs.html($videojs.html().replace(/width: "\d+"/, 'width: "' + w + '"').replace(/height: "\d+"/, 'height: "' + h + '"'));
+                        }
                     }
                 });
             }
@@ -495,8 +611,14 @@
             });
         };
         
-        var startEditing = function($el) {
-            deselect($selectables);
+        this.startEditing = function($el) {
+            if (! $el.length) {
+                return;
+            }
+
+            $el = $el.first();
+
+            app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
             if ($el.find('.dropcap3')) {
@@ -542,7 +664,7 @@
                 }
                 
                 if (stop) {
-                    stopEditing();
+                    app.ContentEditor.stopEditing();
                 }
             });
             $(document).click($(document).data('click'));
@@ -550,9 +672,7 @@
             $editing = $el;
         };
         
-        window.startEdit = startEditing;
-        
-        var stopEditing = function() {
+        this.stopEditing = function() {
             if (! $editing) {
                 return;
             }
@@ -592,11 +712,11 @@
                 // If we are currently editing a different element,
                 // stop editing it.
                 if ($editing) {
-                    stopEditing($editing);
+                    app.ContentEditor.stopEditing();
                 }
                 
                 $this.off('dblclick');
-                startEditing($this);
+                app.ContentEditor.startEditing($this);
             });
         };
         

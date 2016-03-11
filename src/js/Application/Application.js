@@ -46,7 +46,7 @@ var MagTool = MagTool || {};
         });
         
         // Change bindings
-        app.UI.getUI().find('input[data-change], textarea[data-change]').on('change paste', function() {
+        app.UI.getUI().find('input[data-change], textarea[data-change], select[data-change]').on('change paste', function() {
             var value;
             var $this = $(this);
             var $group = $([]);
@@ -109,6 +109,9 @@ var MagTool = MagTool || {};
             handlers: originalKeyEvents
         });
         
+        // Reset Mousetrap in case any Mousetrap shortcuts are already bound.
+        Mousetrap.reset();
+
         // Time to bind our own key events then.
         Mousetrap.bind('mod+e', function() {
             resolveAction('edit');
@@ -161,29 +164,33 @@ var MagTool = MagTool || {};
         Mousetrap.bind(['backspace', 'del'], function(e) {
             e.preventDefault();
             
-            app.ContentEditor.remove(app.ContentEditor.getSelectedElements());
+            app.ContentEditor.remove(app.ContentEditor.getSelection());
         });
         
         Mousetrap.bind('c', function() {
-            app.Credits.show();
-            app.ContentEditor.deselectAll();
-            app.ContentEditor.select(app.Credits.getCredits());
+            app.ContentEditor.selectOnly(app.Credits.getCredits());
         });
         
-        Mousetrap.bind('tab', function() {
-            // select next ui-selectee
+        Mousetrap.bind('tab', function(e) {
+            e.preventDefault();
+
+            app.ContentEditor.selectNext();
         });
         
-        Mousetrap.bind('shift+tab', function() {
-            // select prev ui-selectee
+        Mousetrap.bind('shift+tab', function(e) {
+            e.preventDefault();
+
+            app.ContentEditor.selectPrev();
         });
         
-        Mousetrap.bind('enter', function() {
-            // start editing selected
+        Mousetrap.bind('enter', function(e) {
+            e.preventDefault();
+
+            app.ContentEditor.startEditing(app.ContentEditor.getSelection().filter('.editable'));
         });
         
-        Mousetrap.bind('mod+enter', function() {
-            // stop editing selected
+        Mousetrap.bindGlobal('mod+enter', function() {
+            app.ContentEditor.stopEditing();
         });
     };
     
@@ -413,9 +420,11 @@ var MagTool = MagTool || {};
     
     registerAction('updateUI', function() {
         var type = app.ContentEditor.getSelectionType();
-        var $selectionEditor = $('#' + type + 'Selection');
+        var $selectionEditor = app.UI.getSelectionSection().find('[data-selection~="' + type + '"]');
         
-        if (type !== 'credits') {
+        if (app.ContentEditor.getSelection().filter(app.Credits.getCredits()).length > 0) {
+            app.Credits.show();
+        } else {
             app.Credits.hide();
         }
         
@@ -434,6 +443,7 @@ var MagTool = MagTool || {};
 
         switch (type) {
             case 'text':
+            case 'multiText':
                 app.TextEditor.detectSelectedAlignment();
                 app.BottomEditor.detectSelectedClass();
 
@@ -441,6 +451,13 @@ var MagTool = MagTool || {};
             case 'image':
                 app.ImageEditor.detectImage();
                 app.BottomEditor.detectSelectedClass();
+                break;
+            case 'video':
+                app.VideoEditor.detectId();
+                break;
+            case 'credits':
+
+                // detect cred
                 break;
             case 'cta':
                 app.CtaEditor.detectSelectedCta();
@@ -520,12 +537,17 @@ var MagTool = MagTool || {};
     }, false, true);
 
     // Image Editor
-    registerAction('changeUrl', function(src) {
+    registerAction('changeImageUrl', function(src) {
         app.ImageEditor.changeUrl(src);
     }, false, true);
     
-    registerAction('changeSize', function(w, h) {
+    registerAction('changeImageSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
+    }, false, true);
+
+    // Video Editor
+    registerAction('changeVideoId', function(id) {
+        app.VideoEditor.changeId(id);
     }, false, true);
 
     // vertical Class change

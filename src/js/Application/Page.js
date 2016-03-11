@@ -2,14 +2,8 @@
 
 (function(window, $, app, builder) {
     function Page() {
-        var $currentPage;
-        
         this.get = function() {
-            if (typeof $currentPage === 'undefined') {
-                $currentPage = $('#page' + builder.get_CurrentPageNumber());
-            }
-            
-            return $currentPage;
+            return $('#page' + builder.get_CurrentPageNumber());
         };
         
         this.getContent = function() {

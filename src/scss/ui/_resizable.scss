@@ -1,8 +1,6 @@
 $uiResizableGrabSize: 32px;
 
 .ui-resizable-handle {
-    @include absolute((top: -$uiPadding, bottom: -$uiPadding));
-    width: $uiResizableGrabSize;
     opacity: 0;
     transition: opacity .3s;
     
@@ -12,25 +10,107 @@ $uiResizableGrabSize: 32px;
     
     &:after {
         content: '';
-        @include absolute((top: 0, left: 50%));
-        width: 1px;
-        height: 100%;
         background: rgba(#B975FF, 1);
         box-shadow: 0 0 8px rgba(#B975FF, .5);
     }
-    
-    &.ui-resizable-e {
-        right: - ($uiResizableGrabSize / 2 + $uiPadding);
-        cursor: e-resize;
-        
-        &:after {
-            margin-left: -1px;
-        }
+}
+
+.ui-resizable-n, .ui-resizable-s {
+    @include absolute((left: -$uiPadding, right: -$uiPadding));
+    height: $uiResizableGrabSize;
+
+    &:after {
+        @include absolute((top: 0, left: 50%));
+        width: 100%;
+        height: 1px;
     }
+}
+
+.ui-resizable-e, .ui-resizable-w {
+    @include absolute((top: -$uiPadding, bottom: -$uiPadding));
+    width: $uiResizableGrabSize;
+
+    &:after {
+        @include absolute((top: 0, left: 50%));
+        width: 1px;
+        height: 100%;
+    }
+}
+
+.ui-resizable-n {
+    top: - ($uiResizableGrabSize / 2 + $uiPadding);
+    cursor: n-resize;
+}
+
+.ui-resizable-e {
+    right: - ($uiResizableGrabSize / 2 + $uiPadding);
+    cursor: e-resize;
     
-    &.ui-resizable-w {
-        left: - ($uiResizableGrabSize / 2 + $uiPadding);
-        cursor: w-resize;
+    &:after {
+        margin-left: -1px;
+    }
+}
+
+.ui-resizable-s {
+    bottom: - ($uiResizableGrabSize / 2 + $uiPadding);
+    cursor: s-resize;
+}
+
+.ui-resizable-w {
+    left: - ($uiResizableGrabSize / 2 + $uiPadding);
+    cursor: w-resize;
+}
+
+.ui-resizable-ne, .ui-resizable-se, .ui-resizable-sw, .ui-resizable-nw {
+	position: absolute;
+    @include size($uiResizableGrabSize, $uiResizableGrabSize);
+    
+    &:after {
+        @include size($uiResizableGrabSize / 2, $uiResizableGrabSize / 2);
+    }
+}
+
+.ui-resizable-ne {
+    top: - (($uiResizableGrabSize + $uiPadding) / 2);
+    right: - (($uiResizableGrabSize + $uiPadding) / 2);
+    cursor: ne-resize;
+
+    &:after {
+        @include absolute((bottom: 2px, left: 2px));
+        border-radius: 0 0 0 ($uiResizableGrabSize / 2);
+    }
+}
+
+.ui-resizable-se {
+    right: - (($uiResizableGrabSize + $uiPadding) / 2);
+    bottom: - (($uiResizableGrabSize + $uiPadding) / 2);
+    cursor: se-resize;
+
+    &:after {
+        @include absolute((top: 2px, left: 2px));
+        border-radius: ($uiResizableGrabSize / 2) 0 0 0;
+    }
+}
+
+.ui-resizable-sw {
+    bottom: - (($uiResizableGrabSize + $uiPadding) / 2);
+    left: - (($uiResizableGrabSize + $uiPadding) / 2);
+    cursor: sw-resize;
+
+    &:after {
+        @include absolute((top: 2px, right: 2px));
+        border-radius: 0 ($uiResizableGrabSize / 2) 0 0;
+    }
+}
+
+.ui-resizable-nw {
+    top: - (($uiResizableGrabSize + $uiPadding) / 2);
+    left: - (($uiResizableGrabSize + $uiPadding) / 2);
+    cursor: nw-resize;
+
+    &:after {
+        @include absolute((bottom: 2px, right: 2px));
+        border-radius: 0 0 ($uiResizableGrabSize / 2) 0;
     }
 }
 
