@@ -46,7 +46,7 @@ var MagTool = MagTool || {};
         });
         
         // Change bindings
-        app.UI.getUI().find('input[data-change], textarea[data-change]').on('change paste', function() {
+        app.UI.getUI().find('input[data-change], textarea[data-change], select[data-change]').on('change paste', function() {
             var value;
             var $this = $(this);
             var $group = $([]);
@@ -515,7 +515,7 @@ var MagTool = MagTool || {};
     registerAction('changeCta', function(cta) {
         app.CtaEditor.changeCta(cta);
     }, false, true);
-
+    
     // Image Editor
     registerAction('changeUrl', function(src) {
         app.ImageEditor.changeUrl(src);
@@ -524,12 +524,12 @@ var MagTool = MagTool || {};
     registerAction('changeSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
     }, false, true);
-
+    
     // vertical Class change
     registerAction('changeVerticalClass', function(vertical) {
         app.TextEditor.changeVerticalClass(vertical);
     }, false, true);
-
+    
     //
     registerAction('changeHorizontalClass', function(horizontal) {
         app.TextEditor.changeHorizontalClass(horizontal);
