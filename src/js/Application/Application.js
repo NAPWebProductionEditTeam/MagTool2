@@ -539,6 +539,7 @@ var MagTool = MagTool || {};
     registerAction('changeCtaColor', function(ctaColor) {
         app.CtaEditor.changeCtaColor(ctaColor);
     }, false, true);
+
     // Image Editor
     registerAction('changeImageUrl', function(src) {
         app.ImageEditor.changeUrl(src);
