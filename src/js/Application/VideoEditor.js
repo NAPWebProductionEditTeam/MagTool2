@@ -10,8 +10,6 @@
             var $js = this.getJs($video);
             var id = $js.html().match(/.*videoID\s*:\s*"(\d+)".*/)[1];
             
-            console.log($js, id);
-            
             $editor.val(id);
         };
         
