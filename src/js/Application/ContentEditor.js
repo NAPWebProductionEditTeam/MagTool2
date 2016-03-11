@@ -519,6 +519,9 @@
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
                         
+                        changeXPos($this);
+                        $this.removeAttr('style');
+                        
                         if ($this.is('[class*=span]')) {
                             var span = Math.round(width / 19);
                             
@@ -536,10 +539,6 @@
                             var $videojs = $this.nextAll('script').first();
                             $videojs.html($videojs.html().replace(/width: "\d+"/, 'width: "' + w + '"').replace(/height: "\d+"/, 'height: "' + h + '"'));
                         }
-                        
-                        changeXPos($this);
-                        
-                        $this.removeAttr('style');
                     }
                 });
             }
