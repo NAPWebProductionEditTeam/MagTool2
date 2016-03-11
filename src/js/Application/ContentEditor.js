@@ -306,7 +306,7 @@
                     start: function(e, ui) {
                         var $this = $(this);
                         
-                        stopEditing($this);
+                        app.ContentEditor.stopEditing();
                         
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
@@ -466,7 +466,7 @@
                     handles: 'e, w',
                     grid: [19, 10],
                     start: function() {
-                        stopEditing($(this));
+                        app.ContentEditor.stopEditing();
                     },
                     stop: function() {
                         var $this = $(this);
@@ -557,7 +557,13 @@
             });
         };
         
-        var startEditing = function($el) {
+        this.startEditing = function($el) {
+            if ($el.length === 0) {
+                return;
+            }
+            
+            $el = $el.first();
+            
             app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
@@ -604,7 +610,7 @@
                 }
                 
                 if (stop) {
-                    stopEditing();
+                    app.ContentEditor.stopEditing();
                 }
             });
             $(document).click($(document).data('click'));
@@ -612,9 +618,7 @@
             $editing = $el;
         };
         
-        window.startEdit = startEditing;
-        
-        var stopEditing = function() {
+        this.stopEditing = function() {
             if (! $editing) {
                 return;
             }
@@ -654,11 +658,11 @@
                 // If we are currently editing a different element,
                 // stop editing it.
                 if ($editing) {
-                    stopEditing($editing);
+                    app.ContentEditor.stopEditing();
                 }
                 
                 $this.off('dblclick');
-                startEditing($this);
+                app.ContentEditor.startEditing($this);
             });
         };
         

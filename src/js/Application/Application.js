@@ -180,12 +180,14 @@ var MagTool = MagTool || {};
             app.ContentEditor.selectPrev();
         });
         
-        Mousetrap.bind('enter', function() {
-            // start editing selected
+        Mousetrap.bind('enter', function(e) {
+            e.preventDefault();
+            
+            app.ContentEditor.startEditing(app.ContentEditor.getSelectedElements().filter('.editable'));
         });
         
-        Mousetrap.bind('mod+enter', function() {
-            // stop editing selected
+        Mousetrap.bindGlobal('mod+enter', function() {
+            app.ContentEditor.stopEditing();
         });
     };
     
@@ -417,13 +419,9 @@ var MagTool = MagTool || {};
         var type = app.ContentEditor.getSelectionType();
         var $selectionEditor = $('#' + type + 'Selection');
         
-        console.log('u ui');
-        
         if (app.ContentEditor.getSelectedElements().filter(app.Credits.getCredits()).length > 0) {
-            console.log('sh cre');
             app.Credits.show();
         } else {
-            console.log('hi cre');
             app.Credits.hide();
         }
         
