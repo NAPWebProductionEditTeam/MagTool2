@@ -10,6 +10,10 @@
             } else {
                 $selectionControls.filter('#CTA').val('NO CTA');
             }
+
+            if ($selected.is('.btnShopThe')) {
+                $selectionControls.filter('#ctaBlack').prop('checked', true);
+            }
         };
 
         this.changeCta = function(cta) {

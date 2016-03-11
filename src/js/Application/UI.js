@@ -3,7 +3,7 @@
     var clearTimeout = window.clearTimeout;
     
     function UI() {
-        var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls;
+        var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls, $bottomSection;
         
         this.show = function() {
             // dirty but that's the only way I could get it to work 100% of the time.
@@ -87,6 +87,14 @@
             return $selectionSection;
         };
         
+        this.getBottomSection = function() {
+            if (typeof $bottomSection === 'undefined') {
+                $bottomSection = this.getUI().find('#bottom-section');
+            }
+
+            return $bottomSection;
+        };
+
         this.getSelectionControls = function() {
             if (typeof $selectionControls === 'undefined') {
                 $selectionControls = this.getUI().find('.selection-controls :input');

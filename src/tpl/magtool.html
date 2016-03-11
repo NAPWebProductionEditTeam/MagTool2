@@ -118,7 +118,7 @@
 
             <!-- Element Specific Tools -->
             <section class="col-md-6 section selection-controls">
-                <div class="wrapper">
+                <div class="wrapper selection/container">
                     <!-- textSelection -->
                     <div class="form-horizontal selection" id="textSelection">
                         <div class="form-group">
@@ -153,34 +153,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">Vertical:</label>
-                            <div class="col-sm-4">
-                                <div class="btn-group">
-                                    <input type="radio" class="radioBtn" name="vertical" id="push-down" value="push-down" data-change="changeVerticalClass">
-                                    <label class="btn btn-default" for="push-down">
-                                        push down
-                                    </label>
-                                    <input type="radio" class="radioBtn" name="vertical" id="pull-up" value="pull-up" data-change="changeVerticalClass">
-                                    <label class="btn btn-default" for="pull-up">
-                                        pull up
-                                    </label>
-                                </div>
-                            </div>
-                            <label class="col-sm-2 control-label">Horizontal:</label>
-                             <div class="col-sm-4">
-                                <div class="btn-group">
-                                    <input type="radio" class="radioBtn" name="horizontal" id="push-right" value="push-right" data-change="changeHorizontalClass">
-                                    <label class="btn btn-default" for="push-right">
-                                        push right
-                                    </label>
-                                    <input type="radio" class="radioBtn" name="horizontal" id="pull-left" value="pull-left" data-change="changeHorizontalClass">
-                                    <label class="btn btn-default" for="pull-left">
-                                        pull left
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- imageSelection -->
@@ -190,7 +162,7 @@
                                 <label for="imageURL" class="col-sm-2 control-label">
                                     URL
                                 </label>
-                                <div class="col-sm-6">
+                                <div class="col-sm-7">
                                     <input type="url" class="form-control" id="imageURL" placeholder="" data-change="changeUrl">
                                 </div>
                             </div>
@@ -198,13 +170,14 @@
                                 <label for="imageWidth" class="col-sm-2 control-label">
                                     Size
                                 </label>
-                                <div class="col-sm-3">
+                                <div class="col-sm-2">
                                     <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" placeholder="100" data-change="changeSize">
-                                    <p class="help-block" id="naturalWidth"></p>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeSize">
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeSize">
-                                    <p class="help-block" id="naturalHeight"></p>
+                                    <p class="help-block" id="naturalSize"></p>
                                 </div>
                             </div>
                         </form>
@@ -255,7 +228,39 @@
                             You have selected elements of multiple types.
                         </p>
                     </div>
+
                 </div>
+                <div class="wrapper">
+                 <div class="form-horizontal selection bottom-section" id="bottom-section">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Anchor</label>
+                            <div class="col-sm-4">
+                                <div class="btn-group">
+                                    <input type="radio" class="radioBtn" name="verticalAnchor" id="push-down" value="push-down" data-change="changeVerticalAnchor">
+                                    <label class="btn btn-default" for="push-down">
+                                        Top
+                                    </label>
+                                    <input type="radio" class="radioBtn" name="verticalAnchor" id="pull-up" value="pull-up" data-change="changeVerticalAnchor">
+                                    <label class="btn btn-default" for="pull-up">
+                                        Bottom
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="btn-group">
+                                    <input type="radio" class="radioBtn" name="horizontalAnchor" id="push-right" value="push-right" data-change="changeHorizontalAnchor">
+                                    <label class="btn btn-default" for="push-right">
+                                        Left
+                                    </label>
+                                    <input type="radio" class="radioBtn" name="horizontalAnchor" id="pull-left" value="pull-left" data-change="changeHorizontalAnchor">
+                                    <label class="btn btn-default" for="pull-left">
+                                        Right
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
             </section>
         </div>
     </div>

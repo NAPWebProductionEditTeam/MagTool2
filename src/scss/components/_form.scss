@@ -6,7 +6,7 @@ label {
 	padding: 0 12px;
 }
 
-@include component(radioBtn, uRadioBtn) {
+@include component(radioBtn, uRadioBtn, checkbox) {
     display: none;
     
     + label {

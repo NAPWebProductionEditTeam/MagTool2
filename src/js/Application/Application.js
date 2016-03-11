@@ -425,16 +425,29 @@ var MagTool = MagTool || {};
             $selectionEditor.addClass('--active');
         }
         
+        if (type === 'text' || type === 'image' || type === 'video' || type === 'cta') {
+            app.UI.getBottomSection().addClass('--active');
+
+        } else {
+            app.UI.getBottomSection().removeClass('--active');
+        }
+
         switch (type) {
             case 'text':
                 app.TextEditor.detectSelectedAlignment();
-                app.TextEditor.detectSelectedClass();
+                app.BottomEditor.detectSelectedClass();
+
                 break;
             case 'image':
                 app.ImageEditor.detectImage();
+                app.BottomEditor.detectSelectedClass();
                 break;
             case 'cta':
                 app.CtaEditor.detectSelectedCta();
+                app.BottomEditor.detectSelectedClass();
+                break;
+            case 'video':
+                app.BottomEditor.detectSelectedClass();
                 break;
         }
     }, false, true);
@@ -516,12 +529,12 @@ var MagTool = MagTool || {};
     }, false, true);
 
     // vertical Class change
-    registerAction('changeVerticalClass', function(vertical) {
-        app.TextEditor.changeVerticalClass(vertical);
+    registerAction('changeVerticalAnchor', function(vertical) {
+        app.BottomEditor.changeVerticalAnchor(vertical);
     }, false, true);
 
     //
-    registerAction('changeHorizontalClass', function(horizontal) {
-        app.TextEditor.changeHorizontalClass(horizontal);
+    registerAction('changeHorizontalAnchor', function(horizontal) {
+        app.BottomEditor.changeHorizontalAnchor(horizontal);
     }, false, true);
 })(window, $, MagTool, Mousetrap);

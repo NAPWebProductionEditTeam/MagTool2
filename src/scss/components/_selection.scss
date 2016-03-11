@@ -11,4 +11,7 @@
         transition: opacity .3s ease .3s;
     }
 
+    @include part(container) {
+        height: (34px + 15px) * 2;
+    }
 }
