@@ -529,7 +529,15 @@ var MagTool = MagTool || {};
     registerAction('changeCta', function(cta) {
         app.CtaEditor.changeCta(cta);
     }, false, true);
+<<<<<<< HEAD
     
+=======
+
+    registerAction('changeCtaColor', function(ctaColor) {
+        app.CtaEditor.changeCtaColor(ctaColor);
+    }, false, true);
+
+>>>>>>> origin/master
     // Image Editor
     registerAction('changeImageUrl', function(src) {
         app.ImageEditor.changeUrl(src);

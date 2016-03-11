@@ -4,16 +4,33 @@
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
             var $oldCta = $selected.find('a').attr('data-magtool');
+<<<<<<< HEAD
             
             if ($selected.is('.btnShopThe')) {
+=======
+
+            if ($selected.is('.btnShopThe') || $selected.is('.btnShopTheWhite')) {
+>>>>>>> origin/master
                 $selectionControls.filter('#CTA').val($oldCta);
+
+                if ($selected.is('.btnShopThe')) {
+                    $selectionControls.filter('#ctaBlack').prop('checked', true);
+                    $selectionControls.filter('#ctaWhite').prop('checked', false);
+
+                } else {
+                    $selectionControls.filter('#ctaWhite').prop('checked', true);
+                    $selectionControls.filter('#ctaBlack').prop('checked', false);
+                }
             } else {
                 $selectionControls.filter('#CTA').val('NO CTA');
             }
+<<<<<<< HEAD
             
             if ($selected.is('.btnShopThe')) {
                 $selectionControls.filter('#ctaBlack').prop('checked', true);
             }
+=======
+>>>>>>> origin/master
         };
         
         this.changeCta = function(cta) {
@@ -24,6 +41,18 @@
             
             if (cta !== $oldCta && $selected.is('.btnShopThe')) {
                 $selected.find('a').attr('data-magtool', cta);
+            }
+        };
+
+        this.changeCtaColor = function(ctaColor) {
+            var $selected = app.ContentEditor.getSelection();
+            var $selectionControls = app.UI.getSelectionControls();
+            $selected.removeClass('btnShopThe btnShopTheWhite');
+
+            if (ctaColor == 'ctaBlack') {
+                $selected.addClass('btnShopThe');
+            } else {
+                $selected.addClass('btnShopTheWhite');
             }
         };
     }
