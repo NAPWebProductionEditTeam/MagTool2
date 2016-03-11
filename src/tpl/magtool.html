@@ -120,9 +120,9 @@
             <section class="col-md-6 section selection-controls">
                 <div class="wrapper">
                     <!-- textSelection -->
-                    <div class="form-horizontal selection" id="textSelection">
+                    <div class="form-horizontal selection" data-selection="text multiText">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">Align:</label>
+                            <label class="col-sm-2 control-label">Align</label>
                             <div class="col-sm-4">
                                 <div class="btn-group">
                                     <input type="checkbox" class="uRadioBtn" name="textAlignment" id="leftText" value="leftText" data-change="alignSelected">
@@ -139,7 +139,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <label class="col-sm-2 control-label">Colour:</label>
+                            <label class="col-sm-2 control-label">Colour</label>
                             <div class="col-sm-4">
                                 <div class="btn-group">
                                     <input type="checkbox" class="uRadioBtn" name="fontColor" id="black" value="black" data-change="changeColor">
@@ -182,16 +182,16 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- imageSelection -->
-                    <div class="form-horizontal selection" id="imageSelection">
+                    <div class="form-horizontal selection" data-selection="image">
                         <form class="form-horizontal">
                             <div class="form-group">
                                 <label for="imageURL" class="col-sm-2 control-label">
                                     URL
                                 </label>
                                 <div class="col-sm-6">
-                                    <input type="url" class="form-control" id="imageURL" placeholder="" data-change="changeUrl">
+                                    <input type="url" class="form-control" id="imageURL" data-change="changeImageUrl">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -199,22 +199,36 @@
                                     Size
                                 </label>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" placeholder="100" data-change="changeSize">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" placeholder="100" data-change="changeImageSize">
                                     <p class="help-block" id="naturalWidth"></p>
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeSize">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeImageSize">
                                     <p class="help-block" id="naturalHeight"></p>
                                 </div>
                             </div>
                         </form>
                     </div>
-
+                    
+                    <!-- videoSelection -->
+                    <div class="form-horizontal selection" data-selection="video">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="videoId" class="col-sm-2 control-label">
+                                    Id
+                                </label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="videoId" data-change="changeVideoId">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
                     <!-- creditsSelection -->
-                    <div class="form-horizontal selection" id="creditsSelection">
+                    <div class="form-horizontal selection" data-selection="credits">
                         <div class="form-group">
                             <label for="creditsContents" class="col-sm-2 control-label">
-                                Contents:
+                                Contents
                             </label>
                             <div class="col-sm-8">
                                 <textarea class="form-control" rows="5" data-change="updateCredits" id="creditsEditor"></textarea>
@@ -223,9 +237,9 @@
                     </div>
 
                     <!-- CtaSelection -->
-                    <div class="form-horizontal selection" id="ctaSelection">
+                    <div class="form-horizontal selection" data-selection="cta">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label">Colour:</label>
+                            <label class="col-sm-2 control-label">Colour</label>
                             <div class="col-sm-10">
                                 <div class="btn-group">
                                     <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaBlack" value="ctaBlack" data-change="changeCtaColor">
@@ -250,7 +264,7 @@
                     </div>
 
                     <!-- mixedSelection -->
-                    <div class="selection" id="mixedSelection">
+                    <div class="selection" data-selection="mixed">
                         <p class="lead">
                             You have selected elements of multiple types.
                         </p>

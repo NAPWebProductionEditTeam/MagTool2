@@ -111,7 +111,7 @@ var MagTool = MagTool || {};
         
         // Reset Mousetrap in case any Mousetrap shortcuts are already bound.
         Mousetrap.reset();
-        
+
         // Time to bind our own key events then.
         Mousetrap.bind('mod+e', function() {
             resolveAction('edit');
@@ -164,7 +164,7 @@ var MagTool = MagTool || {};
         Mousetrap.bind(['backspace', 'del'], function(e) {
             e.preventDefault();
             
-            app.ContentEditor.remove(app.ContentEditor.getSelectedElements());
+            app.ContentEditor.remove(app.ContentEditor.getSelection());
         });
         
         Mousetrap.bind('c', function() {
@@ -186,7 +186,7 @@ var MagTool = MagTool || {};
         Mousetrap.bind('enter', function(e) {
             e.preventDefault();
             
-            app.ContentEditor.startEditing(app.ContentEditor.getSelectedElements().filter('.editable'));
+            app.ContentEditor.startEditing(app.ContentEditor.getSelection().filter('.editable'));
         });
         
         Mousetrap.bindGlobal('mod+enter', function() {
@@ -420,9 +420,9 @@ var MagTool = MagTool || {};
     
     registerAction('updateUI', function() {
         var type = app.ContentEditor.getSelectionType();
-        var $selectionEditor = $('#' + type + 'Selection');
+        var $selectionEditor = app.UI.getSelectionSection().find('[data-selection~="' + type + '"]');
         
-        if (app.ContentEditor.getSelectedElements().filter(app.Credits.getCredits()).length > 0) {
+        if (app.ContentEditor.getSelection().filter(app.Credits.getCredits()).length > 0) {
             app.Credits.show();
         } else {
             app.Credits.hide();
@@ -436,11 +436,15 @@ var MagTool = MagTool || {};
         
         switch (type) {
             case 'text':
+            case 'multiText':
                 app.TextEditor.detectSelectedAlignment();
                 app.TextEditor.detectSelectedClass();
                 break;
             case 'image':
                 app.ImageEditor.detectImage();
+                break;
+            case 'video':
+                app.VideoEditor.detectId();
                 break;
             case 'credits':
 
@@ -520,12 +524,17 @@ var MagTool = MagTool || {};
     }, false, true);
     
     // Image Editor
-    registerAction('changeUrl', function(src) {
+    registerAction('changeImageUrl', function(src) {
         app.ImageEditor.changeUrl(src);
     }, false, true);
     
-    registerAction('changeSize', function(w, h) {
+    registerAction('changeImageSize', function(w, h) {
         app.ImageEditor.changeSize(w, h);
+    }, false, true);
+    
+    // Video Editor
+    registerAction('changeVideoId', function(id) {
+        app.VideoEditor.changeId(id);
     }, false, true);
     
     // vertical Class change

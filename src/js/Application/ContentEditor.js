@@ -50,7 +50,7 @@
         };
         
         this.getSelection = function() {
-            return app.Page.get().find('.ui-selected');
+            return this.sort(app.Page.get().find('.ui-selected'));
         };
         
         this.getSelectionType = function() {
@@ -80,7 +80,11 @@
             types = $.unique(types);
             
             if (types.length === 1) {
-                return types[0];
+                if ($selection.length === 1) {
+                    return types[0];
+                }
+                
+                return 'multi' + types[0].ucfirst();
             }
             
             return 'mixed';
@@ -157,14 +161,14 @@
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
             
-            if (this.getSelectedElements().filter($el).length) {
+            if (this.getSelection().filter($el).length) {
                 this.select($el);
             }
         };
         
         this.selectNext = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
-            var $last = this.getSelectedElements().last();
+            var $last = this.getSelection().last();
             var index = $tabbable.index($last) + 1;
             
             if (index >= $tabbable.length) {
@@ -179,7 +183,7 @@
         
         this.selectPrev = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
-            var $first = this.getSelectedElements().first();
+            var $first = this.getSelection().first();
             var index = $tabbable.index($first) - 1;
             
             if (index < 0) {
@@ -274,10 +278,6 @@
                 
                 callWidgetFunction($selectable, 'selectable', 'destroy');
             }
-        };
-        
-        this.getSelectedElements = function() {
-            return this.sort(app.Page.get().find('.ui-selected'));
         };
         
         var changeXPos = function($this) {
