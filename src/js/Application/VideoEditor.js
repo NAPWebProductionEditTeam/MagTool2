@@ -9,7 +9,7 @@
             var $video = app.ContentEditor.getSelection();
             var $js = this.getJs($video);
             var id = $js.html().match(/.*videoID\s*:\s*"(\d+)".*/)[1];
-
+            
             $editor.val(id);
         };
         
