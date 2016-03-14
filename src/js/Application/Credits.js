@@ -56,7 +56,7 @@
             text = text.replace(/<br>/g, '\n');
             $editor.val(text);
         };
-        
+
         this.show = function() {
             this.getCredits().fadeIn(300);
         };
