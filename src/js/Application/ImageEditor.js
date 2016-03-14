@@ -55,15 +55,15 @@
             var imgH = $selected.find('img').prop('naturalHeight');
 
             if (w == imgW || w === '') {
-                $selected.find('img').removeAttr('width');                
+                $selected.find('img').removeAttr('width');
             } else if (w !== currentW) {
-                $selected.find('img').attr('width', w);                
+                $selected.find('img').attr('width', w);
             }
 
             if (h == imgH || h === '') {
-                $selected.find('img').removeAttr('height');                
+                $selected.find('img').removeAttr('height');
             } else if (h !== currentH) {
-                $selected.find('img').attr('height', h);                
+                $selected.find('img').attr('height', h);
             }
         };
     }
