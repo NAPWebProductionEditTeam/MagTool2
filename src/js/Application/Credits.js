@@ -23,8 +23,6 @@
                 creditsHolder.addClass('creditsHolderRight').removeClass('creditsHolderLeft');
                 creditsWhole.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
             }
-
-            //
         };
         
         this.toggleColor = function() {

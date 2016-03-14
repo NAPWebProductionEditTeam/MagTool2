@@ -436,7 +436,6 @@ var MagTool = MagTool || {};
         
         if (type === 'text' || type === 'image' || type === 'video' || type === 'cta') {
             app.UI.getBottomSection().addClass('--active');
-
         } else {
             app.UI.getBottomSection().removeClass('--active');
         }
@@ -466,17 +465,15 @@ var MagTool = MagTool || {};
         }
     }, false, true);
     
-    // New Text Element
+    // Create New Elements
     registerAction('new-text', function() {
         app.NewElement.newText();
     }, false, true);
 
-    // New Image Element
     registerAction('new-image', function() {
         app.NewElement.newImage();
     }, false, true);
 
-    // New CTA Element
     registerAction('new-cta', function() {
         app.NewElement.newCTA();
     }, false, true);
@@ -551,12 +548,11 @@ var MagTool = MagTool || {};
         app.VideoEditor.changeId(id);
     }, false, true);
 
-    // vertical Class change
+    // Element Anchoring
     registerAction('changeVerticalAnchor', function(vertical) {
         app.Anchor.changeVerticalAnchor(vertical);
     }, false, true);
 
-    //
     registerAction('changeHorizontalAnchor', function(horizontal) {
         app.Anchor.changeHorizontalAnchor(horizontal);
     }, false, true);

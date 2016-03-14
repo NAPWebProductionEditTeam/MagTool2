@@ -11,7 +11,6 @@
                 if ($selected.is('.btnShopThe')) {
                     $selectionControls.filter('#ctaBlack').prop('checked', true);
                     $selectionControls.filter('#ctaWhite').prop('checked', false);
-
                 } else {
                     $selectionControls.filter('#ctaWhite').prop('checked', true);
                     $selectionControls.filter('#ctaBlack').prop('checked', false);

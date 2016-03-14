@@ -48,12 +48,11 @@
         };
 
         this.changeSize = function(w, h) {
-            console.log(w, h);
-
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
             var imgW = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
+
             w = $selectionControls.filter('#imageWidth').val();
             h = $selectionControls.filter('#imageHeight').val();
 
