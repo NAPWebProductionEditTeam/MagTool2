@@ -49,23 +49,21 @@
 
         this.changeSize = function(w, h) {
             var $selected = app.ContentEditor.getSelection();
-            var $selectionControls = app.UI.getSelectionControls();
+            var currentW = $selected.find('img').attr('width');
+            var currentH = $selected.find('img').attr('height');
             var imgW = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
 
-            w = $selectionControls.filter('#imageWidth').val();
-            h = $selectionControls.filter('#imageHeight').val();
-
             if (w == imgW || w === '') {
-                $selected.find('img').removeAttr('width');
+                $selected.find('img').removeAttr('width');                
             } else if (w !== currentW) {
-                $selected.find('img').attr('width', w);
+                $selected.find('img').attr('width', w);                
             }
 
             if (h == imgH || h === '') {
-                $selected.find('img').removeAttr('height');
+                $selected.find('img').removeAttr('height');                
             } else if (h !== currentH) {
-                $selected.find('img').attr('height', h);
+                $selected.find('img').attr('height', h);                
             }
         };
     }
