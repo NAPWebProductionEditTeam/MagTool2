@@ -51,10 +51,11 @@
             console.log(w, h);
 
             var $selected = app.ContentEditor.getSelection();
-            var currentW = $selected.find('img').attr('width');
-            var currentH = $selected.find('img').attr('height');
+            var $selectionControls = app.UI.getSelectionControls();
             var imgW = $selected.find('img').prop('naturalWidth');
             var imgH = $selected.find('img').prop('naturalHeight');
+            w = $selectionControls.filter('#imageWidth').val();
+            h = $selectionControls.filter('#imageHeight').val();
 
             if (w == imgW || w === '') {
                 $selected.find('img').removeAttr('width');
