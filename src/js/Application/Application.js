@@ -268,11 +268,12 @@ var MagTool = MagTool || {};
         }
     };
     
-    var $navigation;
+    var $navigation, $pageLinks;
     
     app.registerNavigationBindings = function() {
         // Magazine navigation
         $navigation = $('.control, #button-content, #button-archive');
+        $pageLinks = app.Page.getContent().find('a');
         
         $navigation.each(function() {
             var $this = $(this);
@@ -333,7 +334,11 @@ var MagTool = MagTool || {};
             }
         }).click(navigate);
         
-        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).click(navigate);
+        $pageLinks.click(function(e) {
+            e.preventDefault();
+        });
+        
+        $('a:not([target="_blank"]):not(.js-popup)').not($navigation).not($pageLinks).click(navigate);
         $(window).on('beforeunload', navigate);
     };
     
