@@ -1,10 +1,11 @@
-(function(window, $, app, Medium) {
+(function(window, $, require, app) {
     var console = window.console;
+    var minify = require('html-minifier').minify;
     
     function Exporter() {
         var $html;
         
-        var getHtml = function() {
+        var getCloneContainer = function() {
             if (typeof $html === 'undefined' || ! $html.length) {
                 $html = $('#html');
             }
@@ -13,40 +14,68 @@
         };
         
         var clearHtml = function() {
-            getHtml().html('');
+            getCloneContainer().html('');
+        };
+        
+        var removeVideo = function() {
+            getCloneContainer().find('.videoLoader').children().remove();
+        };
+        
+        var removeUnnecessaryBreaks = function() {
+            getCloneContainer().find('br:first-child, br:last-child').remove();
+        };
+        
+        var removeStyleAttributes = function() {
+            getCloneContainer().find('[style]:not(.videoLoader)').removeAttr('style');
         };
         
         var cleanUp = function() {
-            app.Page.get().find('[style]:not(.videoLoader):not(object)').removeAttr('style');
-            app.Page.get().find('[contenteditable], [aria-disabled], [data-mtifont], .ui-resizable, .onEdit')
-                .removeClass('onEdit ui-resizable')
-                .removeAttr('contenteditable aria-disabled data-mtifont');
+            removeVideo();
+            removeUnnecessaryBreaks();
+            removeStyleAttributes();
+        };
+        
+        var getHtml = function($elements) {
+            var $cloneContainer = getCloneContainer();
+            var html;
+            
+            clearHtml();
+            
+            $elements.clone().appendTo($cloneContainer);
+            
+            cleanUp();
+            
+            html = $cloneContainer.html();
+            html = minify(html, {
+                removeComments: true,
+                collapseWhitespace: true,
+                collapseBooleanAttributes: true,
+                removeRedundantAttributes: true,
+                removeEmptyAttributes: true,
+                quoteCharacter: '"'
+            });
+            
+            return html;
         };
         
         var getCreditsHtml = function() {
-            clearHtml();
-            
-            app.Page.get().find('[class^="credits"]').clone().appendTo(getHtml());
-            
-            return getHtml().html();
+            return getHtml(app.Page.get().find('[class^="credits"]'));
         };
         
         var getContentHtml = function() {
-            clearHtml();
-            
-            app.Page.get()
-                .find('.magazineContent div:not([class^="credits"]):not(.edLetterList):not(.videoHolder)').clone().appendTo($html);
-            
-            return $html.html();
+            return getHtml(app.Page.get().find('.magazineContent > div:not([class^="credits"]):not(.edLetterList):not(.videoHolder)'));
         };
         
         var getVideoHtml = function() {
-            clearHtml();
+            var $elements = app.Page.get().find('.videoHolder');
+            $elements.add(app.VideoEditor.getJs($elements));
             
-            app.Page.get().find('.videoHolder #videojs').clone().appendTo($html);
-            
-            return $html.html();
+            return getHtml($elements);
         };
+        
+        this.getCreditsHtml = getCreditsHtml;
+        this.getContentHtml = getContentHtml;
+        this.getVideoHtml = getVideoHtml;
         
         this.toJSON = function() {
             return {
@@ -73,4 +102,4 @@
     }
     
     app.modules.Exporter = Exporter;
-})(window, jQuery, MagTool);
+})(window, jQuery, require, MagTool);

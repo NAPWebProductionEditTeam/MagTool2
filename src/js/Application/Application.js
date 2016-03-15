@@ -8,6 +8,10 @@ var MagTool = MagTool || {};
     app.$doc = $(window.document);
     app.$body = $('body');
     
+    app.getLanguage = function() {
+        return app.$body.data('language');
+    };
+    
     var resolveAction = app.resolveAction = function(actionName, params) {
         var action = app[actionName];
         

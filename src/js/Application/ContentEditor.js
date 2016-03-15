@@ -2,6 +2,7 @@
     var parseInt = window.parseInt;
     var parseFloat = window.parseFloat;
     var document = window.document;
+    var Node = window.Node;
     
     function ContentEditor() {
         var editing = false;
@@ -570,8 +571,19 @@
         
         var editor, $editing;
         
+        var getSelectedElement = function() {
+            var Selection = window.getSelection();
+            var node = Selection.focusNode;
+            
+            if (node.nodeType == Node.TEXT_NODE) {
+                return node.parentNode;
+            }
+            
+            return node;
+        };
+        
         var makeEditor = function(selector) {
-            return new Medium.editor(selector, {
+            var options = {
                 disableExtraSpaces: true,
                 toolbar: {
                     buttons: [
@@ -583,17 +595,18 @@
                         'h4',
                         'h5',
                         'span',
+                        'dropcap',
                         'case'
                     ]
                 },
                 extensions: {
                     'b': new Medium.button({
-                        label: '<b>B</b>',
+                        label: '<i class="fa fa-bold"></i>',
                         start: '<strong>',
                         end: '</strong>'
                     }),
                     'i': new Medium.button({
-                        label: '<b><i>I</i></b>',
+                        label: '<i class="fa fa-italic"></i>',
                         start: '<em>',
                         end: '</em>'
                     }),
@@ -602,36 +615,61 @@
                         start: '<span>',
                         end: '</span>'
                     }),
+                    'dropcap': new Medium.button({
+                        label: '<b>A</b><i class="fa fa-ellipsis-v"></i>',
+                        action: function(html, mark) {
+                            var el = getSelectedElement();
+                            
+                            editor.selectElement(el);
+                            
+                            html = window.getCurrentSelection();
+                            html = '<p class="dropcap3">' + html + '</p>';
+                            
+                            return html;
+                        }
+                    }),
                     'case': new Medium.button({
                         label: '<b>Aa</b>',
                         start: '<span class="upperCase">',
                         end: '</span>'
                     })
                 }
-            });
+            };
+            
+            return new Medium.editor(selector, options);
         };
         
         this.startEditing = function($el) {
             if (! $el.length) {
                 return;
             }
-
+            
             $el = $el.first();
-
+            
             app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
+            $el.data('class', {});
+            
             if ($el.find('.dropcap3')) {
                 var $dropcap = $el.find('.dropcap3');
-                var classes = [];
                 
-                if ($dropcap.data('class')) {
-                    classes = $dropcap.data('class').split(' ');
-                }
+                $dropcap.each(function() {
+                    var $this = $(this);
+                    var id = $this.get(0).tagName.toLowerCase() + $this.index();
+                    var classObj = $el.data('class');
+                    
+                    if (typeof classObj[id] !== 'undefined') {
+                        classObj[id].push('dropcap3');
+                    } else {
+                        classObj[id] = ['dropcap3'];
+                    }
+                    
+                    $this.attr('id', id);
+                    $el.data('class', classObj);
+                });
                 
-                classes.push('dropcap3');
-                
-                $dropcap.attr('data-class', classes.join(' ')).removeClass('dropcap3');
+                $dropcap.removeClass('dropcap3');
             }
             
             app.ContentEditor.disableDraggable($el);
@@ -641,6 +679,21 @@
             editor = window.editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
+            
+            // Remove id from new nodes.
+            $el.keyup(function(e) {
+                if (e.keyCode === 13 && ! e.shiftKey) {
+                    var $node, $parent;
+                    
+                    $node = $(getSelectedElement());
+                    
+                    if ($node.is('span, em, strong') && ($parent = $node.parents('p, :header')).length) {
+                        $node = $parent;
+                    }
+                    
+                    $node.removeAttr('id');
+                }
+            });
             
             $(document).data('click', function(e) {
                 if (! $editing) {
@@ -689,11 +742,29 @@
             
             $(document).off('click', $(document).data('click'));
             
-            $el.find('[data-class]').each(function() {
-                var $child = $(this);
+            var classObj = $el.data('class');
+            
+            for (var id in classObj) {
+                var classes = classObj[id];
+                var $child = $el.find('#' + id);
                 
-                $child.addClass($child.data('class'));
-            });
+                if ($child.length) {
+                    $child.addClass(classes.join(' '));
+                }
+            }
+            
+            $el.off('keyup');
+            
+            // Remove all empty elements.
+            $el.find('p, :header, em, strong, span').filter(function() {
+                return ! $(this).text();
+            }).remove();
+            
+            $el.find('span[style]').contents().unwrap();
+            $el.find('[id]').removeAttr('id');
+            
+            // Ensure newline before .dropcap3
+            $el.find('.dropcap3').prev(':not(br)').after('<br>');
             
             app.ContentEditor.enableDraggable($el);
             app.ContentEditor.enableResizable($el);

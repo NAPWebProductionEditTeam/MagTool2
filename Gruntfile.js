@@ -10,6 +10,7 @@ module.exports = function(grunt) {
                     'bower_components/mousetrap-js/plugins/global-bind/mousetrap-global-bind.js',
                     'bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js',
                     'src/js/jQuery/**',
+                    'src/js/vendor.js',
                     'src/js/lib/**',
                     'src/js/Application/Application.js',
                     'src/js/Application/**/*.js',
@@ -18,18 +19,28 @@ module.exports = function(grunt) {
                 dest: 'build/js/MagazineTool.js'
             },
         },
+        browserify: {
+            vendor: {
+                src: [],
+                dest: 'src/js/vendor.js',
+                options: {
+                    require: ['html-minifier']
+                }
+            }
+        },
         jshint: {
-            files: ['Gruntfile.js', 'src/**/*.js'],
+            files: ['Gruntfile.js', 'src/**/*.js', '!src/js/vendor.js'],
             options: {
                 // options here to override JSHint defaults
                 '-W008': true,
+                '-W027': true,
                 globals: {
                     jQuery: true
                 }
             }
         },
         jscs: {
-            files: ['Gruntfile.js', 'src/**/*.js'],
+            files: ['Gruntfile.js', 'src/**/*.js', '!src/js/vendor.js'],
             options: {
                 config: 'jscs.json',
                 fix: true
@@ -188,6 +199,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-exec');
     
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-jscs');
@@ -198,8 +210,8 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     
-    grunt.registerTask('default', ['jshint', 'jscs', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
+    grunt.registerTask('default', ['jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
+    grunt.registerTask('dist', ['jshint', 'jscs', 'browserify', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     
