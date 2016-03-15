@@ -2,40 +2,96 @@
     var Date = window.Date;
     
     function Modal() {
-        var $modal = $('#modal');
-        var $dialog = $modal.find('.modal-dialog');
-        var $header = $modal.find('.modal-header');
-        var $body = $modal.find('.modal-body');
-        
-        var $title = $modal.find('.modal-title');
-        var $content = $body.find('p');
-        
-        var $alert = $modal.find('[data-footer="alert"]');
-        var $confirm = $modal.find('[data-footer="confirm"]');
-        
+        var $modal, $dialog, $header, $title, $content, $modal_blocks;
+        var type;
+        var typeBlocks = {};
         var resized = false;
         
-        $modal.modal({
-            show: false
-        });
-        
-        $modal.on('hidden.bs.modal', function() {
-            resized = false;
-        });
-
-        $modal.on('show.bs.modal', function() {
-            if (! resized) {
-                app.Modal.size();
+        var init = function(_type) {
+            type = _type;
+            
+            if (typeof $modal !== 'undefined') {
+                return;
             }
-        });
+            
+            $modal = $('#modal');
+            $dialog = $modal.find('.modal-dialog');
+            $header = $modal.find('.modal-header');
+            
+            $title = $modal.find('.modal-title');
+            
+            $modal_blocks = $modal.find('[data-modal-type]');
+            
+            $modal.modal({
+                show: false
+            });
+            
+            $modal.on('hidden.bs.modal', function() {
+                resized = false;
+            });
+            
+            $modal.on('show.bs.modal', function() {
+                if (! resized) {
+                    app.Modal.size();
+                }
+            });
+        };
         
-        var setContent = function(title, content) {
+        var getBlocks = function() {
+            if (typeof typeBlocks[type] === 'undefined') {
+                typeBlocks[type] = $modal.find('[data-modal-type~="' + type + '"]');
+            }
+            
+            return typeBlocks[type];
+        };
+        
+        var getBody = function() {
+            var bodyType = type + ':body';
+            
+            if (typeof typeBlocks[bodyType] === 'undefined') {
+                typeBlocks[bodyType] = getBlocks(type).filter('.modal-body');
+            }
+            
+            return typeBlocks[bodyType];
+        };
+        
+        var getContent = function() {
+            var contentType = type + ':content';
+            
+            if (typeof typeBlocks[contentType] === 'undefined') {
+                typeBlocks[contentType] = getBody(type).find('p');
+            }
+            
+            return typeBlocks[contentType];
+        };
+        
+        var getFooter = function() {
+            var footerType = type + ':footer';
+            
+            if (typeof typeBlocks[footerType] === 'undefined') {
+                typeBlocks[footerType] = getBlocks(type).filter('.modal-footer');
+            }
+            
+            return typeBlocks[footerType];
+        };
+        
+        this.init = init;
+        this.getTypeBlocks = getBlocks;
+        
+        var setTitle = function(title) {
             if (title) {
                 $header.removeClass('+hide');
                 $title.text(title);
             } else {
                 $header.addClass('+hide');
             }
+        };
+        
+        var setContent = function(title, content) {
+            setTitle(title);
+            
+            var $body = getBody();
+            var $content = getContent();
             
             if (content) {
                 $body.removeClass('+hide');
@@ -46,18 +102,21 @@
         };
         
         this.confirm = function(e, title, content, ok, cancel) {
+            init('confirm');
+            
             title = Argument.default(title, false);
             content = Argument.default(content, false);
             ok = Argument.default(ok, 'Continue');
             cancel = Argument.default(cancel, 'Cancel');
             
+            var $confirm = getBlocks();
             var fire = ! e.isDefaultPrevented();
             
             // Cancel event
             e.preventDefault();
             
-            // Show appropriate footer
-            $alert.addClass('+hide');
+            // Show appropriate blocks
+            $modal_blocks.addClass('+hide');
             $confirm.removeClass('+hide');
             
             // Set content
@@ -97,12 +156,16 @@
         };
         
         this.alert = function(title, content, ok) {
+            init('alert');
+            
             title = Argument.default(title, false);
             content = Argument.default(content, false);
             ok = Argument.default(ok, 'Okay');
             
-            // Show appropriate footer
-            $confirm.addClass('+hide');
+            var $alert = getBlocks('alert');
+            
+            // Show appropriate blocks
+            $modal_blocks.addClass('+hide');
             $alert.removeClass('+hide');
             
             // Set content
@@ -114,6 +177,66 @@
             
             // For chaining...
             return this;
+        };
+        
+        // Usage: select('title', {'': '-- Please select --', red: 'Red', blue: 'Blue'})
+        //          .done(function(v) { console.log(v); })
+        //          .fail(function() { console.error('failed'); });
+        this.select = function(title, options, cancel) {
+            init('select');
+            
+            title = Argument.default(title, false);
+            options = Argument.default(options, false);
+            cancel = Argument.default(cancel, 'Cancel');
+            
+            if (! options) {
+                return console.err('Options argument must be defined!');
+            }
+            
+            var Deferred = $.Deferred();
+            var $select = getBlocks('select');
+            
+            // Show appropriate blocks
+            $modal_blocks.addClass('+hide');
+            $select.removeClass('+hide');
+            
+            setTitle(title);
+            $select.find('[data-dismiss]').text(cancel);
+            
+            var $input = $select.find('#modal-select');
+            
+            for (var option in options) {
+                var $option = $('<option/>');
+                
+                $option.attr('value', option);
+                $option.text(options[option]);
+                $option.appendTo($input);
+            }
+            
+            $modal.modal('show');
+            
+            $input.change(function(e) {
+                var val = $(this).val();
+                
+                if (val) {
+                    Deferred.resolve(val, e);
+                    
+                    $modal.modal('hide');
+                }
+            });
+            
+            $modal.on('hide.bs.modal', function(e) {
+                Deferred.reject(e);
+            });
+            
+            Deferred.always(function() {
+                $input.off('change');
+                $modal.off('hide.bs.modal');
+                
+                $input.empty();
+            });
+            
+            return Deferred;
         };
         
         this.size = function(size) {

@@ -308,13 +308,16 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><i class="fa fa-close"></i></button>
                     <h4 class="modal-title"></h4>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" data-modal-type="alert confirm">
                     <p></p>
                 </div>
-                <div class="modal-footer" data-footer="alert">
+                <div class="modal-body" data-modal-type="select">
+                    <select class="form-control" id="modal-select"></select>
+                </div>
+                <div class="modal-footer" data-modal-type="alert select">
                     <button type="button" class="btn btn-primary" data-dismiss="modal"></button>
                 </div>
-                <div class="modal-footer" data-footer="confirm">
+                <div class="modal-footer" data-modal-type="confirm">
                     <button type="button" class="btn btn-default" data-dismiss="modal"></button>
                     <button type="button" class="btn btn-primary" data-confirm></button>
                 </div>

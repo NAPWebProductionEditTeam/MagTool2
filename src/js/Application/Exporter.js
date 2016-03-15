@@ -21,7 +21,7 @@
             getCloneContainer().find('.videoLoader').children().remove();
         };
         
-        var removeUnnecessaryBreaks = function() {
+        var trimBreakTags = function() {
             getCloneContainer().find('br:first-child, br:last-child').remove();
         };
         
@@ -31,7 +31,7 @@
         
         var cleanUp = function() {
             removeVideo();
-            removeUnnecessaryBreaks();
+            trimBreakTags();
             removeStyleAttributes();
         };
         
