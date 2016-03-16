@@ -105,6 +105,5 @@
     "requireLineBreakAfterVariableAssignment": true,
     "requireNumericLiterals": true,
     "requireParenthesesAroundIIFE": true,
-    "requireSemicolons": true,
-    "safeContextKeyword": ["_this"]
+    "requireSemicolons": true
 }

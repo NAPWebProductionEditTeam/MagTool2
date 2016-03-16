@@ -133,7 +133,7 @@ module.exports = function(grunt) {
                 tasks: ['exec:npm_update']
             },
             js: {
-                files: ['Gruntfile.js', 'src/**/*.js'],
+                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js'],
                 tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
             },
             tpl: {
