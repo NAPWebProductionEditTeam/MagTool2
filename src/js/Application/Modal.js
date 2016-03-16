@@ -150,9 +150,6 @@
             
             // Show modal
             $modal.modal('show');
-            
-            // For chaining...
-            return this;
         };
         
         this.alert = function(title, content, ok) {
@@ -174,9 +171,6 @@
             
             // Show modal
             $modal.modal('show');
-            
-            // For chaining...
-            return this;
         };
         
         // Usage: select('title', {'': '-- Please select --', red: 'Red', blue: 'Blue'})
