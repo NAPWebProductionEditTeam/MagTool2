@@ -49,18 +49,6 @@
             getCloneContainer().html('');
         };
         
-        var removeVideo = function() {
-            getCloneContainer().find('.videoLoader').children().remove();
-        };
-        
-        var trimBreakTags = function() {
-            getCloneContainer().find('br:first-child, br:last-child').remove();
-        };
-        
-        var removeStyleAttributes = function() {
-            getCloneContainer().find('[style]:not(.videoLoader)').removeAttr('style');
-        };
-        
         /**
          * Ensure none of the textContent is actually in ALL CAPS. Good for SEO.
          *
@@ -159,6 +147,28 @@
             });
         };
         
+        var removeVideo = function() {
+            getCloneContainer().find('.videoLoader').children().remove();
+        };
+        
+        var trimBreakTags = function() {
+            getCloneContainer().find('br:first-child, br:last-child').remove();
+        };
+        
+        var removeStyleAttributes = function() {
+            getCloneContainer().find('[style]:not(.videoLoader)').removeAttr('style');
+        };
+        
+        var prepareCtaForTemplate = function() {
+            var $ctaLinks = getCloneContainer().find('a[data-magtool]');
+            
+            $ctaLinks.each(function() {
+                var $this = $(this);
+                
+                $this.attr('href', "${CtaLinkXML['" + $this.data('magtool') + "'].@url}");
+            });
+        };
+        
         var cleanUp = function() {
             var $container = app.Page.getContent();
             var nodes = getAllNodes($container.get(0).childNodes);
@@ -179,17 +189,18 @@
             removeVideo();
             trimBreakTags();
             removeStyleAttributes();
+            prepareCtaForTemplate();
         };
         
         var getHtml = function($elements) {
             var $cloneContainer = getCloneContainer();
             var html;
             
-            clearHtml();
+            cleanUp();
             
+            clearHtml();
             $elements.clone().appendTo($cloneContainer);
             
-            cleanUp();
             cleanUpForServer($cloneContainer);
             
             html = $cloneContainer.html();
