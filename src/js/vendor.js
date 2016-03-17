@@ -22850,6 +22850,7 @@ function tokenizer($TEXT, filename, html5_comments, shebang) {
                 if (octal_len > 0) ch = String.fromCharCode(parseInt(ch, 8));
                 else ch = read_escaped_char(true);
             }
+            else if ("\r\n\u2028\u2029".indexOf(ch) >= 0) parse_error("Unterminated string constant");
             else if (ch == quote) break;
             ret += ch;
         }
@@ -23175,9 +23176,9 @@ function parse($TEXT, options) {
         );
     };
 
-    function semicolon() {
+    function semicolon(optional) {
         if (is("punc", ";")) next();
-        else if (!can_insert_semicolon()) unexpected();
+        else if (!optional && !can_insert_semicolon()) unexpected();
     };
 
     function parenthesised() {
@@ -23265,7 +23266,7 @@ function parse($TEXT, options) {
               case "do":
                 return new AST_Do({
                     body      : in_loop(statement),
-                    condition : (expect_token("keyword", "while"), tmp = parenthesised(), semicolon(), tmp)
+                    condition : (expect_token("keyword", "while"), tmp = parenthesised(), semicolon(true), tmp)
                 });
 
               case "while":
@@ -23627,6 +23628,13 @@ function parse($TEXT, options) {
                 ret = new AST_Null({ start: tok, end: tok });
                 break;
             }
+            break;
+          case "operator":
+            if (!is_identifier_string(tok.value)) {
+                throw new JS_Parse_Error("Invalid getter/setter name: " + tok.value,
+                    tok.file, tok.line, tok.col, tok.pos);
+            }
+            ret = _make_symbol(AST_SymbolRef);
             break;
         }
         next();
@@ -24017,7 +24025,7 @@ TreeTransformer.prototype = new TreeWalker;
                     x = this;
                     descend(x, tw);
                 } else {
-                    tw.stack[tw.stack.length - 1] = x = this.clone();
+                    tw.stack[tw.stack.length - 1] = x = this;
                     descend(x, tw);
                     y = tw.after(x, in_list);
                     if (y !== undefined) x = y;
@@ -24266,6 +24274,7 @@ AST_Toplevel.DEFMETHOD("figure_out_scope", function(options){
     var scope = self.parent_scope = null;
     var labels = new Dictionary();
     var defun = null;
+    var last_var_had_const_pragma = false;
     var nesting = 0;
     var tw = new TreeWalker(function(node, descend){
         if (options.screw_ie8 && node instanceof AST_Catch) {
@@ -24323,10 +24332,13 @@ AST_Toplevel.DEFMETHOD("figure_out_scope", function(options){
             // later.
             (node.scope = defun.parent_scope).def_function(node);
         }
+        else if (node instanceof AST_Var) {
+            last_var_had_const_pragma = node.has_const_pragma();
+        }
         else if (node instanceof AST_SymbolVar
                  || node instanceof AST_SymbolConst) {
             var def = defun.def_variable(node);
-            def.constant = node instanceof AST_SymbolConst;
+            def.constant = node instanceof AST_SymbolConst || last_var_had_const_pragma;
             def.init = tw.parent().value;
         }
         else if (node instanceof AST_SymbolCatch) {
@@ -24362,6 +24374,11 @@ AST_Toplevel.DEFMETHOD("figure_out_scope", function(options){
         }
         if (node instanceof AST_SymbolRef) {
             var name = node.name;
+            if (name == "eval" && tw.parent() instanceof AST_Call) {
+                for (var s = node.scope; s && !s.uses_eval; s = s.parent_scope) {
+                    s.uses_eval = true;
+                }
+            }
             var sym = node.scope.find_variable(name);
             if (!sym) {
                 var g;
@@ -24374,10 +24391,6 @@ AST_Toplevel.DEFMETHOD("figure_out_scope", function(options){
                     globals.set(name, g);
                 }
                 node.thedef = g;
-                if (name == "eval" && tw.parent() instanceof AST_Call) {
-                    for (var s = node.scope; s && !s.uses_eval; s = s.parent_scope)
-                        s.uses_eval = true;
-                }
                 if (func && name == "arguments") {
                     func.uses_arguments = true;
                 }
@@ -24409,6 +24422,10 @@ AST_Scope.DEFMETHOD("init_scope_vars", function(nesting){
 AST_Lambda.DEFMETHOD("init_scope_vars", function(){
     AST_Scope.prototype.init_scope_vars.apply(this, arguments);
     this.uses_arguments = false;
+
+    var symbol = new AST_VarDef({ name: "arguments", start: this.start, end: this.end });
+    var def = new SymbolDef(this, this.variables.size(), symbol);
+    this.variables.set(symbol.name, def);
 });
 
 AST_SymbolRef.DEFMETHOD("reference", function() {
@@ -24525,6 +24542,12 @@ AST_Symbol.DEFMETHOD("global", function(){
     return this.definition().global;
 });
 
+AST_Var.DEFMETHOD("has_const_pragma", function() {
+    var comments_before = this.start && this.start.comments_before;
+    var lastComment = comments_before && comments_before[comments_before.length - 1];
+    return lastComment && /@const\b/.test(lastComment.value);
+});
+
 AST_Toplevel.DEFMETHOD("_default_mangler_options", function(options){
     return defaults(options, {
         except      : [],
@@ -24538,6 +24561,10 @@ AST_Toplevel.DEFMETHOD("_default_mangler_options", function(options){
 
 AST_Toplevel.DEFMETHOD("mangle_names", function(options){
     options = this._default_mangler_options(options);
+
+    // Never mangle arguments
+    options.except.push('arguments');
+
     // We only need to mangle declaration nodes.  Special logic wired
     // into the code generator will display the mangled name if it's
     // present (and for AST_SymbolRef-s it'll use the mangled name of
@@ -25234,11 +25261,11 @@ function OutputStream(options) {
                 });
             } else if (c.test) {
                 comments = comments.filter(function(comment){
-                    return c.test(comment.value) || comment.type == "comment5";
+                    return comment.type == "comment5" || c.test(comment.value);
                 });
             } else if (typeof c == "function") {
                 comments = comments.filter(function(comment){
-                    return c(self, comment) || comment.type == "comment5";
+                    return comment.type == "comment5" || c(self, comment);
                 });
             }
 
@@ -26228,6 +26255,7 @@ function Compressor(options, false_by_default) {
         hoist_vars    : false,
         if_return     : !false_by_default,
         join_vars     : !false_by_default,
+        collapse_vars : false,
         cascade       : !false_by_default,
         side_effects  : !false_by_default,
         pure_getters  : false,
@@ -26337,6 +26365,23 @@ merge(Compressor.prototype, {
         }
     };
 
+    // we shouldn't compress (1,func)(something) to
+    // func(something) because that changes the meaning of
+    // the func (becomes lexical instead of global).
+    function maintain_this_binding(parent, orig, val) {
+        if (parent instanceof AST_Call && parent.expression === orig) {
+            if (val instanceof AST_PropAccess || val instanceof AST_SymbolRef && val.name === "eval") {
+                return make_node(AST_Seq, orig, {
+                    car: make_node(AST_Number, orig, {
+                        value: 0
+                    }),
+                    cdr: val
+                });
+            }
+        }
+        return val;
+    }
+
     function as_statement_array(thing) {
         if (thing === null) return [];
         if (thing instanceof AST_BlockStatement) return thing.body;
@@ -26380,6 +26425,9 @@ merge(Compressor.prototype, {
             if (compressor.option("join_vars")) {
                 statements = join_consecutive_vars(statements, compressor);
             }
+            if (compressor.option("collapse_vars")) {
+                statements = collapse_single_use_vars(statements, compressor);
+            }
         } while (CHANGED && max_iter-- > 0);
 
         if (compressor.option("negate_iife")) {
@@ -26387,6 +26435,163 @@ merge(Compressor.prototype, {
         }
 
         return statements;
+
+        function collapse_single_use_vars(statements, compressor) {
+            // Iterate statements backwards looking for a statement with a var/const
+            // declaration immediately preceding it. Grab the rightmost var definition
+            // and if it has exactly one reference then attempt to replace its reference
+            // in the statement with the var value and then erase the var definition.
+
+            var self = compressor.self();
+            var var_defs_removed = false;
+            for (var stat_index = statements.length; --stat_index >= 0;) {
+                var stat = statements[stat_index];
+                if (stat instanceof AST_Definitions) continue;
+
+                // Process child blocks of statement if present.
+                [stat, stat.body, stat.alternative, stat.bcatch, stat.bfinally].forEach(function(node) {
+                    node && node.body && collapse_single_use_vars(node.body, compressor);
+                });
+
+                // The variable definition must precede a statement.
+                if (stat_index <= 0) break;
+                var prev_stat_index = stat_index - 1;
+                var prev_stat = statements[prev_stat_index];
+                if (!(prev_stat instanceof AST_Definitions)) continue;
+                var var_defs = prev_stat.definitions;
+                if (var_defs == null) continue;
+
+                var var_names_seen = {};
+                var side_effects_encountered = false;
+                var lvalues_encountered = false;
+                var lvalues = {};
+
+                // Scan variable definitions from right to left.
+                for (var var_defs_index = var_defs.length; --var_defs_index >= 0;) {
+
+                    // Obtain var declaration and var name with basic sanity check.
+                    var var_decl = var_defs[var_defs_index];
+                    if (var_decl.value == null) break;
+                    var var_name = var_decl.name.name;
+                    if (!var_name || !var_name.length) break;
+
+                    // Bail if we've seen a var definition of same name before.
+                    if (var_name in var_names_seen) break;
+                    var_names_seen[var_name] = true;
+
+                    // Only interested in cases with just one reference to the variable.
+                    var def = self.find_variable && self.find_variable(var_name);
+                    if (!def || !def.references || def.references.length !== 1 || var_name == "arguments") {
+                        side_effects_encountered = true;
+                        continue;
+                    }
+                    var ref = def.references[0];
+
+                    // Don't replace ref if eval() or with statement in scope.
+                    if (ref.scope.uses_eval || ref.scope.uses_with) break;
+
+                    // Constant single use vars can be replaced in any scope.
+                    if (var_decl.value.is_constant(compressor)) {
+                        var ctt = new TreeTransformer(function(node) {
+                            if (node === ref)
+                                return replace_var(node, ctt.parent(), true);
+                        });
+                        stat.transform(ctt);
+                        continue;
+                    }
+
+                    // Restrict var replacement to constants if side effects encountered.
+                    if (side_effects_encountered |= lvalues_encountered) continue;
+
+                    // Non-constant single use vars can only be replaced in same scope.
+                    if (ref.scope !== self) {
+                        side_effects_encountered |= var_decl.value.has_side_effects(compressor);
+                        continue;
+                    }
+
+                    // Detect lvalues in var value.
+                    var tw = new TreeWalker(function(node){
+                        if (node instanceof AST_SymbolRef && is_lvalue(node, tw.parent())) {
+                            lvalues[node.name] = lvalues_encountered = true;
+                        }
+                    });
+                    var_decl.value.walk(tw);
+
+                    // Replace the non-constant single use var in statement if side effect free.
+                    var unwind = false;
+                    var tt = new TreeTransformer(
+                        function preorder(node) {
+                            if (unwind) return node;
+                            var parent = tt.parent();
+                            if (node instanceof AST_Lambda
+                                || node instanceof AST_Try
+                                || node instanceof AST_With
+                                || node instanceof AST_Case
+                                || node instanceof AST_IterationStatement
+                                || (parent instanceof AST_If          && node !== parent.condition)
+                                || (parent instanceof AST_Conditional && node !== parent.condition)
+                                || (parent instanceof AST_Binary
+                                    && (parent.operator == "&&" || parent.operator == "||")
+                                    && node === parent.right)
+                                || (parent instanceof AST_Switch && node !== parent.expression)) {
+                                return side_effects_encountered = unwind = true, node;
+                            }
+                        },
+                        function postorder(node) {
+                            if (unwind) return node;
+                            if (node === ref)
+                                return unwind = true, replace_var(node, tt.parent(), false);
+                            if (side_effects_encountered |= node.has_side_effects(compressor))
+                                return unwind = true, node;
+                            if (lvalues_encountered && node instanceof AST_SymbolRef && node.name in lvalues) {
+                                side_effects_encountered = true;
+                                return unwind = true, node;
+                            }
+                        }
+                    );
+                    stat.transform(tt);
+                }
+            }
+
+            // Remove extraneous empty statments in block after removing var definitions.
+            // Leave at least one statement in `statements`.
+            if (var_defs_removed) for (var i = statements.length; --i >= 0;) {
+                if (statements.length > 1 && statements[i] instanceof AST_EmptyStatement)
+                    statements.splice(i, 1);
+            }
+
+            return statements;
+
+            function is_lvalue(node, parent) {
+                return node instanceof AST_SymbolRef && (
+                    (parent instanceof AST_Assign && node === parent.left)
+                    || (parent instanceof AST_Unary && parent.expression === node
+                        && (parent.operator == "++" || parent.operator == "--")));
+            }
+            function replace_var(node, parent, is_constant) {
+                if (is_lvalue(node, parent)) return node;
+
+                // Remove var definition and return its value to the TreeTransformer to replace.
+                var value = maintain_this_binding(parent, node, var_decl.value);
+                var_decl.value = null;
+
+                var_defs.splice(var_defs_index, 1);
+                if (var_defs.length === 0) {
+                    statements[prev_stat_index] = make_node(AST_EmptyStatement, self);
+                    var_defs_removed = true;
+                }
+                // Further optimize statement after substitution.
+                stat.walk(new TreeWalker(function(node){
+                    delete node._squeezed;
+                    delete node._optimized;
+                }));
+
+                compressor.warn("Replacing " + (is_constant ? "constant" : "variable") +
+                    " " + var_name + " [{file}:{line},{col}]", node.start);
+                CHANGED = true;
+                return value;
+            }
+        }
 
         function process_for_angular(statements) {
             function has_inject(comment) {
@@ -26887,6 +27092,32 @@ merge(Compressor.prototype, {
                 if (ex !== def) throw ex;
                 return [ this ];
             }
+        });
+        AST_Node.DEFMETHOD("is_constant", function(compressor){
+            // Accomodate when compress option evaluate=false
+            // as well as the common constant expressions !0 and !1
+            return this instanceof AST_Constant
+                || (this instanceof AST_UnaryPrefix && this.operator == "!"
+                    && this.expression instanceof AST_Constant)
+                || this.evaluate(compressor).length > 1;
+        });
+        // Obtain the constant value of an expression already known to be constant.
+        // Result only valid iff this.is_constant(compressor) is true.
+        AST_Node.DEFMETHOD("constant_value", function(compressor){
+            // Accomodate when option evaluate=false.
+            if (this instanceof AST_Constant) return this.value;
+            // Accomodate the common constant expressions !0 and !1 when option evaluate=false.
+            if (this instanceof AST_UnaryPrefix
+                && this.operator == "!"
+                && this.expression instanceof AST_Constant) {
+                return !this.expression.value;
+            }
+            var result = this.evaluate(compressor)
+            if (result.length > 1) {
+                return result[1];
+            }
+            // should never be reached
+            return undefined;
         });
         def(AST_Statement, function(){
             throw new Error(string_template("Cannot evaluate a statement [{file}:{line},{col}]", this.start));
@@ -27412,7 +27643,10 @@ merge(Compressor.prototype, {
                             var seq = node.to_assignments();
                             var p = tt.parent();
                             if (p instanceof AST_ForIn && p.init === node) {
-                                if (seq == null) return node.definitions[0].name;
+                                if (seq == null) {
+                                    var def = node.definitions[0].name;
+                                    return make_node(AST_SymbolRef, def, def);
+                                }
                                 return seq;
                             }
                             if (p instanceof AST_For && p.init === node) {
@@ -27643,9 +27877,13 @@ merge(Compressor.prototype, {
         }
         if (is_empty(self.alternative)) self.alternative = null;
         var negated = self.condition.negate(compressor);
-        var negated_is_best = best_of(self.condition, negated) === negated;
+        var self_condition_length = self.condition.print_to_string().length;
+        var negated_length = negated.print_to_string().length;
+        var negated_is_best = negated_length < self_condition_length;
         if (self.alternative && negated_is_best) {
             negated_is_best = false; // because we already do the switch here.
+            // no need to swap values of self_condition_length and negated_length
+            // here because they are only used in an equality comparison later on.
             self.condition = negated;
             var tmp = self.body;
             self.body = self.alternative || make_node(AST_EmptyStatement);
@@ -27667,6 +27905,13 @@ merge(Compressor.prototype, {
             }).transform(compressor);
         }
         if (is_empty(self.alternative) && self.body instanceof AST_SimpleStatement) {
+            if (self_condition_length === negated_length && !negated_is_best
+                && self.condition instanceof AST_Binary && self.condition.operator == "||") {
+                // although the code length of self.condition and negated are the same,
+                // negated does not require additional surrounding parentheses.
+                // see https://github.com/mishoo/UglifyJS2/issues/979
+                negated_is_best = true;
+            }
             if (negated_is_best) return make_node(AST_SimpleStatement, self, {
                 body: make_node(AST_Binary, self, {
                     operator : "||",
@@ -28080,13 +28325,7 @@ merge(Compressor.prototype, {
         if (!compressor.option("side_effects"))
             return self;
         if (!self.car.has_side_effects(compressor)) {
-            // we shouldn't compress (1,func)(something) to
-            // func(something) because that changes the meaning of
-            // the func (becomes lexical instead of global).
-            var p = compressor.parent();
-            if (!(p instanceof AST_Call && p.expression === self)) {
-                return self.cdr;
-            }
+            return maintain_this_binding(compressor.parent(), self, self.cdr);
         }
         if (compressor.option("cascade")) {
             if (self.car instanceof AST_Assign
@@ -28276,11 +28515,10 @@ merge(Compressor.prototype, {
                 if (ll.length > 1) {
                     if (ll[1]) {
                         compressor.warn("Condition left of && always true [{file}:{line},{col}]", self.start);
-                        var rr = self.right.evaluate(compressor);
-                        return rr[0];
+                        return maintain_this_binding(compressor.parent(), self, self.right.evaluate(compressor)[0]);
                     } else {
                         compressor.warn("Condition left of && always false [{file}:{line},{col}]", self.start);
-                        return ll[0];
+                        return maintain_this_binding(compressor.parent(), self, ll[0]);
                     }
                 }
             }
@@ -28289,11 +28527,10 @@ merge(Compressor.prototype, {
                 if (ll.length > 1) {
                     if (ll[1]) {
                         compressor.warn("Condition left of || always true [{file}:{line},{col}]", self.start);
-                        return ll[0];
+                        return maintain_this_binding(compressor.parent(), self, ll[0]);
                     } else {
                         compressor.warn("Condition left of || always false [{file}:{line},{col}]", self.start);
-                        var rr = self.right.evaluate(compressor);
-                        return rr[0];
+                        return maintain_this_binding(compressor.parent(), self, self.right.evaluate(compressor)[0]);
                     }
                 }
             }
@@ -28518,10 +28755,10 @@ merge(Compressor.prototype, {
         if (cond.length > 1) {
             if (cond[1]) {
                 compressor.warn("Condition always true [{file}:{line},{col}]", self.start);
-                return self.consequent;
+                return maintain_this_binding(compressor.parent(), self, self.consequent);
             } else {
                 compressor.warn("Condition always false [{file}:{line},{col}]", self.start);
-                return self.alternative;
+                return maintain_this_binding(compressor.parent(), self, self.alternative);
             }
         }
         var negated = cond[0].negate(compressor);
@@ -28589,32 +28826,52 @@ merge(Compressor.prototype, {
                 alternative: alternative
             });
         }
-        // x=y?1:1 --> x=1
-        if (consequent instanceof AST_Constant
-            && alternative instanceof AST_Constant
+        // y?1:1 --> 1
+        if (consequent.is_constant(compressor)
+            && alternative.is_constant(compressor)
             && consequent.equivalent_to(alternative)) {
+            var consequent_value = consequent.constant_value();
             if (self.condition.has_side_effects(compressor)) {
-                return AST_Seq.from_array([self.condition, make_node_from_constant(compressor, consequent.value, self)]);
+                return AST_Seq.from_array([self.condition, make_node_from_constant(compressor, consequent_value, self)]);
             } else {
-                return make_node_from_constant(compressor, consequent.value, self);
-
+                return make_node_from_constant(compressor, consequent_value, self);
             }
         }
-        // x=y?true:false --> x=!!y
-        if (consequent instanceof AST_True
-            && alternative instanceof AST_False) {
+
+        // y?true:false --> !!y
+        if (is_true(consequent) && is_false(alternative)) {
+            if (self.condition.is_boolean()) {
+                // boolean_expression ? true : false --> boolean_expression
+                return self.condition;
+            }
             self.condition = self.condition.negate(compressor);
             return make_node(AST_UnaryPrefix, self.condition, {
                 operator: "!",
                 expression: self.condition
             });
         }
-        // x=y?false:true --> x=!y
-        if (consequent instanceof AST_False
-            && alternative instanceof AST_True) {
+        // y?false:true --> !y
+        if (is_false(consequent) && is_true(alternative)) {
             return self.condition.negate(compressor)
         }
         return self;
+
+        // AST_True or !0
+        function is_true(node) {
+            return node instanceof AST_True
+                || (node instanceof AST_UnaryPrefix
+                    && node.operator == "!"
+                    && node.expression instanceof AST_Constant
+                    && !node.expression.value);
+        }
+        // AST_False or !1
+        function is_false(node) {
+            return node instanceof AST_False
+                || (node instanceof AST_UnaryPrefix
+                    && node.operator == "!"
+                    && node.expression instanceof AST_Constant
+                    && !!node.expression.value);
+        }
     });
 
     OPT(AST_Boolean, function(self, compressor){
@@ -28750,16 +29007,11 @@ function SourceMap(options) {
         orig_line_diff : 0,
         dest_line_diff : 0,
     });
+    var generator = new MOZ_SourceMap.SourceMapGenerator({
+        file       : options.file,
+        sourceRoot : options.root
+    });
     var orig_map = options.orig && new MOZ_SourceMap.SourceMapConsumer(options.orig);
-    var generator;
-    if (orig_map) {
-      generator = MOZ_SourceMap.SourceMapGenerator.fromSourceMap(orig_map);
-    } else {
-        generator = new MOZ_SourceMap.SourceMapGenerator({
-            file       : options.file,
-            sourceRoot : options.root
-        });
-    }
     function add(source, gen_line, gen_col, orig_line, orig_col, name) {
         if (orig_map) {
             var info = orig_map.originalPositionFor({
@@ -28780,7 +29032,7 @@ function SourceMap(options) {
             source    : source,
             name      : name
         });
-    }
+    };
     return {
         add        : add,
         get        : function() { return generator },
@@ -29567,6 +29819,7 @@ exports["parse"] = parse;
 exports["push_uniq"] = push_uniq;
 exports["string_template"] = string_template;
 exports["is_identifier"] = is_identifier;
+exports["SymbolDef"] = SymbolDef;
 
 
 exports.sys = sys;
@@ -29731,15 +29984,18 @@ exports.AST_Node.warn_function = function (txt) { if (typeof console != "undefin
 
 exports.minify = function (files, options) {
     options = UglifyJS.defaults(options, {
-        spidermonkey : false,
-        outSourceMap : null,
-        sourceRoot   : null,
-        inSourceMap  : null,
-        fromString   : false,
-        warnings     : false,
-        mangle       : {},
-        output       : null,
-        compress     : {}
+        spidermonkey     : false,
+        outSourceMap     : null,
+        sourceRoot       : null,
+        inSourceMap      : null,
+        fromString       : false,
+        warnings         : false,
+        mangle           : {},
+        mangleProperties : false,
+        nameCache        : null,
+        output           : null,
+        compress         : {},
+        parse            : {}
     });
     UglifyJS.base54.reset();
 
@@ -29759,7 +30015,8 @@ exports.minify = function (files, options) {
             sourcesContent[file] = code;
             toplevel = UglifyJS.parse(code, {
                 filename: options.fromString ? i : file,
-                toplevel: toplevel
+                toplevel: toplevel,
+                bare_returns: options.parse ? options.parse.bare_returns : undefined
             });
         });
     }
@@ -29776,14 +30033,21 @@ exports.minify = function (files, options) {
         toplevel = toplevel.transform(sq);
     }
 
-    // 3. mangle
+    // 3. mangle properties
+    if (options.mangleProperties || options.nameCache) {
+        options.mangleProperties.cache = UglifyJS.readNameCache(options.nameCache, "props");
+        toplevel = UglifyJS.mangle_properties(toplevel, options.mangleProperties);
+        UglifyJS.writeNameCache(options.nameCache, "props", options.mangleProperties.cache);
+    }
+
+    // 4. mangle
     if (options.mangle) {
         toplevel.figure_out_scope(options.mangle);
         toplevel.compute_char_frequency(options.mangle);
         toplevel.mangle_names(options.mangle);
     }
 
-    // 4. output
+    // 5. output
     var inMap = options.inSourceMap;
     var output = {};
     if (typeof options.inSourceMap == "string") {

@@ -636,6 +636,24 @@
                 }
             };
             
+            if (app.getLanguage() === 'zh') {
+                options.toolbar.buttons.push('continue');
+                options.extensions.continue = new Medium.button({
+                    label: '<b>A</b><i class="fa fa-ellipsis-v"></i>',
+                    action: function(html, mark) {
+                        var el = getSelectedElement();
+
+                        editor.selectElement(el);
+
+                        html = window.getCurrentSelection();
+                        html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
+                        html = '<p class="continue">' + html + '</p>';
+
+                        return html;
+                    }
+                });
+            }
+
             return new Medium.editor(selector, options);
         };
         
@@ -651,25 +669,36 @@
             
             $el.data('class', {});
             
-            if ($el.find('.dropcap3')) {
-                var $dropcap = $el.find('.dropcap3');
+            var removeClassSelector = '.dropcap3, .continue';
+            var removeClasses = removeClassSelector.replace(/(,|\.)/g, '');
+
+            if ($el.find(removeClassSelector)) {
+                var $children = $el.find(removeClassSelector);
                 
-                $dropcap.each(function() {
+                $children.each(function() {
                     var $this = $(this);
                     var id = $this.get(0).tagName.toLowerCase() + $this.index();
                     var classObj = $el.data('class');
+                    var remove = removeClassSelector.split(/,\s*/);
+                    var removed = [];
+
+                    for (var i = 0; i < remove.length; i++) {
+                        if ($this.is(remove[i])) {
+                            removed.push(remove[i].replace('.', ''));
+                        }
+                    }
                     
                     if (typeof classObj[id] !== 'undefined') {
-                        classObj[id].push('dropcap3');
+                        classObj[id] = classObj[id].concat(removed);
                     } else {
-                        classObj[id] = ['dropcap3'];
+                        classObj[id] = removed;
                     }
                     
                     $this.attr('id', id);
                     $el.data('class', classObj);
                 });
                 
-                $dropcap.removeClass('dropcap3');
+                $children.removeClass(removeClasses);
             }
             
             app.ContentEditor.disableDraggable($el);
@@ -763,8 +792,8 @@
             $el.find('span[style]').contents().unwrap();
             $el.find('[id]').removeAttr('id');
             
-            // Ensure newline before .dropcap3
-            $el.find('.dropcap3').prev(':not(br)').after('<br>');
+            // Ensure newline before .dropcap3, .continue
+            $el.find('.dropcap3, .continue').prev(':not(br)').after('<br>');
             
             app.ContentEditor.enableDraggable($el);
             app.ContentEditor.enableResizable($el);
