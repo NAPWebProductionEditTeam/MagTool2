@@ -28,9 +28,9 @@
         };
         
         this.applyInteractions = function($el) {
-            this.applySelectable($el);
             this.applyDraggable($el);
             this.applyResizable($el);
+            this.applySelectable($el);
             this.applyEditable($el);
         };
         
