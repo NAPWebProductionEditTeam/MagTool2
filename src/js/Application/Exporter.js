@@ -115,7 +115,7 @@
                     $em.text($(em).text() + ':');
                 }
                 
-                matches = $(em).text().match(/^(\s*\()/);
+                matches = $(em).text().match(/^(\s*(?:\(|\[|{|\s)+\s*)/);
                 
                 // If the content starts with a brace, optionally preceded by whitespace, move it to the previousSibling Node.
                 if (matches) {
@@ -130,7 +130,7 @@
                     $em.text($(em).text().replace(matches[1], ''));
                 }
                 
-                matches = $(em).text().match(/(\)\s*)$/);
+                matches = $(em).text().match(/(\s*(?:\)|\]|}|\s)+\s*)$/);
                 
                 // If the content ends with a brace, optionally proceded by whitespace, move it to the nextSibling Node.
                 if (matches) {
