@@ -27,16 +27,16 @@
         };
         
         this.applyInteractions = function($el) {
+            this.applySelectable($el);
             this.applyDraggable($el);
             this.applyResizable($el);
-            this.applySelectable($el);
             this.applyEditable($el);
         };
         
         this.stopEdit = function() {
             this.removeSelectable();
-            this.removeResizable();
             this.removeDraggable();
+            this.removeResizable();
             this.removeEditable();
             
             app.Page.getContent().append($img_map);
@@ -305,6 +305,12 @@
         };
         
         this.applyDraggable = function($el) {
+            $el = $el.filter('.draggable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             $draggables = $draggables.add($el);
             
             if ($el.length) {
@@ -466,6 +472,12 @@
         };
         
         this.applyResizable = function($el) {
+            $el = $el.filter('.resizable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             var $filtered = $el.not('.videoHolder');
             var $videos = $el.filter('.videoHolder');
 
@@ -775,6 +787,12 @@
         };
         
         this.applyEditable = function($el) {
+            $el = $el.filter('.editable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             $editables = $editables.add($el);
             
             $el.dblclick(function(e) {
