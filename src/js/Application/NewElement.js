@@ -1,6 +1,6 @@
 /* globals magazineBuilder */
 
-(function(window, $, app) {
+(function(window, $, app, Argument) {
     function NewElement() {
         
         /**
@@ -35,17 +35,26 @@
          * @param   {string} interactions
          * @returns {jQuery}
          */
-        var createContainer = function(interactions) {
+        var createContainer = function(interactions, size) {
+            interactions = Argument.default(interactions, '');
+            size = Argument.default(size, 0);
+            
             var $container = $('<div/>');
             
-            return $container.addClass('span-12 textAlignCenter push-down-18 push-right-18 ui-selectee ' + interactions);
+            if (size === 0) {
+                size = '';
+            } else {
+                size = 'span-' + size + ' ';
+            }
+            
+            return $container.addClass(size + 'push-down-18 push-right-18 ui-selectee ' + interactions);
         };
         
         /**
          * Create New Text Element.
          */
         this.newText = function() {
-            var $container = createContainer('draggable resizable editable');
+            var $container = createContainer('draggable resizable editable', 12);
             var $p = $('<p/>');
             
             $p.text("Geronimo! I once spent a hell of a long time trying to get a gobby Australian to Heathrow airport. Oh, I always rip out the last page of a book. Then it doesn't have to end. I hate endings! There are fixed points throughout time where things must stay exactly the way they are. This is not one of them. This is an opportunity! Whatever happens here will create its own timeline, its own reality, a temporal tipping point. The future revolves around you, here, now, so do good! Overconfidence, this, and a small screwdriver. I’m absolutely sorted.")
@@ -58,22 +67,25 @@
          * Create New Image Element.
          */
         this.newImage = function() {
-            var $container = createContainer('resizable draggable');
+            var $container = createContainer('draggable');
             var $img = $('<img/>');
             
-            $img.attr('src', 'http://lorempixel.com/image_output/cats-q-c-200-200-9.jpg')
-                .attr('data-img-src-2x', 'http://lorempixel.com/image_output/cats-q-c-400-400-9.jpg')
+            $img.attr('src', 'http://placehold.it/200/222/fff')
+                .attr('width', 200)
+                .attr('data-img-src-2x', 'http://placehold.it/400/222/fff')
                 .attr('alt', 'net-a-porter')
                 .appendTo($container);
             
-            addToDom($container);
+            $img.load(function() {
+                addToDom($container);
+            });
         };
         
         /**
          * Create New CTA Element.
          */
         this.newCTA = function() {
-            var $container = createContainer('editable resizable draggable');
+            var $container = createContainer('editable resizable draggable', 12);
             var $a = $('<a/>');
             
             $container.addClass('btnShopThe');
@@ -88,4 +100,4 @@
     }
     
     app.modules.NewElement = NewElement;
-})(window, jQuery, MagTool);
+})(window, jQuery, MagTool, Argument);
