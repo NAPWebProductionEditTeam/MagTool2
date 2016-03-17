@@ -168,6 +168,7 @@ var MagTool = MagTool || {};
         Mousetrap.bind(['backspace', 'del'], function(e) {
             e.preventDefault();
             
+            app.ContentEditor.deselectAll();
             app.ContentEditor.remove(app.ContentEditor.getSelection());
         });
         
