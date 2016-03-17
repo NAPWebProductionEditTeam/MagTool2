@@ -52,13 +52,27 @@ module.exports = function(grunt) {
                 sourceMap: true
             },
             build: {
+                options: {
+                    compress: {
+                        negate_iife: false
+                    }
+                },
                 files: {
                     'build/js/bookmark.min.js': ['src/js/bookmark-dev.js']
                 }
             },
             dist: {
                 files: {
-                    'dist/js/MagazineTool.min.js': ['<%= concat.build.dest %>'],
+                    'dist/js/MagazineTool.min.js': ['<%= concat.build.dest %>']
+                }
+            },
+            bookmark: {
+                options: {
+                    compress: {
+                        negate_iife: false
+                    }
+                },
+                files: {
                     'dist/js/bookmark.min.js': ['src/js/bookmark-production.js']
                 }
             }
