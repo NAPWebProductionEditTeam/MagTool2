@@ -9,6 +9,7 @@ module.exports = function(grunt) {
                     'bower_components/mousetrap-js/mousetrap.js',
                     'bower_components/mousetrap-js/plugins/global-bind/mousetrap-global-bind.js',
                     'bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js',
+                    'bower_components/jszip/dist/jszip.js',
                     'src/js/jQuery/**',
                     'src/js/vendor.js',
                     'src/js/lib/**',
@@ -132,7 +133,7 @@ module.exports = function(grunt) {
                 tasks: ['exec:npm_update']
             },
             js: {
-                files: ['Gruntfile.js', 'src/**/*.js'],
+                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js'],
                 tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
             },
             tpl: {

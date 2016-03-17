@@ -1,7 +1,8 @@
-(function(window, Math, $, app, Medium) {
+(function(window, $, app, Argument, Medium) {
     var parseInt = window.parseInt;
     var parseFloat = window.parseFloat;
     var document = window.document;
+    var Math = window.Math;
     var Node = window.Node;
     
     function ContentEditor() {
@@ -27,16 +28,16 @@
         };
         
         this.applyInteractions = function($el) {
+            this.applySelectable($el);
             this.applyDraggable($el);
             this.applyResizable($el);
-            this.applySelectable($el);
             this.applyEditable($el);
         };
         
         this.stopEdit = function() {
             this.removeSelectable();
-            this.removeResizable();
             this.removeDraggable();
+            this.removeResizable();
             this.removeEditable();
             
             app.Page.getContent().append($img_map);
@@ -84,38 +85,39 @@
                 if ($selection.length === 1) {
                     return types[0];
                 }
-
+                
                 return 'multi' + types[0].ucfirst();
             }
             
             return 'mixed';
         };
         
+        // ?TODO?: swap order to y > x
         this.sort = function($elements) {
             return $elements.sort(function(a, b) {
                 a = $(a).offset();
                 b = $(b).offset();
-
+                
                 if (a.top == b.top) {
                     if (a.left == b.left) {
                         return 0;
                     }
-
+                    
                     if (a.left > b.left) {
                         return 1;
                     }
-
+                    
                     return -1;
                 }
-
+                
                 if (a.top > b.top) {
                     return 1;
                 }
-
+                
                 return -1;
             });
         };
-
+        
         /**
          * Content interactions.
          */
@@ -123,18 +125,16 @@
         $selected = $selectables = $draggables = $resizables = $editables = $([]);
         
         var callWidgetFunction = function($elements, widget, func, args) {
+            args = Argument.default(args, []);
+            
             if (! $elements.length) {
                 return;
-            }
-
-            if (typeof args === 'undefined') {
-                args = [];
             }
             
             if (func === 'instance') {
                 return $elements[widget]('instance');
             }
-
+            
             args.unshift(func);
             
             $elements.each(function() {
@@ -161,46 +161,46 @@
         
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
-
+            
             if (this.getSelection().filter($el).length) {
                 this.select($el);
             }
         };
-
+        
         this.selectNext = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
             var $last = this.getSelection().last();
             var index = $tabbable.index($last) + 1;
-
+            
             if (index >= $tabbable.length) {
                 index = 0;
             }
-
+            
             var $select = $($tabbable.get(index));
-
+            
             this.deselectAll();
             this.select($select);
         };
-
+        
         this.selectPrev = function() {
             var $tabbable = $selectables.not(app.Credits.getCredits());
             var $first = this.getSelection().first();
             var index = $tabbable.index($first) - 1;
-
+            
             if (index < 0) {
                 index = $tabbable.length - 1;
             }
-
+            
             var $select = $($tabbable.get(index));
-
+            
             this.deselectAll();
             this.select($select);
         };
-
+        
         this.remove = function($el) {
             $el.remove();
         };
-
+        
         this.deselect = function($el) {
             $el.removeClass('ui-selected');
             triggerSelectable();
@@ -211,16 +211,14 @@
             $selected = $([]);
             triggerSelectable();
         };
-
+        
         var addSelected = function(el) {
             $selected = app.ContentEditor.sort($selected.add(el));
             $(el).addClass('ui-selected');
         };
         
         this.applySelectable = function($el, refresh) {
-            if (typeof refresh === 'undefined') {
-                refresh = true;
-            }
+            refresh = Argument.default(refresh, true);
             
             $selectables = app.ContentEditor.sort($selectables.add($el));
             
@@ -280,7 +278,7 @@
                 callWidgetFunction($selectable, 'selectable', 'destroy');
             }
         };
-
+        
         var changeXPos = function($this) {
             var left = parseInt($this.css('left'));
             
@@ -305,6 +303,12 @@
         };
         
         this.applyDraggable = function($el) {
+            $el = $el.filter('.draggable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             $draggables = $draggables.add($el);
             
             if ($el.length) {
@@ -411,15 +415,13 @@
         };
         
         this.move = function(axis, ticks) {
+            ticks = Argument.default(ticks, 1);
+            
             var $selection = this.getSelection();
             var maxCols = 50.75;
             var maxRows = 39.75;
             
-            if (typeof ticks === 'undefined') {
-                ticks = .25;
-            } else {
-                ticks = ticks / 4;
-            }
+            ticks = ticks / 4;
             
             $selection.each(function() {
                 var $el = $(this);
@@ -466,9 +468,15 @@
         };
         
         this.applyResizable = function($el) {
+            $el = $el.filter('.resizable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             var $filtered = $el.not('.videoHolder');
             var $videos = $el.filter('.videoHolder');
-
+            
             $resizables = $resizables.add($el);
             
             if ($filtered.length) {
@@ -498,7 +506,7 @@
                     }
                 });
             }
-
+            
             if ($videos.length) {
                 $videos.resizable({
                     handles: 'ne, se, sw, nw',
@@ -508,35 +516,35 @@
                     },
                     resize: function() {
                         var $this = $(this);
-
+                        
                         if ($this.is('[class*=span]')) {
                             var w = $this.width();
                             var h = Math.ceil(w * (9 / 16));
-
+                            
                             $this.height('').find('.videoLoader, .video-js').css({width: w, height: h});
                         }
                     },
                     stop: function() {
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
-
+                        
                         changeXPos($this);
                         $this.removeAttr('style');
-
+                        
                         if ($this.is('[class*=span]')) {
                             var span = Math.round(width / 19);
-
+                            
                             $this.removeClass(function(index, css) {
                                 return (css.match(/\bspan-\S+/g) || []).join(' ');
                             });
-
+                            
                             $this.addClass('span-' + span);
-
+                            
                             var w = $this.width();
                             var h = Math.ceil(w * (9 / 16));
-
+                            
                             $this.find('.videoLoader, .video-js').css({width: w, height: h});
-
+                            
                             var $videojs = $this.nextAll('script').first();
                             $videojs.html($videojs.html().replace(/width: "\d+"/, 'width: "' + w + '"').replace(/height: "\d+"/, 'height: "' + h + '"'));
                         }
@@ -804,6 +812,12 @@
         };
         
         this.applyEditable = function($el) {
+            $el = $el.filter('.editable');
+            
+            if (! $el.length) {
+                return;
+            }
+            
             $editables = $editables.add($el);
             
             $el.dblclick(function(e) {
@@ -842,4 +856,4 @@
     }
     
     app.modules.ContentEditor = ContentEditor;
-})(window, Math, jQuery, MagTool, {editor: MediumEditor, button: MediumButton});
+})(window, jQuery, MagTool, Argument, {editor: MediumEditor, button: MediumButton});

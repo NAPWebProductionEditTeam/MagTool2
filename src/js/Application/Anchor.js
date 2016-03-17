@@ -1,4 +1,5 @@
 (function(window, $, app) {
+    // TODO: Clean up
     function Anchor() {
         this.detectSelectedClass = function() {
             var $selected = app.ContentEditor.getSelection();

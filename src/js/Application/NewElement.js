@@ -1,62 +1,88 @@
 /* globals magazineBuilder */
 
-(function(window, $, app) {
+(function(window, $, app, Argument) {
     function NewElement() {
         
-        // Add the new element to the DOM
-        var addToDom = function($elements) {
-            var $content = app.Page.getContent();
-
-            // If a slug exists, add the new element after the slug, else add it to the top of the page
-            var $slug = app.Slug.findSlug();
-
-            if ($slug.length) {
-                $slug.after($elements);
-            } else {
-                $elements.prependTo($content);
-            }
-            
-            // Deselect all other elements
-            app.ContentEditor.deselectAll();
-            
-            // Apply edit interactions to the new element.
-            app.ContentEditor.applyInteractions($elements);
+        /**
+         * Add the new element to the DOM
+         *
+         * @param   {jQuery}  $el
+         */
+        var addToDom = function($el) {
+            app.Page.getContent().find('.draggable, .resizable, .editable').last().after($el);
+            app.ContentEditor.applyInteractions($el);
             
             // Select the new Element
-            app.ContentEditor.select($elements);
+            app.ContentEditor.selectOnly($el);
         };
         
-        // Create New Text Element
+        /**
+         * Create a new container div.
+         *
+         * @param   {string} interactions
+         * @returns {jQuery}
+         */
+        var createContainer = function(classes, size) {
+            classes = Argument.default(classes, '');
+            size = Argument.default(size, 0);
+            
+            var $container = $('<div/>');
+            
+            if (size === 0) {
+                size = '';
+            } else {
+                size = 'span-' + size + ' ';
+            }
+            
+            return $container.addClass(size + 'push-down-18 push-right-18 ui-selectee ' + classes);
+        };
+        
+        /**
+         * Create New Text Element.
+         */
         this.newText = function() {
-            var $newDiv = $('<div/>', {
-                class: 'span-12 textAlignCenter push-down-18 push-right-18 editable resizable draggable ui-selectee'
-            });
-            $newDiv.text('NEW EMPTY TEXT ELEMENT');
-            addToDom($newDiv);
+            var $container = createContainer('draggable resizable editable', 12);
+            var $p = $('<p/>');
+            
+            $p.text("Geronimo! I once spent a hell of a long time trying to get a gobby Australian to Heathrow airport. Oh, I always rip out the last page of a book. Then it doesn't have to end. I hate endings! There are fixed points throughout time where things must stay exactly the way they are. This is not one of them. This is an opportunity! Whatever happens here will create its own timeline, its own reality, a temporal tipping point. The future revolves around you, here, now, so do good! Overconfidence, this, and a small screwdriver. I’m absolutely sorted.")
+              .appendTo($container);
+            
+            addToDom($container);
         };
         
-        // Create New Image Element
+        /**
+         * Create New Image Element.
+         */
         this.newImage = function() {
-            var $newDiv = $('<div/>', {
-                class: 'span-12 textAlignCenter push-down-18 push-right-18 resizable draggable ui-selectee'
+            var $container = createContainer('draggable');
+            var $img = $('<img/>');
+            
+            $img.attr('src', 'http://placehold.it/200/222/fff')
+                .attr('width', 200)
+                .attr('data-img-src-2x', 'http://placehold.it/400/222/fff')
+                .attr('alt', 'net-a-porter')
+                .appendTo($container);
+            
+            $img.load(function() {
+                addToDom($container);
             });
-
-            $newDiv.append('<img src="http://lorempixel.com/image_output/cats-q-c-200-200-9.jpg" alt="net-a-porter" data-img-src@2x="http://lorempixel.com/image_output/cats-q-c-200-200-9.jpg" />');
-            console.log("img = " + $newDiv);
-            addToDom($newDiv);
         };
         
-        // Create New CTA Element
+        /**
+         * Create New CTA Element.
+         */
         this.newCTA = function() {
-            var $newDiv = $('<div/>', {
-                class: 'btnShopThe span-12 textAlignCenter push-down-18 push-right-18 editable resizable draggable ui-selectee'
-            });
-
-            // --> create new element and then .appenTo($newDiv)
-            $newDiv.append('<a data-magtool="ntk" href="${CtaLinkXML[\'ntk\'].@url}">SHOP THE SELECTION</a>');
-            addToDom($newDiv);
+            var $container = createContainer('btnShopThe textAlignCenter editable resizable draggable', 12);
+            var $a = $('<a/>');
+            
+            $a.attr('href', '')
+              .attr('data-magtool', 'ntk')
+              .text('SHOP THE SELECTION')
+              .appendTo($container);
+            
+            addToDom($container);
         };
     }
     
     app.modules.NewElement = NewElement;
-})(window, jQuery, MagTool);
+})(window, jQuery, MagTool, Argument);

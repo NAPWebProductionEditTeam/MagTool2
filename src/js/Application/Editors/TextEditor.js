@@ -1,4 +1,5 @@
 (function(window, $, app) {
+    // TODO: Clean up (looks fairly clean but check at least)
     function TextEditor() {
         this.detectSelectedAlignment = function() {
             var $selected = app.ContentEditor.getSelection();

@@ -1,4 +1,5 @@
 (function(window, $, app) {
+    // TODO: Clean up
     function ImageEditor() {
         this.detectImage = function($img) {
             var $selected = app.ContentEditor.getSelection();

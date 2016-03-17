@@ -20,6 +20,7 @@
     "bootstrap-sass": "^3.3.6",
     "medium-editor": "^5.14.2",
     "MediumButton": "*",
-    "mousetrap-js": "^1.5.4"
+    "mousetrap-js": "^1.5.4",
+    "jszip": "Stuk/jszip#^2.5.0"
   }
 }

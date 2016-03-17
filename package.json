@@ -32,5 +32,8 @@
     "grunt-notify": "^0.4.3",
     "grunt-sass": "^1.1.0",
     "jscs": "^2.10.1"
+  },
+  "dependencies": {
+    "html-minifier": "^1.2.0"
   }
 }

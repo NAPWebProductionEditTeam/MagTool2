@@ -1,4 +1,5 @@
 (function(window, $, app) {
+    // TODO: Clean up (looks fairly clean but check at least)
     function CtaEditor() {
         this.detectSelectedCta = function() {
             var $selected = app.ContentEditor.getSelection();

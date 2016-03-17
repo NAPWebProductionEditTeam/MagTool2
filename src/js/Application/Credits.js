@@ -1,4 +1,5 @@
 (function(window, $, app) {
+    // TODO: Clean up
     function Credits() {
         var getCreditsHolder = function() {
             return app.Page.get().find('[class*="creditsHolder"]');
@@ -49,14 +50,14 @@
             return ! getCreditsHolder().is('.creditsNone');
         };
         
-        this.detectCreditsContent = function() {
+        this.detectContent = function() {
             var $editor = app.UI.getSelectionControls().filter('#creditsEditor');
             var text = getCreditsWhole().find('p').html();
             
             text = text.replace(/<br>/g, '\n');
             $editor.val(text);
         };
-
+        
         this.show = function() {
             this.getCredits().fadeIn(300);
         };
