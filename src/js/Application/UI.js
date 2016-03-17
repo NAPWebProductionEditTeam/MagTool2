@@ -1,4 +1,4 @@
-(function(window, $, app, CssEvents) {
+(function(window, $, app, Argument, CssEvents) {
     var setTimeout = window.setTimeout;
     var clearTimeout = window.clearTimeout;
     
@@ -91,10 +91,10 @@
             if (typeof $bottomSection === 'undefined') {
                 $bottomSection = this.getUI().find('#bottom-section');
             }
-
+            
             return $bottomSection;
         };
-
+        
         this.getSelectionControls = function() {
             if (typeof $selectionControls === 'undefined') {
                 $selectionControls = this.getUI().find('.selection-controls :input');
@@ -129,26 +129,21 @@
             app.Slug.detectSlugProperties();
             this.getUI().find('.page-controls').addClass('--show');
         };
-
+        
         this.hideEditTools = function() {
             this.getUI().find('.page-controls').removeClass('--show');
         };
-
+        
         var notifyTimer;
         
         this.notify = function(title, body, time) {
+            body = Argument.default(body, '');
+            time = Argument.default(time, 5000);
+            
             var $notify = this.getNotification();
             
             if (notifyTimer) {
                 clearTimeout(notifyTimer);
-            }
-            
-            if (typeof body === 'undefined' || body === null) {
-                body = '';
-            }
-            
-            if (typeof time === 'undefined' || time === null) {
-                time = 5000;
             }
             
             $notify.find('header').text(title);
@@ -166,4 +161,4 @@
     }
     
     app.modules.UI = UI;
-})(window, jQuery, MagTool, CssEvents);
+})(window, jQuery, MagTool, Argument, CssEvents);
