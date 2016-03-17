@@ -48,7 +48,7 @@
             var $container = createContainer('draggable resizable editable');
             var $p = $('<p/>');
             
-            $p.text('NEW EMPTY TEXT ELEMENT')
+            $p.text("Geronimo! I once spent a hell of a long time trying to get a gobby Australian to Heathrow airport. Oh, I always rip out the last page of a book. Then it doesn't have to end. I hate endings! There are fixed points throughout time where things must stay exactly the way they are. This is not one of them. This is an opportunity! Whatever happens here will create its own timeline, its own reality, a temporal tipping point. The future revolves around you, here, now, so do good! Overconfidence, this, and a small screwdriver. I’m absolutely sorted.")
               .appendTo($container);
             
             addToDom($container);
