@@ -267,7 +267,7 @@
             var page = 'page_' + app.Page.getNumber();
             var $a = $('<a/>');
             
-            $a.hide().appendTo(app.$body);
+            $a.hide().appendTo($('#magtoolComponents'));
             
             zip.folder(page + '/' + app.getLanguage())
                 .file('infoBlocks.html', getContentHtml())
