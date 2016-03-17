@@ -9,24 +9,11 @@
          * @param   {jQuery}  $el
          */
         var addToDom = function($el) {
-            var $content = app.Page.getContent();
-            var $slug = app.Slug.findSlug();
-            
-            // If a slug exists, add the new element after the slug, else add it to the top of the page
-            if ($slug.length) {
-                $slug.after($el);
-            } else {
-                $el.prependTo($content);
-            }
-            
-            // Deselect all other elements
-            app.ContentEditor.deselectAll();
-            
-            // Apply edit interactions to the new element.
+            app.Page.getContent().find('.draggable, .resizable, .editable').last().after($el);
             app.ContentEditor.applyInteractions($el);
             
             // Select the new Element
-            app.ContentEditor.select($el);
+            app.ContentEditor.selectOnly($el);
         };
         
         /**
@@ -35,8 +22,8 @@
          * @param   {string} interactions
          * @returns {jQuery}
          */
-        var createContainer = function(interactions, size) {
-            interactions = Argument.default(interactions, '');
+        var createContainer = function(classes, size) {
+            classes = Argument.default(classes, '');
             size = Argument.default(size, 0);
             
             var $container = $('<div/>');
@@ -47,7 +34,7 @@
                 size = 'span-' + size + ' ';
             }
             
-            return $container.addClass(size + 'push-down-18 push-right-18 ui-selectee ' + interactions);
+            return $container.addClass(size + 'push-down-18 push-right-18 ui-selectee ' + classes);
         };
         
         /**
@@ -85,10 +72,8 @@
          * Create New CTA Element.
          */
         this.newCTA = function() {
-            var $container = createContainer('editable resizable draggable', 12);
+            var $container = createContainer('btnShopThe textAlignCenter editable resizable draggable', 12);
             var $a = $('<a/>');
-            
-            $container.addClass('btnShopThe');
             
             $a.attr('href', '')
               .attr('data-magtool', 'ntk')
