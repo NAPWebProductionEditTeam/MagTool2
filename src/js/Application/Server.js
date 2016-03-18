@@ -24,12 +24,12 @@
             return $.postJson(api, data);
         };
         
-        this.save = function(pageId, credit_html, content_html) {
+        this.save = function(pageId, credits, infoBlocks) {
             var data = {
                 "req_type": "save_changes",
                 "page_id": pageId,
-                "credit": credit_html,
-                "content": content_html
+                "credit": credits,
+                "content": infoBlocks
             };
             
             data = window.JSON.stringify(data);

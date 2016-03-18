@@ -1,4 +1,4 @@
-(function(window, $, JsZip, require, app) {
+(function(window, $, Argument, JsZip, require, app) {
     var Array = window.Array;
     var Node = window.Node;
     var Text = window.Text;
@@ -224,9 +224,9 @@
             return getHtml(app.Page.get().find('.magazineContent > div:not([class^="credits"]):not(.edLetterList):not(.videoHolder)'));
         };
         
-        var getVideoHtml = function() {
-            var $elements = app.Page.get().find('.videoHolder');
-            $elements.add(app.VideoEditor.getJs($elements));
+        var getScriptHtml = function() {
+            var $elements = app.Page.getContent().find('script');
+            $elements.add(app.Page.get().find('.videoHolder'));
             
             return getHtml($elements);
         };
@@ -240,7 +240,7 @@
             return {
                 credits: getCreditsHtml(),
                 content: getContentHtml(),
-                video: getVideoHtml()
+                script: getScriptHtml()
             };
         };
         
@@ -250,33 +250,33 @@
         this.toConsole = function() {
             console.file('infoBlocks.html', getContentHtml());
             console.file('credits.html', getCreditsHtml());
-            
-            var video = getVideoHtml();
-            
-            if (video) {
-                console.file('script.html', video);
-            }
+            console.file('script.html', getScriptHtml());
         };
         
         // Holy shit this is possible this is so freaking cool.
         /**
          * Download the page files as a zip.
          */
-        this.toFile = function() {
+        this.toFile = function(files) {
+            files = Argument.default(files, ['infoBlocks', 'credits', 'script']);
+            
             var zip = new JsZip();
             var page = 'page_' + app.Page.getNumber();
+            var lang = app.getLanguage();
             var $a = $('<a/>');
             
             $a.hide().appendTo($('#magtoolComponents'));
             
-            zip.folder(page + '/' + app.getLanguage())
-                .file('infoBlocks.html', getContentHtml())
-                .file('credits.html', getCreditsHtml());
+            if ($.inArray('infoBlocks', files) > -1) {
+                zip.file(page + '/' + lang + '/infoBlocks.html');
+            }
             
-            var video = getVideoHtml();
+            if ($.inArray('credits', files) > -1) {
+                zip.file(page + '/' + lang + '/credits.html');
+            }
             
-            if (video) {
-                zip.file(page + '/common/script.html', video);
+            if ($.inArray('script', files) > -1) {
+                zip.file(page + '/common/script.html', getScriptHtml());
             }
             
             $a.attr('href', 'data:application/zip;base64,' + zip.generate({type: 'base64'}))
@@ -288,4 +288,4 @@
     }
     
     app.registerModule('Exporter', Exporter);
-})(window, jQuery, JSZip, require, MagTool);
+})(window, jQuery, Argument, JSZip, require, MagTool);
