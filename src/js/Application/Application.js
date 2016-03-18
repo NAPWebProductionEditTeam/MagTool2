@@ -601,12 +601,12 @@ var MagTool = MagTool || {};
     }, false, true);
     
     // CTA Editor
-    registerAction('changeCta', function(cta) {
-        app.CtaEditor.changeCta(cta);
+    registerAction('changeCtaId', function(id) {
+        app.CtaEditor.changeId(id);
     }, false, true);
     
     registerAction('changeCtaColor', function(ctaColor) {
-        app.CtaEditor.changeCtaColor(ctaColor);
+        app.CtaEditor.changeColor(ctaColor);
     }, false, true);
     
     // Image Editor

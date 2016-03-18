@@ -20,7 +20,7 @@
             map.remove();
             
             editing = true;
-            app.Page.get().addClass('mt-editing');
+            app.$body.addClass('mt-editing');
             
             this.makeDraggable();
             this.makeResizable();
@@ -45,7 +45,7 @@
             $img_map = null;
             
             editing = false;
-            app.Page.get().removeClass('mt-editing');
+            app.$body.removeClass('mt-editing');
         };
         
         this.isEditing = function() {
@@ -71,7 +71,7 @@
                     types.push('image');
                 } else if ($this.filter('.videoHolder').length) {
                     types.push('video');
-                } else if ($this.is('.btnShopThe') || $selected.is('.btnShopTheWhite')) {
+                } else if ($this.is(app.CTA)) {
                     types.push('cta');
                 } else if ($this.filter('[class*="creditsWhole"]').length) {
                     types.push('credits');

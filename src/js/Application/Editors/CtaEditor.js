@@ -1,46 +1,45 @@
 (function(window, $, app) {
-    // TODO: Clean up (looks fairly clean but check at least)
+    app.CTA = '.btnShopThe, .btnShopTheWhite, .btnShopTheTwoLine, .btnShopTheTwoLineWhite';
+    
+    var ctaBlack = '.btnShopThe, .btnShopTheTwoLine';
+    var ctaWhite = '.btnShopTheWhite, .btnShopTheTwoLineWhite';
+    
+    var ctaOne = '.btnShopThe, .btnShopTheWhite';
+    var ctaTwo = '.btnShopTheTwoLine, .btnShopTheTwoLineWhite';
+    
     function CtaEditor() {
         this.detectSelectedCta = function() {
             var $selected = app.ContentEditor.getSelection();
+            
+            $('#ctaId').val($selected.find('a').data('magtool'));
+            
+            if ($selected.is('.btnShopThe') || $selected.is('.btnShopTheTwoLine')) {
+                $('#ctaBlack').prop('checked', true);
+            } else {
+                $('#ctaWhite').prop('checked', true);
+            }
+        };
+        
+        this.change = function(id) {
+            app.ContentEditor.getSelection().find('a').attr('data-magtool', id);
+        };
+        
+        this.changeColor = function(color) {
+            var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getSelectionControls();
-            var $oldCta = $selected.find('a').attr('data-magtool');
-
-            if ($selected.is('.btnShopThe') || $selected.is('.btnShopTheWhite')) {
-                $selectionControls.filter('#CTA').val($oldCta);
-
-                if ($selected.is('.btnShopThe')) {
-                    $selectionControls.filter('#ctaBlack').prop('checked', true);
-                    $selectionControls.filter('#ctaWhite').prop('checked', false);
+            
+            if (color == 'black') {
+                if ($selected.is(ctaOne)) {
+                    $selected.removeClass('btnShopTheWhite').addClass('btnShopThe');
                 } else {
-                    $selectionControls.filter('#ctaWhite').prop('checked', true);
-                    $selectionControls.filter('#ctaBlack').prop('checked', false);
+                    $selected.removeClass('btnShopTheTwoLineWhite').addClass('btnShopTheTwoLine');
                 }
             } else {
-                $selectionControls.filter('#CTA').val('NO CTA');
-            }
-        };
-
-        this.changeCta = function(cta) {
-            var $selected = app.ContentEditor.getSelection();
-            var $selectionControls = app.UI.getSelectionControls();
-            var $oldCta = $selected.find('a').attr('data-magtool');
-            cta = $selectionControls.filter('#CTA').val();
-
-            if (cta !== $oldCta && $selected.is('.btnShopThe')) {
-                $selected.find('a').attr('data-magtool', cta);
-            }
-        };
-
-        this.changeCtaColor = function(ctaColor) {
-            var $selected = app.ContentEditor.getSelection();
-            var $selectionControls = app.UI.getSelectionControls();
-            $selected.removeClass('btnShopThe btnShopTheWhite');
-
-            if (ctaColor == 'ctaBlack') {
-                $selected.addClass('btnShopThe');
-            } else {
-                $selected.addClass('btnShopTheWhite');
+                if ($selected.is(ctaOne)) {
+                    $selected.removeClass('btnShopThe').addClass('btnShopTheWhite');
+                } else {
+                    $selected.removeClass('btnShopTheTwoLine').addClass('btnShopTheTwoLineWhite');
+                }
             }
         };
     }

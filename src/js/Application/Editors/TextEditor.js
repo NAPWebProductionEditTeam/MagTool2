@@ -1,5 +1,4 @@
 (function(window, $, app) {
-    // TODO: Clean up (looks fairly clean but check at least)
     function TextEditor() {
         this.detectSelectedAlignment = function() {
             var $selected = app.ContentEditor.getSelection();
@@ -20,7 +19,7 @@
                     break;
             }
         };
-
+        
         this.align = function(alignment) {
             var $selected = app.ContentEditor.getSelection();
             
@@ -38,23 +37,11 @@
                     break;
             }
         };
-
+        
         this.changeColor = function(color) {
             var $selected = app.ContentEditor.getSelection();
             
-            $selected.removeClass('black white');
-            
-            if (color === 'white') {
-                $selected.addClass('white');
-                
-                $selected.find('.btnShopThe').removeClass('btnShopThe').addClass('btnShopTheWhite');
-                $selected.find('.btnShopTheTwoLine').removeClass('btnShopTheTwoLine').addClass('btnShopTheTwoLineWhite');
-            } else if (color === 'black') {
-                $selected.addClass('black');
-                
-                $selected.find('.btnShopTheWhite').removeClass('btnShopTheWhite').addClass('btnShopThe');
-                $selected.find('.btnShopTheTwoLineWhite').removeClass('btnShopTheTwoLineWhite').addClass('btnShopTheTwoLine');
-            }
+            $selected.removeClass('black white').addClass(color);
         };
     }
     
