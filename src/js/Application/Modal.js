@@ -255,6 +255,6 @@
         };
     }
     
-    app.modules.Modal = Modal;
+    app.registerModule('Modal', Modal);
 })(window, $, MagTool, Argument);
 

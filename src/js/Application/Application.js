@@ -1,9 +1,25 @@
 var MagTool = MagTool || {};
 
 (function(window, $, app, Argument, Mousetrap) {
+    var Object = window.Object;
     var magazineBuilder = window.magazineBuilder;
+    var modules = {};
+    var actions = {};
     
-    app.modules = {};
+    app.define = function(name, definition) {
+        Object.defineProperty(app, name, {
+            value: definition,
+            writable: false
+        });
+    };
+    
+    app.registerModule = function(id, module) {
+        modules[id] = module;
+    };
+    
+    app.getModules = function() {
+        return modules;
+    };
     
     app.$doc = $(window.document);
     app.$body = $('body');
@@ -15,7 +31,7 @@ var MagTool = MagTool || {};
     var resolveAction = app.resolveAction = function(actionName, params) {
         params = Argument.default(params, []);
         
-        var action = app[actionName];
+        var action = actions[actionName];
         
         if (action) {
             if (
@@ -35,7 +51,7 @@ var MagTool = MagTool || {};
             action.whenEditing = whenEditing;
         }
         
-        app[name] = action;
+        actions[name] = action;
     };
     
     /**
@@ -130,10 +146,18 @@ var MagTool = MagTool || {};
         Mousetrap.bind('up', function(e) {
             e.preventDefault();
             
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('y', 1);
         });
         
         Mousetrap.bind('shift+up', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('y', 4);
         });
         
@@ -142,29 +166,53 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('shift+right', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('x', 4);
         });
         
         Mousetrap.bind('down', function(e) {
             e.preventDefault();
             
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('y', -1);
         });
         
         Mousetrap.bind('shift+down', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('y', -4);
         });
         
         Mousetrap.bind('left', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('x', -1);
         });
         
         Mousetrap.bind('shift+left', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.move('x', -4);
         });
         
         Mousetrap.bind(['backspace', 'del'], function(e) {
             e.preventDefault();
+            
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
             
             var $del = app.ContentEditor.getSelection();
             
@@ -173,11 +221,19 @@ var MagTool = MagTool || {};
         });
         
         Mousetrap.bind('c', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.selectOnly(app.Credits.getCredits());
         });
         
         Mousetrap.bind('tab', function(e) {
             e.preventDefault();
+            
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
             
             app.ContentEditor.selectNext();
         });
@@ -185,16 +241,28 @@ var MagTool = MagTool || {};
         Mousetrap.bind('shift+tab', function(e) {
             e.preventDefault();
             
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.selectPrev();
         });
         
         Mousetrap.bind('enter', function(e) {
             e.preventDefault();
             
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.startEditing(app.ContentEditor.getSelection().filter('.editable'));
         });
         
         Mousetrap.bindGlobal('mod+enter', function() {
+            if (! app.ContentEditor.isEditing()) {
+                return;
+            }
+            
             app.ContentEditor.stopEditing();
         });
     };

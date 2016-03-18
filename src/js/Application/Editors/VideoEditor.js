@@ -21,5 +21,5 @@
         };
     }
     
-    app.modules.VideoEditor = VideoEditor;
+    app.registerModule('VideoEditor', VideoEditor);
 })(window, jQuery, MagTool);

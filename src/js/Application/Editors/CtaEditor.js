@@ -45,5 +45,5 @@
         };
     }
 
-    app.modules.CtaEditor = CtaEditor;
+    app.registerModule('CtaEditor', CtaEditor);
 })(window, jQuery, MagTool);

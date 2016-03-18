@@ -69,5 +69,5 @@
         };
     }
 
-    app.modules.ImageEditor = ImageEditor;
+    app.registerModule('ImageEditor', ImageEditor);
 })(window, jQuery, MagTool);

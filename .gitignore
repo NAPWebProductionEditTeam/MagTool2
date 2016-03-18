@@ -3,5 +3,5 @@
 .sass-cache
 bower_components
 node_modules
-build/*
+build
 src/js/vendor.js

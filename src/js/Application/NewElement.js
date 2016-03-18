@@ -84,5 +84,5 @@
         };
     }
     
-    app.modules.NewElement = NewElement;
+    app.registerModule('NewElement', NewElement);
 })(window, jQuery, MagTool, Argument);

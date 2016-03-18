@@ -162,7 +162,7 @@
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
             
-            if (this.getSelection().filter($el).length) {
+            if (! this.getSelection().filter($el).length) {
                 this.select($el);
             }
         };
@@ -318,6 +318,7 @@
                         var $this = $(this);
                         
                         app.ContentEditor.stopEditing();
+                        app.ContentEditor.deselect(app.Credits.getCredits());
                         
                         if ($this.hasClass('ui-selected')) {
                             $selected = $selected.filter('.draggable').each(function() {
@@ -485,6 +486,7 @@
                     grid: [19, 10],
                     start: function() {
                         app.ContentEditor.stopEditing();
+                        app.ContentEditor.deselect(app.Credits.getCredits());
                     },
                     stop: function() {
                         var $this = $(this);
@@ -855,5 +857,5 @@
         };
     }
     
-    app.modules.ContentEditor = ContentEditor;
+    app.registerModule('ContentEditor', ContentEditor);
 })(window, jQuery, MagTool, Argument, {editor: MediumEditor, button: MediumButton});

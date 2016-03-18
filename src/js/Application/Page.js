@@ -27,5 +27,5 @@
         };
     }
     
-    app.modules.Page = Page;
+    app.registerModule('Page', Page);
 })(window, jQuery, MagTool, magazineBuilder);

@@ -1,4 +1,7 @@
 (function(window, $, app) {
+    var Math = window.Math;
+    var parseInt = window.parseInt;
+    
     // TODO: Clean up
     function Anchor() {
         this.detectSelectedClass = function() {
@@ -68,5 +71,5 @@
         };
     }
     
-    app.modules.Anchor = Anchor;
+    app.registerModule('Anchor', Anchor);
 })(window, jQuery, MagTool);

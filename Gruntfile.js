@@ -25,16 +25,14 @@ module.exports = function(grunt) {
                 src: [],
                 dest: 'src/js/vendor.js',
                 options: {
-                    require: ['html-minifier']
+                    require: ['html-minifier', 'relateurl', 'uglify-js', 'clean-css']
                 }
             }
         },
         jshint: {
             files: ['Gruntfile.js', 'src/**/*.js', '!src/js/vendor.js'],
             options: {
-                // options here to override JSHint defaults
                 '-W008': true,
-                '-W027': true,
                 globals: {
                     jQuery: true
                 }
@@ -58,7 +56,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'build/js/bookmark.min.js': ['src/js/bookmark-dev.js']
+                    'build/js/bookmark.min.js': ['src/js/bookmark.js']
                 }
             },
             dist: {
@@ -73,7 +71,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'dist/js/bookmark.min.js': ['src/js/bookmark-production.js']
+                    'dist/js/bookmark.min.js': ['src/js/bookmark.js']
                 }
             }
         },
@@ -137,6 +135,36 @@ module.exports = function(grunt) {
                 }
             }
         },
+        'string-replace': {
+            options: {
+                replacements: [
+                    {
+                        pattern: '{{ APP_ENV }}',
+                        replacement: function() {
+                            return grunt.option('env') || 'production';
+                        }
+                    }
+                ]
+            },
+            build: {
+                files: {
+                    'build/js/bookmark.min.js': 'build/js/bookmark.min.js'
+                }
+            },
+            dist: {
+                files: {
+                    'dist/js/bookmark.min.js': 'dist/js/bookmark.min.js'
+                }
+            }
+        },
+        exec: {
+            bower_update: {
+                cmd: 'bower update'
+            },
+            npm_update: {
+                cmd: 'npm update'
+            }
+        },
         watch: {
             bower: {
                 files: ['bower.json'],
@@ -148,7 +176,7 @@ module.exports = function(grunt) {
             },
             js: {
                 files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js'],
-                tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'notify:concat']
+                tasks: ['jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'string-replace:build', 'notify:concat']
             },
             tpl: {
                 files: ['src/tpl/**'],
@@ -161,14 +189,6 @@ module.exports = function(grunt) {
             options: {
                 spawn: false,
             },
-        },
-        exec: {
-            bower_update: {
-                cmd: 'bower update'
-            },
-            npm_update: {
-                cmd: 'npm update'
-            }
         },
         notify: {
             concat: {
@@ -210,6 +230,7 @@ module.exports = function(grunt) {
         }
     });
     
+    grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-exec');
@@ -225,8 +246,14 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     
-    grunt.registerTask('default', ['jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'notify:build']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'browserify', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'notify:dist']);
+    grunt.registerTask('env:dev', function() {
+        if (! grunt.option('env')) {
+            grunt.option('env', 'dev');
+        }
+    });
+    
+    grunt.registerTask('default', ['env:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
+    grunt.registerTask('dist', ['jshint', 'jscs', 'browserify', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     

@@ -1,5 +1,5 @@
 (function(window, $, app, CssEvents) {
-    var suffix = '?v=' + app.version;
+    var suffix = '?v=' + app.VERSION;
     var fa = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
     var css = 'css/app.css';
     var tpl = 'tpl/magtool.html';
@@ -14,11 +14,11 @@
                 $('<link>').attr({rel: 'stylesheet', href: fa, id: 'fontAwesome'})
                     .appendTo($('head'));
             }),
-            $.get(app.base_uri + css + suffix).done(function() {
-                $('<link>').attr({rel: 'stylesheet', href: app.base_uri + css + suffix, id: 'mtCss'})
+            $.get(app.BASE_URI + css + suffix).done(function() {
+                $('<link>').attr({rel: 'stylesheet', href: app.BASE_URI + css + suffix, id: 'mtCss'})
                     .appendTo($('head'));
             }),
-            $.get(app.base_uri + tpl + suffix).done(function(data) {
+            $.get(app.BASE_URI + tpl + suffix).done(function(data) {
                 html = data;
             }),
             $.getScript(jqUi)
@@ -48,15 +48,15 @@
             app.getVersion()
         ).done(function() {
             window.MagTool = {
-                base_uri: app.base_uri,
+                BASE_URI: app.BASE_URI,
                 getVersion: app.getVersion,
                 reloading: true,
-                version: app.version
+                VERSION: app.VERSION
             };
             
             $('#mtCss, #fontAwesome').remove();
             
-            $.getScript(app.base_uri + 'js/MagazineTool.js?v=' + app.version);
+            $.getScript(app.BASE_URI + 'js/MagazineTool.js?v=' + app.VERSION);
         });
     };
     

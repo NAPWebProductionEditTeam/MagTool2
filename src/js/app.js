@@ -1,8 +1,10 @@
 (function(window, $, app) {
     app.Loader.load(function() {
         // Initialize modules
-        for (var module in app.modules) {
-            app[module] = new app.modules[module]();
+        var modules = app.getModules();
+        
+        for (var module in modules) {
+            app.define(module, new modules[module]());
         }
         
         /**

@@ -58,5 +58,5 @@
         };
     }
     
-    app.modules.TextEditor = TextEditor;
+    app.registerModule('TextEditor', TextEditor);
 })(window, jQuery, MagTool);

@@ -74,5 +74,5 @@
         };
     }
     
-    app.modules.Credits = Credits;
+    app.registerModule('Credits', Credits);
 })(window, jQuery, MagTool);

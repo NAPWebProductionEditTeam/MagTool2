@@ -38,5 +38,5 @@
         };
     }
     
-    app.modules.Server = Server;
+    app.registerModule('Server', Server);
 })(window, jQuery, MagTool);

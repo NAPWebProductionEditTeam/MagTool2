@@ -287,5 +287,5 @@
         };
     }
     
-    app.modules.Exporter = Exporter;
+    app.registerModule('Exporter', Exporter);
 })(window, jQuery, JSZip, require, MagTool);

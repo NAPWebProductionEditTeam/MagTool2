@@ -160,5 +160,5 @@
         };
     }
     
-    app.modules.UI = UI;
+    app.registerModule('UI', UI);
 })(window, jQuery, MagTool, Argument, CssEvents);

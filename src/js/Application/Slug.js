@@ -70,5 +70,5 @@
         };
     }
     
-    app.modules.Slug = Slug;
+    app.registerModule('Slug', Slug);
 })(window, jQuery, MagTool);
