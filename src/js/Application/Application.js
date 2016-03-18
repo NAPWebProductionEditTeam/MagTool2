@@ -513,14 +513,11 @@ var MagTool = MagTool || {};
             $selectionEditor.addClass('--active');
         }
         
-        if (type === 'text' || type === 'image' || type === 'video' || type === 'cta') {
+        if ($.inArray(type, ['text', 'multiText', 'image', 'video', 'cta']) > -1) {
             app.UI.getBottomSection().addClass('--active');
+            app.Anchor.detectAnchor();
         } else {
             app.UI.getBottomSection().removeClass('--active');
-        }
-        
-        if (['text', 'multiText', 'image', 'video', 'cta']) {
-            app.Anchor.detectSelectedClass();
         }
         
         switch (type) {
@@ -627,11 +624,11 @@ var MagTool = MagTool || {};
     }, false, true);
     
     // Element Anchoring
-    registerAction('changeVerticalAnchor', function(vertical) {
-        app.Anchor.changeVerticalAnchor(vertical);
+    registerAction('changeVerticalAnchor', function(anchor) {
+        app.Anchor.changeVerticalAnchor(anchor);
     }, false, true);
     
-    registerAction('changeHorizontalAnchor', function(horizontal) {
-        app.Anchor.changeHorizontalAnchor(horizontal);
+    registerAction('changeHorizontalAnchor', function(anchor) {
+        app.Anchor.changeHorizontalAnchor(anchor);
     }, false, true);
 })(window, $, MagTool, Argument, Mousetrap);

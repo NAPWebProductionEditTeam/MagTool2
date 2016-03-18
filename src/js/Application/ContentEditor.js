@@ -2,6 +2,7 @@
     var parseInt = window.parseInt;
     var parseFloat = window.parseFloat;
     var document = window.document;
+    var RegExp = window.RegExp;
     var Math = window.Math;
     var Node = window.Node;
     
@@ -279,27 +280,67 @@
             }
         };
         
-        var changeXPos = function($this) {
-            var left = parseInt($this.css('left'));
+        var getPos = function(pos, grid, max) {
+            pos = Math.max(pos, 0);
+            pos = Math.min(pos, max);
             
-            if ($this.is('[class*=push-right]')) {
-                var push_right = Math.round(left / 19);
+            return Math.floor(pos / grid).toString() + (Math.round(pos / 4) / 4).toString()
+                .replace(/^\d+/, '')
+                .replace('.25', '-a')
+                .replace('.5', '-b')
+                .replace('.75', '-c');
+        };
+        
+        var changePos = function($el, axis, anchor, grid, max) {
+            anchor = Argument.default(anchor, false);
+            
+            var push, pull, master, slave;
+            
+            if (axis === 'x') {
+                push = 'right';
+                pull = 'left';
                 
-                $this.removeClass(function(index, css) {
-                    return (css.match(/\bpush-right\S+/g) || []).join(' ');
-                });
-                
-                $this.addClass('push-right-' + push_right);
+                master = 'left';
+                slave = 'right';
             } else {
-                var right = 950 - left - $this.outerWidth();
-                var pull_left = Math.round(right / 19);
+                push = 'down';
+                pull = 'up';
                 
-                $this.removeClass(function(index, css) {
-                    return (css.match(/\bpull-left-\S+/g) || []).join(' ');
-                });
-                
-                $this.addClass('pull-left-' + pull_left);
+                master = 'top';
+                slave = 'bottom';
             }
+            
+            if (! anchor) {
+                anchor = $el.is('[class*=push-' + push + ']') ? master : slave;
+            }
+            
+            var $parent = $el.offsetParent();
+            var offsetMaster, offsetSlave, size;
+            
+            offsetMaster = $el.offset()[master] - $parent.offset()[master];
+            
+            $el.removeClass(function(index, css) {
+                var regex = new RegExp('\\b(?:push|pull)-(?:' + push + '|' + pull + ')-\\S+', 'g');
+                
+                return (css.match(regex) || []).join(' ');
+            });
+            
+            if (anchor === master) {
+                $el.addClass('push-' + push + '-' + getPos(offsetMaster, grid, max));
+            } else {
+                size = axis === 'x' ? $el.outerWidth() : $el.outerHeight();
+                offsetSlave = max - offsetMaster - size;
+                
+                $el.addClass('pull-' + pull + '-' + getPos(offsetSlave, grid, max));
+            }
+        };
+        
+        this.changeHorizontalPos = function($el, anchor) {
+            changePos($el, 'x', anchor, 19, 950);
+        };
+        
+        this.changeVerticalPos = function($el, anchor) {
+            changePos($el, 'y', anchor, 16, 624);
         };
         
         this.applyDraggable = function($el) {
@@ -352,41 +393,16 @@
                     stop: function(e, ui) {
                         $selected.each(function() {
                             var $this = $(this);
-                            var top = parseInt($this.css('top'));
                             
-                            if ($this.is('[class*=push-down]')) {
-                                var push_down = Math.round(top / 16).toString();
-                                push_down += (Math.round(top / 4) / 4).toString()
-                                    .replace(/^\d+/, '')
-                                    .replace('.25', '-a')
-                                    .replace('.5', '-b')
-                                    .replace('.75', '-c');
-                                
-                                $this.removeClass(function(index, css) {
-                                    return (css.match(/\bpush-down\S+/g) || []).join(' ');
-                                });
-                                
-                                $this.addClass('push-down-' + push_down);
-                            } else {
-                                var bottom = 624 - top - $this.outerHeight();
-                                var pull_up = Math.round(bottom / 16);
-                                pull_up += (Math.round(bottom / 4) / 4).toString()
-                                    .replace(/^\d+/, '')
-                                    .replace('.25', '-a')
-                                    .replace('.5', '-b')
-                                    .replace('.75', '-c');
-                                
-                                $this.removeClass(function(index, css) {
-                                    return (css.match(/\bpull-up\S+/g) || []).join(' ');
-                                });
-                                
-                                $this.addClass('pull-up-' + pull_up);
-                            }
-                            
-                            changeXPos($this);
+                            app.ContentEditor.changeHorizontalPos($this);
+                            app.ContentEditor.changeVerticalPos($this);
                         }).removeClass('ui-draggable-dragging').removeAttr('style');
                     },
-                    grid: [19, 4]
+                    
+                    // Both these x grid sizes have issues. The grid actually has a different "step" size every fourth step.
+                    // push-right-x --> push-right-x-a = 5px; push-right-x-a --> push-right-x-b = 5px; push-right-x-b --> push-right-x-c = 5px; push-right-x-c --> push-right-x+1 = 4px;
+                    // grid: [4.75, 4]
+                    grid: [5, 4]
                 });
             }
         };
@@ -502,7 +518,7 @@
                             $this.addClass('span-' + span);
                         }
                         
-                        changeXPos($this);
+                        app.ContentEditor.changeHorizontalPos($this);
                         
                         $this.removeAttr("style");
                     }
@@ -530,7 +546,7 @@
                         var $this = $(this);
                         var width = parseInt($this.css('width'));
                         
-                        changeXPos($this);
+                        app.ContentEditor.changeHorizontalPos($this);
                         $this.removeAttr('style');
                         
                         if ($this.is('[class*=span]')) {
