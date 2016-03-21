@@ -1,73 +1,78 @@
 (function(window, $, app) {
     // TODO: Clean up
     function ImageEditor() {
-        this.detectImage = function($img) {
-            var $selected = app.ContentEditor.getSelection();
-            var $selectionControls = app.UI.getSelectionControls();
-            $img = $selected.find('img');
-            var currentUrl = $img.attr('src').replace('@2x', '');
-            var currentW = $img.attr('width');
-            var currentH = $img.attr('height');
-
-            $('<img/>').attr('src', currentUrl).load(function() {
-                var $this = $(this);
-                var imgW = $this.prop('naturalWidth');
-                var imgH = $this.prop('naturalHeight');
-                app.UI.getSelectionSection().find('#naturalSize').text(imgW + 'x' + imgH);
-
-                if (typeof currentW === 'undefined' || currentW == imgW) {
-                    currentW = 'auto';
-                }
-
-                if (typeof currentH === 'undefined' || currentH == imgH) {
-                    currentH = 'auto';
-                }
-
-                $selectionControls.filter('#imageWidth').val(currentW);
-                $selectionControls.filter('#imageHeight').val(currentH);
-            });
-
-            $selectionControls.filter('#imageURL').val(currentUrl);
+        this.detectImage = function() {
+            var $selected = app.ContentEditor.getSelection().find('img');
+            var url = $selected.attr('src').replace('@2x', '');
+            var width = $selected.attr('width');
+            var height = $selected.attr('height');
+            var imgWidth = $selected.prop('naturalWidth');
+            var imgHeight = $selected.prop('naturalHeight');
+            
+            if (typeof width === 'undefined') {
+                width = 'auto';
+            }
+            
+            if (typeof height === 'undefined') {
+                height = 'auto';
+            }
+            
+            $('#naturalSize').text(imgWidth + 'x' + imgHeight);
+            
+            $('#imageWidth').val(width);
+            $('#imageHeight').val(height);
+            
+            $('#imageURL').val(url);
         };
-
+        
         this.changeUrl = function(url) {
-            var $selected = app.ContentEditor.getSelection();
-            var currentUrl = $selected.find('img').attr('src');
-
+            var $selected = app.ContentEditor.getSelection().find('img');
+            var currentUrl = $selected.attr('src');
+            
             if (url !== currentUrl) {
-                var $currentImg = $selected.find('img');
-                var $img = $currentImg.clone().wrap('<p/>');
-                $img.removeAttr('width height');
-                $img.attr('src', url);
                 var url2x = url.replace(/(.*)(\..*)$/, '$1@2x$2');
-
-                var imghtml = $img.parent().html().replace(/(data-img-src@2x=")[^"]+(")/, '$1' + url2x + '$2');
-                var img = $currentImg.replaceWith(imghtml);
-                app.ImageEditor.detectImage(img);
-
+                
+                $selected.src(url)
+                    .attr('data-img-src-2x', url2x)
+                    .removeAttr('height')
+                    .load(function() {
+                        var $this = $(this);
+                        
+                        $this.width($this.prop('naturalWidth'));
+                        
+                        app.ImageEditor.detectImage();
+                    });
             }
         };
-
-        this.changeSize = function(w, h) {
-            var $selected = app.ContentEditor.getSelection();
-            var currentW = $selected.find('img').attr('width');
-            var currentH = $selected.find('img').attr('height');
-            var imgW = $selected.find('img').prop('naturalWidth');
-            var imgH = $selected.find('img').prop('naturalHeight');
-
-            if (w == imgW || w === '') {
-                $selected.find('img').removeAttr('width');
-            } else if (w !== currentW) {
-                $selected.find('img').attr('width', w);
+        
+        this.changeSize = function(width, height) {
+            var $selected = app.ContentEditor.getSelection().find('img');
+            var imgWidth = $selected.prop('naturalWidth');
+            var imgHeight = $selected.prop('naturalHeight');
+            
+            if (width == imgWidth || width === '') {
+                width = 'auto';
             }
-
-            if (h == imgH || h === '') {
-                $selected.find('img').removeAttr('height');
-            } else if (h !== currentH) {
-                $selected.find('img').attr('height', h);
+            
+            if (height == imgHeight || height === '') {
+                height = 'auto';
             }
+            
+            if (width === 'auto' && height === 'auto') {
+                width = imgWidth;
+            }
+            
+            $selected.attr('width', width).attr('height', height);
+            
+            if (width === 'auto') {
+                $selected.removeAttr('width');
+            } else if (height === 'auto') {
+                $selected.removeAttr('height');
+            }
+            
+            this.detectImage();
         };
     }
-
+    
     app.registerModule('ImageEditor', ImageEditor);
 })(window, jQuery, MagTool);
