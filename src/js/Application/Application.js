@@ -456,10 +456,7 @@ var MagTool = MagTool || {};
         });
     }, false, false);
     
-    // TODO: Needs refactoring.
     registerAction('save', function() {
-        app.ContentEditor.cleanUp();
-        
         var pageId = app.Page.getId();
         var files = app.Exporter.toJSON();
         
@@ -468,6 +465,7 @@ var MagTool = MagTool || {};
         app.Server.save(pageId, files.credits, files.infoBlocks).done(function() {
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
+            
             app.ContentEditor.stopEdit();
             app.UI.hideEditTools();
             
@@ -476,6 +474,10 @@ var MagTool = MagTool || {};
             app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.');
         }).fail(function() {
             app.UI.notify('Error Saving Page.', '## ERROR MESSAGE ##');
+            
+            // TODO: Switch to offline mode.
+        }).always(function() {
+            app.UI.btnGroupLoaded('editSave');
         });
     }, false, true);
     
