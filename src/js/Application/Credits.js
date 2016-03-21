@@ -1,5 +1,4 @@
 (function(window, $, app) {
-    // TODO: Clean up
     function Credits() {
         var getCreditsHolder = function() {
             return app.Page.get().find('[class*="creditsHolder"]');
@@ -10,11 +9,11 @@
         };
         
         this.detectVisibility = function() {
-            $('#creditsVisibility').prop('checked', this.isVisible());
+            $('#creditsVisibility').prop('checked', ! getCreditsHolder().is('.creditsNone'));
         };
         
         this.detectContent = function() {
-            var $editor = app.UI.getSelectionControls().filter('#creditsEditor');
+            var $editor = $('#creditsEditor');
             var text = getCreditsWhole().find('p').html();
             
             text = text.replace(/<br>/g, '\n');
@@ -23,6 +22,14 @@
         
         this.getCredits = function() {
             return getCreditsWhole();
+        };
+        
+        this.show = function() {
+            this.getCredits().fadeIn(300);
+        };
+        
+        this.hide = function() {
+            this.getCredits().fadeOut(300);
         };
         
         this.togglePosition = function() {
@@ -65,18 +72,6 @@
                 content = $content.html();
                 $content.html('').data('content', content);
             }
-        };
-        
-        this.isVisible = function() {
-            return ! getCreditsHolder().is('.creditsNone');
-        };
-        
-        this.show = function() {
-            this.getCredits().fadeIn(300);
-        };
-        
-        this.hide = function() {
-            this.getCredits().fadeOut(300);
         };
         
         this.update = function(text) {
