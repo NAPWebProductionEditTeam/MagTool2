@@ -460,17 +460,12 @@ var MagTool = MagTool || {};
     registerAction('save', function() {
         app.ContentEditor.cleanUp();
         
-        var pageId = app.Page.getId(),
-            credits = app.ContentEditor.getCreditsHtml(),
-            contents = app.ContentEditor.getContentHtml(),
-            video = app.ContentEditor.getVideoHtml();
+        var pageId = app.Page.getId();
+        var files = app.Exporter.toJSON();
         
-        console.info('Copy the following output into common/script.html:');
-        console.log('>>>> BEGIN SCRIPT.HTML CONTENT <<<<');
-        console.log(video);
-        console.log('<<<< END SCRIPT.HTML CONTENT >>>>');
+        app.Exporter.toConsole('script');
         
-        app.Server.save(pageId, credits, contents).done(function() {
+        app.Server.save(pageId, files.credits, files.infoBlocks).done(function() {
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
             app.ContentEditor.stopEdit();
@@ -555,13 +550,18 @@ var MagTool = MagTool || {};
     
     // Credits
     registerAction('toggleCreditsPosition', function() {
+        $('#creditsPosition').find('.fa').toggleClass('fa-flip-horizontal');
+        
         app.Credits.togglePosition();
     }, false, true);
     
     registerAction('toggleCreditsColor', function() {
+        $('#creditsColor').find('.fa').toggleClass('fa-flip-horizontal');
+        
         app.Credits.toggleColor();
     }, false, true);
     
+    // TODO: Detect visibility
     registerAction('toggleCredits', function() {
         app.Credits.toggle();
         

@@ -217,11 +217,11 @@
         };
         
         var getCreditsHtml = function() {
-            return getHtml(app.Page.get().find('[class^="credits"]'));
+            return getHtml(app.Page.get().find('[class*="credits"]'));
         };
         
         var getContentHtml = function() {
-            return getHtml(app.Page.get().find('.magazineContent > div:not([class^="credits"]):not(.edLetterList):not(.videoHolder)'));
+            return getHtml(app.Page.get().find('.magazineContent > div:not([class*="credits"]):not(.edLetterList):not(.videoHolder)'));
         };
         
         var getScriptHtml = function() {
@@ -238,8 +238,8 @@
          */
         this.toJSON = function() {
             return {
+                infoBlocks: getContentHtml(),
                 credits: getCreditsHtml(),
-                content: getContentHtml(),
                 script: getScriptHtml()
             };
         };
@@ -247,10 +247,20 @@
         /**
          * Export the page to console. Mainly for testing.
          */
-        this.toConsole = function() {
-            console.file('infoBlocks.html', getContentHtml());
-            console.file('credits.html', getCreditsHtml());
-            console.file('script.html', getScriptHtml());
+        this.toConsole = function(files) {
+            files = Argument.default(files, ['infoBlocks', 'credits', 'script']);
+            
+            if ($.inArray('infoBlocks', files) > -1) {
+                console.file('infoBlocks.html', getContentHtml());
+            }
+            
+            if ($.inArray('credits', files) > -1) {
+                console.file('credits.html', getCreditsHtml());
+            }
+            
+            if ($.inArray('script', files) > -1) {
+                console.file('script.html', getScriptHtml());
+            }
         };
         
         // Holy shit this is possible this is so freaking cool.
