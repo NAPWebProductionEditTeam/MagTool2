@@ -127,6 +127,7 @@
         
         this.showEditTools = function() {
             app.Slug.detectSlugProperties();
+            app.Credits.detectVisibility();
             this.getUI().find('.page-controls').addClass('--show');
         };
         

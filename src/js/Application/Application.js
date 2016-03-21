@@ -561,20 +561,13 @@ var MagTool = MagTool || {};
         app.Credits.toggleColor();
     }, false, true);
     
-    // TODO: Detect visibility
-    registerAction('toggleCredits', function() {
-        app.Credits.toggle();
+    registerAction('changeCreditsVisibility', function(visible) {
+        app.Credits.setVisibility(!! visible);
         
-        var $toggle = $('[data-action="toggleCredits"]');
-        
-        if (app.Credits.isVisible()) {
-            $toggle.attr('title', 'Hide credits');
-            $toggle.find('.fa').removeClass('fa-eye').addClass('fa-eye-slash');
-            
+        if (visible) {
             app.ContentEditor.select(app.Credits.getCredits());
         } else {
-            $toggle.attr('title', 'Show credits');
-            $toggle.find('.fa').removeClass('fa-eye-slash').addClass('fa-eye');
+            app.ContentEditor.deselect(app.Credits.getCredits());
         }
     }, false, true);
     
