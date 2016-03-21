@@ -645,11 +645,17 @@
                         label: '<b>A</b><i class="fa fa-ellipsis-v"></i>',
                         action: function(html, mark) {
                             var el = getSelectedElement();
+                            var $el = $(el);
                             
                             editor.selectElement(el);
                             
-                            html = window.getCurrentSelection();
-                            html = '<p class="dropcap3">' + html + '</p>';
+                            if ($el.is('.dropcap3')) {
+                                $el.removeClass('dropcap3');
+                                html = $el.html();
+                            } else {
+                                html = window.getCurrentSelection();
+                                html = '<p class="dropcap3">' + html + '</p>';
+                            }
                             
                             return html;
                         }
@@ -665,15 +671,27 @@
             if (app.getLanguage() === 'zh') {
                 options.toolbar.buttons.push('continue');
                 options.extensions.continue = new Medium.button({
-                    label: '<b>A</b><i class="fa fa-ellipsis-v"></i>',
+                    label: '<b>如</b><i class="fa fa-ellipsis-v"></i>',
                     action: function(html, mark) {
                         var el = getSelectedElement();
+                        var $el = $(el);
+
+                        $el.removeClass('dropcap3');
 
                         editor.selectElement(el);
 
-                        html = window.getCurrentSelection();
-                        html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
-                        html = '<p class="continue">' + html + '</p>';
+                        if ($el.is('.continue')) {
+                            var $firstLetter = $el.find('.firstletter');
+
+                            $el.removeClass('continue');
+                            $firstLetter.replaceWith($firstLetter.text());
+
+                            html = $el.html();
+                        } else {
+                            html = window.getCurrentSelection();
+                            html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
+                            html = '<p class="continue">' + html + '</p>';
+                        }
 
                         return html;
                     }
@@ -695,37 +713,37 @@
             
             $el.data('class', {});
             
-            var removeClassSelector = '.dropcap3, .continue';
-            var removeClasses = removeClassSelector.replace(/(,|\.)/g, '');
-
-            if ($el.find(removeClassSelector)) {
-                var $children = $el.find(removeClassSelector);
-                
-                $children.each(function() {
-                    var $this = $(this);
-                    var id = $this.get(0).tagName.toLowerCase() + $this.index();
-                    var classObj = $el.data('class');
-                    var remove = removeClassSelector.split(/,\s*/);
-                    var removed = [];
-
-                    for (var i = 0; i < remove.length; i++) {
-                        if ($this.is(remove[i])) {
-                            removed.push(remove[i].replace('.', ''));
-                        }
-                    }
-                    
-                    if (typeof classObj[id] !== 'undefined') {
-                        classObj[id] = classObj[id].concat(removed);
-                    } else {
-                        classObj[id] = removed;
-                    }
-                    
-                    $this.attr('id', id);
-                    $el.data('class', classObj);
-                });
-                
-                $children.removeClass(removeClasses);
-            }
+            //            var removeClassSelector = '.dropcap3, .continue';
+            //            var removeClasses = removeClassSelector.replace(/(,|\.)/g, '');
+            //
+            //            if ($el.find(removeClassSelector)) {
+            //                var $children = $el.find(removeClassSelector);
+            //
+            //                $children.each(function() {
+            //                    var $this = $(this);
+            //                    var id = $this.get(0).tagName.toLowerCase() + $this.index();
+            //                    var classObj = $el.data('class');
+            //                    var remove = removeClassSelector.split(/,\s*/);
+            //                    var removed = [];
+            //
+            //                    for (var i = 0; i < remove.length; i++) {
+            //                        if ($this.is(remove[i])) {
+            //                            removed.push(remove[i].replace('.', ''));
+            //                        }
+            //                    }
+            //
+            //                    if (typeof classObj[id] !== 'undefined') {
+            //                        classObj[id] = classObj[id].concat(removed);
+            //                    } else {
+            //                        classObj[id] = removed;
+            //                    }
+            //
+            //                    $this.attr('id', id);
+            //                    $el.data('class', classObj);
+            //                });
+            //
+            //                $children.removeClass(removeClasses);
+            //            }
             
             app.ContentEditor.disableDraggable($el);
             app.ContentEditor.disableResizable($el);
@@ -746,7 +764,7 @@
                         $node = $parent;
                     }
                     
-                    $node.removeAttr('id');
+                    $node.removeAttr('class');
                 }
             });
             
@@ -797,16 +815,16 @@
             
             $(document).off('click', $(document).data('click'));
             
-            var classObj = $el.data('class');
-            
-            for (var id in classObj) {
-                var classes = classObj[id];
-                var $child = $el.find('#' + id);
-                
-                if ($child.length) {
-                    $child.addClass(classes.join(' '));
-                }
-            }
+            //            var classObj = $el.data('class');
+            //
+            //            for (var id in classObj) {
+            //                var classes = classObj[id];
+            //                var $child = $el.find('#' + id);
+            //
+            //                if ($child.length) {
+            //                    $child.addClass(classes.join(' '));
+            //                }
+            //            }
             
             $el.off('keyup');
             
