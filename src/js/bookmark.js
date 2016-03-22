@@ -35,7 +35,7 @@ var MagTool = MagTool || {};
     };
     
     // Needs to change to Alfresco once first dist is uploaded.
-    app.BASE_URI = 'http://magtool.local/build/';
+    app.BASE_URI = 'http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/';
     
     if (app.env('dist')) {
         app.BASE_URI = 'http://magtool.local/build/';
