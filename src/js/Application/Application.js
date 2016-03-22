@@ -435,8 +435,10 @@ var MagTool = MagTool || {};
             } else {
                 app.UI.notify('Page Locked', 'The page is currently being edited.');
             }
-        }).fail(function() {
-            app.UI.notify('Failed Locking Page.', '## ERROR MESSAGE ##');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            // @TODO: Better error message once #12 is fixed.
+            
+            app.UI.notify('Failed Locking Page.', 'The page could not be locked for editing.');
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
         });
@@ -450,7 +452,9 @@ var MagTool = MagTool || {};
         app.Server.unlock(pageId).done(function() {
             app.UI.notify('Page Unlocked.');
         }).fail(function() {
-            app.UI.notify('Failed Unlocking Page.', '## ERROR MESSAGE ##');
+            // @TODO: Better error message once #12 is fixed.
+            
+            app.UI.notify('Failed Unlocking Page.', 'The page could not be unlocked.');
         }).always(function() {
             app.UI.btnGroupLoaded('lock');
         });
@@ -472,10 +476,10 @@ var MagTool = MagTool || {};
             app.UI.showBtn('editSave', 'edit');
             
             app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.');
-        }).fail(function() {
-            app.UI.notify('Error Saving Page.', '## ERROR MESSAGE ##');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            // @TODO: Better error message once #12 is fixed.
             
-            // TODO: Switch to offline mode.
+            app.UI.notify('Error Saving Page.', 'The page could not be saved.');
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
         });
