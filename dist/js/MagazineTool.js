@@ -51147,8 +51147,12 @@ var MagTool = MagTool || {};
     
     registerAction('save', function() {
         var pageId = app.Page.getId();
-        var files = app.Exporter.toJSON();
+        var files;
         
+        app.ContentEditor.stopEdit();
+        app.UI.hideEditTools();
+        
+        files = app.Exporter.toJSON();
         app.Exporter.toConsole('script');
         
         app.UI.btnGroupLoading('editSave');
@@ -51157,14 +51161,15 @@ var MagTool = MagTool || {};
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
             
-            app.ContentEditor.stopEdit();
-            app.UI.hideEditTools();
-            
             app.UI.showBtn('editSave', 'edit');
             
             app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.', 'check');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             // @TODO: Better error message once #12 is fixed.
+            
+            // When fails, resume edit mode.
+            app.ContentEditor.startEdit();
+            app.UI.showEditTools();
             
             app.UI.notify('Error Saving Page.', 'The page could not be saved.', 'exclamation-triangle');
         }).always(function() {
@@ -51374,24 +51379,24 @@ var MagTool = MagTool || {};
             editing = true;
             app.$body.addClass('mt-editing');
             
-            this.makeDraggable();
             this.makeResizable();
+            this.makeDraggable();
             this.makeSelectable();
             this.makeEditable();
         };
         
         this.applyInteractions = function($el) {
-            this.applyDraggable($el);
             this.applyResizable($el);
+            this.applyDraggable($el);
             this.applySelectable($el);
             this.applyEditable($el);
         };
         
         this.stopEdit = function() {
+            this.removeEditable();
             this.removeSelectable();
             this.removeDraggable();
             this.removeResizable();
-            this.removeEditable();
             
             app.Page.getContent().append($img_map);
             $img_map = null;
@@ -52062,40 +52067,6 @@ var MagTool = MagTool || {};
             app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
-            $el.data('class', {});
-            
-            //            var removeClassSelector = '.dropcap3, .continue';
-            //            var removeClasses = removeClassSelector.replace(/(,|\.)/g, '');
-            //
-            //            if ($el.find(removeClassSelector)) {
-            //                var $children = $el.find(removeClassSelector);
-            //
-            //                $children.each(function() {
-            //                    var $this = $(this);
-            //                    var id = $this.get(0).tagName.toLowerCase() + $this.index();
-            //                    var classObj = $el.data('class');
-            //                    var remove = removeClassSelector.split(/,\s*/);
-            //                    var removed = [];
-            //
-            //                    for (var i = 0; i < remove.length; i++) {
-            //                        if ($this.is(remove[i])) {
-            //                            removed.push(remove[i].replace('.', ''));
-            //                        }
-            //                    }
-            //
-            //                    if (typeof classObj[id] !== 'undefined') {
-            //                        classObj[id] = classObj[id].concat(removed);
-            //                    } else {
-            //                        classObj[id] = removed;
-            //                    }
-            //
-            //                    $this.attr('id', id);
-            //                    $el.data('class', classObj);
-            //                });
-            //
-            //                $children.removeClass(removeClasses);
-            //            }
-            
             app.ContentEditor.disableDraggable($el);
             app.ContentEditor.disableResizable($el);
             app.ContentEditor.removeSelectable();
@@ -52165,17 +52136,6 @@ var MagTool = MagTool || {};
             $editing = null;
             
             $(document).off('click', $(document).data('click'));
-            
-            //            var classObj = $el.data('class');
-            //
-            //            for (var id in classObj) {
-            //                var classes = classObj[id];
-            //                var $child = $el.find('#' + id);
-            //
-            //                if ($child.length) {
-            //                    $child.addClass(classes.join(' '));
-            //                }
-            //            }
             
             $el.off('keyup');
             
