@@ -433,12 +433,12 @@ var MagTool = MagTool || {};
                 
                 app.UI.showBtn('editSave', 'save');
             } else {
-                app.UI.notify('Page Locked', 'The page is currently being edited.');
+                app.UI.notify('Page Locked', 'The page is currently being edited.', 'exclamation');
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             // @TODO: Better error message once #12 is fixed.
             
-            app.UI.notify('Failed Locking Page.', 'The page could not be locked for editing.');
+            app.UI.notify('Failed Locking Page.', 'The page could not be locked for editing.', 'exclamation-triangle');
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
         });
@@ -450,11 +450,11 @@ var MagTool = MagTool || {};
         app.UI.btnGroupLoading('lock');
         
         app.Server.unlock(pageId).done(function() {
-            app.UI.notify('Page Unlocked.');
+            app.UI.notify('Page Unlocked.', 'The page is now unlocked.');
         }).fail(function() {
             // @TODO: Better error message once #12 is fixed.
             
-            app.UI.notify('Failed Unlocking Page.', 'The page could not be unlocked.');
+            app.UI.notify('Failed Unlocking Page.', 'The page could not be unlocked.', 'exclamation-triangle');
         }).always(function() {
             app.UI.btnGroupLoaded('lock');
         });
@@ -466,6 +466,8 @@ var MagTool = MagTool || {};
         
         app.Exporter.toConsole('script');
         
+        app.UI.btnGroupLoading('editSave');
+        
         app.Server.save(pageId, files.credits, files.infoBlocks).done(function() {
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
@@ -475,11 +477,11 @@ var MagTool = MagTool || {};
             
             app.UI.showBtn('editSave', 'edit');
             
-            app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.');
+            app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.', 'check');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             // @TODO: Better error message once #12 is fixed.
             
-            app.UI.notify('Error Saving Page.', 'The page could not be saved.');
+            app.UI.notify('Error Saving Page.', 'The page could not be saved.', 'exclamation-triangle');
         }).always(function() {
             app.UI.btnGroupLoaded('editSave');
         });

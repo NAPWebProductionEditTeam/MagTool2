@@ -136,9 +136,11 @@
         };
         
         var notifyTimer;
+        var notifyIcon = 'bell';
         
-        this.notify = function(title, body, time) {
+        this.notify = function(title, body, icon, time) {
             body = Argument.default(body, '');
+            icon = Argument.default(icon, 'bell');
             time = Argument.default(time, 5000);
             
             var $notify = this.getNotification();
@@ -149,7 +151,10 @@
             
             $notify.find('header').text(title);
             $notify.find('main').text(body);
+            $notify.find('.notification\\/icon').removeClass('fa-' + notifyIcon).addClass('fa-' + icon);
             $notify.addClass('--open');
+            
+            notifyIcon = icon;
             
             if (time > 0) {
                 notifyTimer = setTimeout(function() {
