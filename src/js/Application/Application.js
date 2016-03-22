@@ -462,8 +462,12 @@ var MagTool = MagTool || {};
     
     registerAction('save', function() {
         var pageId = app.Page.getId();
-        var files = app.Exporter.toJSON();
+        var files;
         
+        app.ContentEditor.stopEdit();
+        app.UI.hideEditTools();
+        
+        files = app.Exporter.toJSON();
         app.Exporter.toConsole('script');
         
         app.UI.btnGroupLoading('editSave');
@@ -472,14 +476,15 @@ var MagTool = MagTool || {};
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
             
-            app.ContentEditor.stopEdit();
-            app.UI.hideEditTools();
-            
             app.UI.showBtn('editSave', 'edit');
             
             app.UI.notify('Page Saved.', 'Page ' + app.Page.getNumber() + ' saved successfully.', 'check');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             // @TODO: Better error message once #12 is fixed.
+            
+            // When fails, resume edit mode.
+            app.ContentEditor.startEdit();
+            app.UI.showEditTools();
             
             app.UI.notify('Error Saving Page.', 'The page could not be saved.', 'exclamation-triangle');
         }).always(function() {
