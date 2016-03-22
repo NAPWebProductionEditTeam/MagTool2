@@ -1,0 +1,48 @@
+# Site settings
+
+project:
+    name: "MagTool2"
+    alt_name: "MagTool"
+    tagline: Net-A-Porter Magazine Tool
+    author: "NAPWebProductionEditTeam"
+    github: "https://github.com/NAPWebProductionEditTeam/MagTool2"
+navigation:
+  - name: User Documentation
+    url: "docs/user"
+    navigation:
+      - name: Getting Started
+        type: category
+      - name: Installation
+        type: page
+        url: "installation"
+navigation:
+  - name: Developer Documentation
+    url: "docs/dev"
+    navigation:
+      - name: Getting Started
+        type: category
+      - name: Installation
+        type: page
+        url: "installation"
+url: "https://napwebproductioneditteam.github.com/MagTool2"
+github_username: NAPWebProductionEditTeam
+
+# Build settings
+markdown: redcarpet
+redcarpet:
+  extensions: ['no_intra_emphasis', 'with_toc_data', 'html_toc', 'strikethrough', 'autolink', 'tables', 'footnotes', 'underline']
+highlighter: pygments
+pygments_options: ['startinline']
+gems:
+  - jekyll-assets
+  - nokogiri
+  - octopress-minify-html
+assets:
+  dirname: assets
+  base_url: assets/
+  cachebust: soft
+  js_compressor: uglifier
+  css_compressor: sass
+  gzip: [ text/css, application/javascript ]
+  sources:
+    - _assets
