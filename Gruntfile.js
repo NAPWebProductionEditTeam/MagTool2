@@ -258,7 +258,7 @@ module.exports = function(grunt) {
     });
     
     grunt.registerTask('default', ['env:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
+    grunt.registerTask('dist', ['exec', 'jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     
