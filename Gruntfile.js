@@ -132,7 +132,7 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
-                    'dist/css/app.css': ['<%= concat.build.dest %>']
+                    'dist/css/app.css': 'build/css/app.css'
                 }
             }
         },

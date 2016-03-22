@@ -54,6 +54,6 @@ var MagTool = MagTool || {};
     };
     
     app.getVersion(function() {
-        $.getScript(app.BASE_URI + 'js/MagazineTool.js?v=' + app.VERSION);
+        $.getScript(app.BASE_URI + 'js/MagazineTool' + (app.env('dist') ? '.min' : '') + '.js?v=' + app.VERSION);
     });
 })(window, jQuery, MagTool);
