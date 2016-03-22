@@ -52891,7 +52891,7 @@ var MagTool = MagTool || {};
             
             $('#mtCss, #fontAwesome').remove();
             
-            $.getScript(app.BASE_URI + 'js/MagazineTool.js?v=' + app.VERSION);
+            $.getScript(app.BASE_URI + 'js/MagazineTool' + (app.env('dist') ? '.min' : '') + '.js?v=' + app.VERSION);
         });
     };
     
