@@ -22,24 +22,24 @@
             editing = true;
             app.$body.addClass('mt-editing');
             
-            this.makeDraggable();
             this.makeResizable();
+            this.makeDraggable();
             this.makeSelectable();
             this.makeEditable();
         };
         
         this.applyInteractions = function($el) {
-            this.applyDraggable($el);
             this.applyResizable($el);
+            this.applyDraggable($el);
             this.applySelectable($el);
             this.applyEditable($el);
         };
         
         this.stopEdit = function() {
+            this.removeEditable();
             this.removeSelectable();
             this.removeDraggable();
             this.removeResizable();
-            this.removeEditable();
             
             app.Page.getContent().append($img_map);
             $img_map = null;
