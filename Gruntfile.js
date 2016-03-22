@@ -142,7 +142,7 @@ module.exports = function(grunt) {
                     {
                         pattern: '{{ APP_ENV }}',
                         replacement: function() {
-                            return grunt.option('env') || 'production';
+                            return grunt.option('env') || 'dist';
                         }
                     },
                     {
@@ -231,6 +231,12 @@ module.exports = function(grunt) {
                     title: 'Distribution complete',
                     message: 'The grunt distribution build was successfull'
                 }
+            },
+            bookmarks: {
+                options: {
+                    title: 'Bookmarks generated',
+                    message: 'The dev and dist bookmarks were generated successfully'
+                }
             }
         }
     });
@@ -252,13 +258,17 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     
     grunt.registerTask('env:dev', function() {
+        grunt.option('env', 'dev');
+    });
+    grunt.registerTask('env-default:dev', function() {
         if (! grunt.option('env')) {
             grunt.option('env', 'dev');
         }
     });
     
-    grunt.registerTask('default', ['env:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
+    grunt.registerTask('default', ['env-default:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
     grunt.registerTask('dist', ['exec', 'jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
+    grunt.registerTask('bookmarks', ['uglify:bookmark', 'string-replace:dist', 'env:dev', 'uglify:build', 'string-replace:build', 'notify:bookmarks']);
     
     grunt.registerTask('update', ['exec']);
     
