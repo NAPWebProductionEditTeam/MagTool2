@@ -245,6 +245,8 @@
             }
         };
         
+        var uiSelectableCancel = '[class*="creditsHolder"], [data-medium-focused="true"], .ui-resizable-handle';
+        
         this.makeSelectable = function() {
             var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
             
@@ -252,7 +254,7 @@
             
             $selectable.selectable({
                 filter: selectableSelector,
-                cancel: '[class*="creditsHolder"]',
+                cancel: uiSelectableCancel,
                 start: function() {
                     app.UI.getAllControls().blur();
                 },
@@ -268,6 +270,24 @@
             });
             
             this.applySelectable($selectable.find(selectableSelector), false);
+        };
+        
+        this.enableSelectable = function($el) {
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', uiSelectableCancel]);
+            callWidgetFunction($selectable, 'selectable', 'enable');
+            
+            if (typeof $el !== 'undefined') {
+                this.applySelectable($el);
+            }
+        };
+        
+        this.disableSelectable = function($el) {
+            if (typeof $el !== 'undefined') {
+                $el.off('click');
+            }
+            
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', '*']);
+            callWidgetFunction($selectable, 'selectable', 'disable');
         };
         
         this.removeSelectable = function() {
@@ -412,7 +432,7 @@
         
         this.enableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('enable');
+                return callWidgetFunction($el, 'draggable', 'enable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'enable');
@@ -420,7 +440,7 @@
         
         this.disableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('disable');
+                return callWidgetFunction($el, 'draggable', 'disable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'disable');
@@ -576,7 +596,7 @@
         
         this.enableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('enable');
+                return this.applyResizable($el);
             }
             
             callWidgetFunction($resizables, 'resizable', 'enable');
@@ -584,7 +604,7 @@
         
         this.disableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('disable');
+                return callWidgetFunction($el, 'resizable', 'destroy');
             }
             
             callWidgetFunction($resizables, 'resizable', 'disable');
@@ -712,9 +732,9 @@
             
             app.ContentEditor.disableDraggable($el);
             app.ContentEditor.disableResizable($el);
-            app.ContentEditor.removeSelectable();
+            app.ContentEditor.disableSelectable($el);
             
-            editor = window.editor = makeEditor($el);
+            editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
             
@@ -758,6 +778,7 @@
                     app.ContentEditor.stopEditing();
                 }
             });
+            
             $(document).click($(document).data('click'));
             
             $editing = $el;
@@ -776,7 +797,7 @@
             }
             
             editor.destroy();
-            $editing = null;
+            editor = $editing = null;
             
             $(document).off('click', $(document).data('click'));
             
@@ -793,10 +814,10 @@
             // Ensure newline before .dropcap3, .continue
             $el.find('.dropcap3, .continue').prev(':not(br)').after('<br>');
             
-            app.ContentEditor.enableDraggable($el);
-            app.ContentEditor.enableResizable($el);
-            app.ContentEditor.makeSelectable();
-            app.ContentEditor.makeEditable();
+            this.enableSelectable($el);
+            this.enableDraggable($el);
+            this.enableResizable($el);
+            this.makeEditable();
             
             app.ContentEditor.select($el);
         };
@@ -835,7 +856,7 @@
                 selection.collapseToStart();
             }
             
-            if (typeof editor !== 'undefined') {
+            if (typeof editor !== 'undefined' && editor !== null) {
                 editor.destroy();
             }
             
