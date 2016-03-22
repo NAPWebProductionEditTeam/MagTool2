@@ -6815,13 +6815,9 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
   box-shadow: inset 0 0 8px rgba(102, 175, 233, 0.3), 0 0 8px rgba(102, 175, 233, 0.3);
 }
 
-.ui-selected:after, [contenteditable][data-medium-focused="true"]:not(.ui-selected):after, .ui-selected:hover:after, [contenteditable][data-medium-focused="true"]:not(.ui-selected):hover:after {
+.ui-selected:after, .ui-draggable-dragging:after, [contenteditable][data-medium-focused="true"]:after, .ui-selected:hover:after, .ui-draggable-dragging:hover:after, [contenteditable][data-medium-focused="true"]:hover:after {
   border-color: #66AFE9;
   box-shadow: inset 0 0 8px rgba(102, 175, 233, 0.6), 0 0 8px rgba(102, 175, 233, 0.6);
-}
-
-.ui-draggable-dragging {
-  @extends .ui-selected;
 }
 
 .ui-draggable-dragging:after {
@@ -6964,7 +6960,7 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
   display: none;
 }
 
-[contenteditable][data-medium-focused="true"]:not(.ui-selected):after, [contenteditable][data-medium-focused="true"]:not(.ui-selected):hover:after {
+[contenteditable][data-medium-focused="true"]:after, [contenteditable][data-medium-focused="true"]:hover:after {
   border-color: #5cb85c;
   box-shadow: inset 0 0 8px rgba(92, 184, 92, 0.6), 0 0 8px rgba(92, 184, 92, 0.6);
 }
