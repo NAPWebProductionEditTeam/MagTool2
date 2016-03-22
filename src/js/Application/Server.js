@@ -1,4 +1,6 @@
 (function(window, $, app) {
+    var JSON = window.JSON;
+    
     function Server() {
         var api = "http://webprod-nap.dave.net-a-porter.com/save_test";
         
@@ -8,7 +10,7 @@
                 "page_id": pageId
             };
             
-            data = window.JSON.stringify(data);
+            data = JSON.stringify(data);
             
             return $.postJson(api, data);
         };
@@ -19,7 +21,7 @@
                 "page_id": pageId
             };
             
-            data = window.JSON.stringify(data);
+            data = JSON.stringify(data);
             
             return $.postJson(api, data);
         };
@@ -32,7 +34,7 @@
                 "content": infoBlocks
             };
             
-            data = window.JSON.stringify(data);
+            data = JSON.stringify(data);
             
             return $.postJson(api, data);
         };
