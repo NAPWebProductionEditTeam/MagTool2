@@ -710,40 +710,6 @@
             app.ContentEditor.deselectAll($selectables);
             app.ContentEditor.select($el);
             
-            $el.data('class', {});
-            
-            //            var removeClassSelector = '.dropcap3, .continue';
-            //            var removeClasses = removeClassSelector.replace(/(,|\.)/g, '');
-            //
-            //            if ($el.find(removeClassSelector)) {
-            //                var $children = $el.find(removeClassSelector);
-            //
-            //                $children.each(function() {
-            //                    var $this = $(this);
-            //                    var id = $this.get(0).tagName.toLowerCase() + $this.index();
-            //                    var classObj = $el.data('class');
-            //                    var remove = removeClassSelector.split(/,\s*/);
-            //                    var removed = [];
-            //
-            //                    for (var i = 0; i < remove.length; i++) {
-            //                        if ($this.is(remove[i])) {
-            //                            removed.push(remove[i].replace('.', ''));
-            //                        }
-            //                    }
-            //
-            //                    if (typeof classObj[id] !== 'undefined') {
-            //                        classObj[id] = classObj[id].concat(removed);
-            //                    } else {
-            //                        classObj[id] = removed;
-            //                    }
-            //
-            //                    $this.attr('id', id);
-            //                    $el.data('class', classObj);
-            //                });
-            //
-            //                $children.removeClass(removeClasses);
-            //            }
-            
             app.ContentEditor.disableDraggable($el);
             app.ContentEditor.disableResizable($el);
             app.ContentEditor.removeSelectable();
@@ -813,17 +779,6 @@
             $editing = null;
             
             $(document).off('click', $(document).data('click'));
-            
-            //            var classObj = $el.data('class');
-            //
-            //            for (var id in classObj) {
-            //                var classes = classObj[id];
-            //                var $child = $el.find('#' + id);
-            //
-            //                if ($child.length) {
-            //                    $child.addClass(classes.join(' '));
-            //                }
-            //            }
             
             $el.off('keyup');
             
