@@ -1,6 +1,16 @@
 <div id="magtoolComponents" class="mtOverride">
     <div class="magtool hasZ --hide +z-depth-1" id="magtool">
         <div class="container">
+            <!-- OFFLINE MODE BTN
+            <section class="mode" style="
+                                         position: absolute;
+                                         top: 0;
+                                         left: 0;
+                                         padding: 15px;
+                                         "><span class="fa-stack fa-lg">
+                <i class="fa fa-wifi fa-stack-1x"></i>
+                <i class="fa fa-ban fa-stack-2x text-danger"></i>
+                </span></section>-->
             <!-- Edit/Save etc.  -->
             <section class="col-md-2 text-right section main-controls">
                 <div class="form-horizontal">
@@ -11,7 +21,7 @@
                                     <i class="fa fa-fw fa-edit"></i>
                                     <span class="text">Edit Page</span>
                                 </button>
-                                <button type="button" class="btn btn-default btn-block text-left --hide" data-name="save">
+                                <button type="button" class="btn btn-default btn-block text-left --hide" data-name="save" data-action="save">
                                     <i class="fa fa-fw fa-floppy-o"></i>
                                     <span class="text">Save</span>
                                 </button>
