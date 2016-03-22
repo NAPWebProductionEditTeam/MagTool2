@@ -10,9 +10,9 @@ module.exports = function(grunt) {
                     'bower_components/mousetrap-js/plugins/global-bind/mousetrap-global-bind.js',
                     'bower_components/bootstrap-sass/assets/javascripts/bootstrap/modal.js',
                     'bower_components/jszip/dist/jszip.js',
-                    'src/js/jQuery/**',
+                    'src/js/jQuery/**/*.js',
                     'src/js/vendor.js',
-                    'src/js/lib/**',
+                    'src/js/lib/**/*.js',
                     'src/js/Application/Application.js',
                     'src/js/Application/**/*.js',
                     'src/js/app.js'
@@ -33,6 +33,7 @@ module.exports = function(grunt) {
             files: ['Gruntfile.js', 'src/**/*.js', '!src/js/vendor.js'],
             options: {
                 '-W008': true,
+                '-W107': true,
                 globals: {
                     jQuery: true
                 }
@@ -46,9 +47,6 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
-            options: {
-                sourceMap: true
-            },
             build: {
                 options: {
                     compress: {
@@ -60,8 +58,11 @@ module.exports = function(grunt) {
                 }
             },
             dist: {
+                options: {
+                    sourceMap: true
+                },
                 files: {
-                    'dist/js/MagazineTool.min.js': ['<%= concat.build.dest %>']
+                    'dist/js/MagazineTool.min.js': '<%= concat.build.src %>'
                 }
             },
             bookmark: {
@@ -131,7 +132,7 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     'dist/js/MagazineTool.js': ['<%= concat.build.dest %>'],
-                    'dist/css/app.css': ['<%= concat.build.dest %>']
+                    'dist/css/app.css': 'build/css/app.css'
                 }
             }
         },
@@ -143,6 +144,10 @@ module.exports = function(grunt) {
                         replacement: function() {
                             return grunt.option('env') || 'production';
                         }
+                    },
+                    {
+                        pattern: /^/,
+                        replacement: 'javascript:'
                     }
                 ]
             },
@@ -175,7 +180,7 @@ module.exports = function(grunt) {
                 tasks: ['exec:npm_update']
             },
             js: {
-                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js'],
+                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js', '!src/js/vendor.js'],
                 tasks: ['jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'string-replace:build', 'notify:concat']
             },
             tpl: {
@@ -253,7 +258,7 @@ module.exports = function(grunt) {
     });
     
     grunt.registerTask('default', ['env:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
-    grunt.registerTask('dist', ['jshint', 'jscs', 'browserify', 'concat', 'uglify', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
+    grunt.registerTask('dist', ['exec', 'jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
     
     grunt.registerTask('update', ['exec']);
     

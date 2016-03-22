@@ -1,7 +1,7 @@
 (function(window, $, app, CssEvents) {
     var suffix = '?v=' + app.VERSION;
     var fa = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css';
-    var css = 'css/app.css';
+    var css = 'css/app' + (app.env('dist') ? '.min' : '') + '.css';
     var tpl = 'tpl/magtool.html';
     var jqUi = 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js';
     
@@ -56,7 +56,7 @@
             
             $('#mtCss, #fontAwesome').remove();
             
-            $.getScript(app.BASE_URI + 'js/MagazineTool.js?v=' + app.VERSION);
+            $.getScript(app.BASE_URI + 'js/MagazineTool' + (app.env('dist') ? '.min' : '') + '.js?v=' + app.VERSION);
         });
     };
     

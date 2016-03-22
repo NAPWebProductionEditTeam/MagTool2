@@ -278,11 +278,11 @@
             $a.hide().appendTo($('#magtoolComponents'));
             
             if ($.inArray('infoBlocks', files) > -1) {
-                zip.file(page + '/' + lang + '/infoBlocks.html');
+                zip.file(page + '/' + lang + '/infoBlocks.html', getContentHtml());
             }
             
             if ($.inArray('credits', files) > -1) {
-                zip.file(page + '/' + lang + '/credits.html');
+                zip.file(page + '/' + lang + '/credits.html', getCreditsHtml());
             }
             
             if ($.inArray('script', files) > -1) {

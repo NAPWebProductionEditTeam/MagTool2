@@ -93,25 +93,24 @@
             return 'mixed';
         };
         
-        // ?TODO?: swap order to y > x
         this.sort = function($elements) {
             return $elements.sort(function(a, b) {
                 a = $(a).offset();
                 b = $(b).offset();
                 
-                if (a.top == b.top) {
-                    if (a.left == b.left) {
+                if (a.left == b.left) {
+                    if (a.top == b.top) {
                         return 0;
                     }
                     
-                    if (a.left > b.left) {
+                    if (a.top > b.top) {
                         return 1;
                     }
                     
                     return -1;
                 }
                 
-                if (a.top > b.top) {
+                if (a.left > b.left) {
                     return 1;
                 }
                 

@@ -31,7 +31,7 @@
             if (url !== currentUrl) {
                 var url2x = url.replace(/(.*)(\..*)$/, '$1@2x$2');
                 
-                $selected.src(url)
+                $selected.attr('src', url)
                     .attr('data-img-src-2x', url2x)
                     .removeAttr('height')
                     .load(function() {
