@@ -23,11 +23,11 @@ var MagTool = MagTool || {};
             return $.inArray(env, dev) > -1;
         }
         
-        if ($.inArray(ENV, test)) {
+        if ($.inArray(ENV, test) > -1) {
             return $.inArray(env, test) > -1;
         }
         
-        if ($.inArray(ENV, dist)) {
+        if ($.inArray(ENV, dist) > -1) {
             return $.inArray(env, dist) > -1;
         }
         
