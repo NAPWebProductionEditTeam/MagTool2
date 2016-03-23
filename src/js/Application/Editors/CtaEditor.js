@@ -20,7 +20,7 @@
             }
         };
         
-        this.change = function(id) {
+        this.changeId = function(id) {
             app.ContentEditor.getSelection().find('a').attr('data-magtool', id);
         };
         
