@@ -43,6 +43,6 @@
             }
         };
     }
-
+    
     app.registerModule('CtaEditor', CtaEditor);
 })(window, jQuery, MagTool);
