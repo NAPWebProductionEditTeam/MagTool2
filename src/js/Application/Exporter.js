@@ -277,7 +277,11 @@
             
             $a.hide().appendTo($('#magtoolComponents'));
             
-            if ($.inArray('infoBlocks', files) > -1) {
+            if (typeof files === 'string') {
+                files = files.split(/[,\s]+/);
+            }
+            
+            if ($.inArray('infoBlocks', files) > -1 || $.inArray('infoblocks', files) > -1) {
                 zip.file(page + '/' + lang + '/infoBlocks.html', getContentHtml());
             }
             
