@@ -614,7 +614,7 @@
             callWidgetFunction($resizables, 'resizable', 'destroy');
         };
         
-        var editor, $editing;
+        var editor, $editing, $disableInteractions;
         
         var getSelectedElement = function() {
             var Selection = window.getSelection();
@@ -694,29 +694,29 @@
                     action: function(html, mark) {
                         var el = getSelectedElement();
                         var $el = $(el);
-
+                        
                         $el.removeClass('dropcap3');
-
+                        
                         editor.selectElement(el);
-
+                        
                         if ($el.is('.continue')) {
                             var $firstLetter = $el.find('.firstletter');
-
+                            
                             $el.removeClass('continue');
                             $firstLetter.replaceWith($firstLetter.text());
-
+                            
                             html = $el.html();
                         } else {
                             html = window.getCurrentSelection();
                             html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
                             html = '<p class="continue">' + html + '</p>';
                         }
-
+                        
                         return html;
                     }
                 });
             }
-
+            
             return new Medium.editor(selector, options);
         };
         
@@ -727,12 +727,15 @@
             
             $el = $el.first();
             
-            app.ContentEditor.deselectAll($selectables);
-            app.ContentEditor.select($el);
+            this.deselectAll($selectables);
+            this.select($el);
             
-            app.ContentEditor.disableDraggable($el);
-            app.ContentEditor.disableResizable($el);
-            app.ContentEditor.disableSelectable($el);
+            $disableInteractions = $el.add($el.parentsUntil('.magazineContent'));
+            
+            this.disableDraggable($disableInteractions);
+            this.disableResizable($disableInteractions);
+            this.disableSelectable($disableInteractions);
+            this.disableEditable($el);
             
             editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
@@ -762,15 +765,17 @@
                 var $medium = $('[id*=medium-]');
                 var stop = true;
                 
-                if ($target.is($el) || $.contains($el.get(0), e.target)) {
+                if ($target.is($disableInteractions) || $.contains($el.get(0), e.target)) {
                     stop = false;
                 }
                 
-                for (var i = 0; i < $medium.length; i++) {
-                    if ($.contains($medium.get(i), e.target)) {
-                        stop = false;
-                        
-                        break;
+                if (stop) {
+                    for (var i = 0; i < $medium.length; i++) {
+                        if ($.contains($medium.get(i), e.target)) {
+                            stop = false;
+                            
+                            break;
+                        }
                     }
                 }
                 
@@ -814,10 +819,10 @@
             // Ensure newline before .dropcap3, .continue
             $el.find('.dropcap3, .continue').prev(':not(br)').after('<br>');
             
-            this.enableSelectable($el);
-            this.enableDraggable($el);
-            this.enableResizable($el);
-            this.makeEditable();
+            this.enableSelectable($disableInteractions);
+            this.enableDraggable($disableInteractions);
+            this.enableResizable($disableInteractions);
+            this.enableEditable($el);
             
             app.ContentEditor.select($el);
         };
@@ -831,7 +836,7 @@
             
             $editables = $editables.add($el);
             
-            $el.dblclick(function(e) {
+            $el.data('startEdit', function(e) {
                 var $this = $(this);
                 
                 // If we are currently editing a different element,
@@ -840,13 +845,30 @@
                     app.ContentEditor.stopEditing();
                 }
                 
-                $this.off('dblclick');
                 app.ContentEditor.startEditing($this);
             });
+            
+            $el.dblclick($el.data('startEdit'));
         };
         
         this.makeEditable = function() {
             this.applyEditable(app.Page.getContent().find('.editable'));
+        };
+        
+        this.enableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick').dblclick($el.data('startEdit'));
+            }
+            
+            $editables.off('dblclick').dblclick($editables.data('startEdit'));
+        };
+        
+        this.disableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick');
+            }
+            
+            $editables.off('dblclick');
         };
         
         this.removeEditable = function() {
