@@ -634,6 +634,7 @@
                     buttons: [
                         'b',
                         'i',
+                        'u',
                         'anchor',
                         'h2',
                         'h3',
@@ -642,6 +643,65 @@
                         'span',
                         'dropcap',
                         'case'
+                    ]
+                },
+                keyboardCommands: {
+                    commands: [
+                        {
+                            key: 'B',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('b').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'I',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('i').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'U',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('u').button.onclick();
+                            },
+                        },
+                        {
+                            key: '2',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h2'
+                        },
+                        {
+                            key: '3',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h3'
+                        },
+                        {
+                            key: '4',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h4'
+                        },
+                        {
+                            key: '5',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h5'
+                        }
                     ]
                 },
                 extensions: {
@@ -654,6 +714,14 @@
                         label: '<i class="fa fa-italic"></i>',
                         start: '<em>',
                         end: '</em>'
+                    }),
+                    'u': new Medium.button({
+                        label: '<i class="fa fa-underline"></i>',
+                        action: function(html, mark) {
+                            var $el = $(getSelectedElement());
+                            
+                            $el.toggleClass('underline');
+                        }
                     }),
                     'span': new Medium.button({
                         label: '<b>span</b>',
