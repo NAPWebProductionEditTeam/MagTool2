@@ -718,9 +718,23 @@
                     'u': new Medium.button({
                         label: '<i class="fa fa-underline"></i>',
                         action: function(html, mark) {
-                            var $el = $(getSelectedElement());
+                            var el = getSelectedElement();
+                            var $el = $(el);
                             
-                            $el.toggleClass('underline');
+                            if (! $el.is(':header')) {
+                                if (! $el.is('u')) {
+                                    return '<u>' + html + '</u>';
+                                }
+                                
+                                editor.selectElement(el);
+                                html = $el.html();
+                                
+                                $el.remove();
+                            } else {
+                                $el.toggleClass('underline');
+                            }
+                            
+                            return html;
                         }
                     }),
                     'span': new Medium.button({
