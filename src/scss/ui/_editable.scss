@@ -1,12 +1,18 @@
 [contenteditable] {
-    @extend .ui-selectee;
-    
-    &[data-medium-focused="true"] {
-        @extend .ui-selected;
+    &:not([class*="-disabled"]) {
+        @extend .ui-selectee;
         
-        &:after, &:hover:after {
-            border-color: #5cb85c;
-            box-shadow: inset 0 0 8px rgba(#5cb85c, .6), 0 0 8px rgba(#5cb85c, .6);
+        &[data-medium-focused="true"] {
+            @extend .ui-selected;
+            
+            &:after, &:hover:after {
+                border-color: #5cb85c;
+                box-shadow: inset 0 0 8px rgba(#5cb85c, .6), 0 0 8px rgba(#5cb85c, .6);
+            }
         }
     }
+}
+
+p[contenteditable] {
+    position: relative;
 }

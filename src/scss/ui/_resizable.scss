@@ -18,7 +18,7 @@ $uiResizableGrabSize: 32px;
 .ui-resizable-n, .ui-resizable-s {
     @include absolute((left: -$uiPadding, right: -$uiPadding));
     height: $uiResizableGrabSize;
-
+    
     &:after {
         @include absolute((top: 0, left: 50%));
         width: 100%;
@@ -29,7 +29,7 @@ $uiResizableGrabSize: 32px;
 .ui-resizable-e, .ui-resizable-w {
     @include absolute((top: -$uiPadding, bottom: -$uiPadding));
     width: $uiResizableGrabSize;
-
+    
     &:after {
         @include absolute((top: 0, left: 50%));
         width: 1px;
@@ -74,7 +74,7 @@ $uiResizableGrabSize: 32px;
     top: - (($uiResizableGrabSize + $uiPadding) / 2);
     right: - (($uiResizableGrabSize + $uiPadding) / 2);
     cursor: ne-resize;
-
+    
     &:after {
         @include absolute((bottom: 2px, left: 2px));
         border-radius: 0 0 0 ($uiResizableGrabSize / 2);
@@ -85,7 +85,7 @@ $uiResizableGrabSize: 32px;
     right: - (($uiResizableGrabSize + $uiPadding) / 2);
     bottom: - (($uiResizableGrabSize + $uiPadding) / 2);
     cursor: se-resize;
-
+    
     &:after {
         @include absolute((top: 2px, left: 2px));
         border-radius: ($uiResizableGrabSize / 2) 0 0 0;
@@ -96,7 +96,7 @@ $uiResizableGrabSize: 32px;
     bottom: - (($uiResizableGrabSize + $uiPadding) / 2);
     left: - (($uiResizableGrabSize + $uiPadding) / 2);
     cursor: sw-resize;
-
+    
     &:after {
         @include absolute((top: 2px, right: 2px));
         border-radius: 0 ($uiResizableGrabSize / 2) 0 0;
@@ -107,7 +107,7 @@ $uiResizableGrabSize: 32px;
     top: - (($uiResizableGrabSize + $uiPadding) / 2);
     left: - (($uiResizableGrabSize + $uiPadding) / 2);
     cursor: nw-resize;
-
+    
     &:after {
         @include absolute((bottom: 2px, right: 2px));
         border-radius: 0 0 ($uiResizableGrabSize / 2) 0;
