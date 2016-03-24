@@ -146,6 +146,25 @@
             });
         };
         
+        var selectableSelector;
+        var selectableCancelSelector = '[class*="creditsHolder"], [data-medium-focused="true"], .ui-resizable-handle';
+        
+        var getSelectableSelector = function() {
+            if (typeof selectableSelector === 'undefined') {
+                selectableSelector = [];
+                
+                selectableSelector.push('.draggable');
+                selectableSelector.push('.editable:not(.draggable .editable)');
+                selectableSelector.push('.editable:not(.resizable .editable)');
+                selectableSelector.push('.resizable');
+                selectableSelector.push('[class*="creditsWhole"]');
+                
+                selectableSelector = selectableSelector.join(', ');
+            }
+            
+            return selectableSelector;
+        };
+        
         var triggerSelectable = function() {
             var selectable = callWidgetFunction($selectable, 'selectable', 'instance');
             
@@ -155,6 +174,8 @@
         };
         
         this.select = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.addClass('ui-selecting');
             triggerSelectable();
         };
@@ -202,6 +223,8 @@
         };
         
         this.deselect = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.removeClass('ui-selected');
             triggerSelectable();
         };
@@ -245,16 +268,12 @@
             }
         };
         
-        var uiSelectableCancel = '[class*="creditsHolder"], [data-medium-focused="true"], .ui-resizable-handle';
-        
         this.makeSelectable = function() {
-            var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
-            
             $selectable = app.Page.getContent();
             
             $selectable.selectable({
-                filter: selectableSelector,
-                cancel: uiSelectableCancel,
+                filter: getSelectableSelector(),
+                cancel: selectableCancelSelector,
                 start: function() {
                     app.UI.getAllControls().blur();
                 },
@@ -269,11 +288,11 @@
                 }
             });
             
-            this.applySelectable($selectable.find(selectableSelector), false);
+            this.applySelectable($selectable.find(getSelectableSelector()), false);
         };
         
         this.enableSelectable = function($el) {
-            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', uiSelectableCancel]);
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', selectableCancelSelector]);
             callWidgetFunction($selectable, 'selectable', 'enable');
             
             if (typeof $el !== 'undefined') {
@@ -810,7 +829,10 @@
             $el = $el.first();
             
             this.deselectAll($selectables);
-            this.select($el);
+            
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            }
             
             $disableInteractions = $el.add($el.parentsUntil('.magazineContent'));
             
@@ -906,7 +928,15 @@
             this.enableResizable($disableInteractions);
             this.enableEditable($el);
             
-            app.ContentEditor.select($el);
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            } else {
+                var $parent = $el.parentsUntil(getSelectableSelector());
+                
+                if ($parent.length) {
+                    this.select($parent);
+                }
+            }
         };
         
         this.applyEditable = function($el) {
