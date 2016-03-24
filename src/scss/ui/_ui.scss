@@ -12,6 +12,8 @@ $uiPadding: 4px;
 }
 
 %ui-interacting {
+    z-index: 5;
+    
     &:after {
         border-color: rgba($uiColor, .5);
         box-shadow: inset 0 0 8px rgba($uiColor, .3), 0 0 8px rgba($uiColor, .3);
@@ -19,6 +21,8 @@ $uiPadding: 4px;
 }
 
 %ui-interacted {
+    z-index: 9;
+    
     &:after {
         border-color: $uiColor;
         box-shadow: inset 0 0 8px rgba($uiColor, .6), 0 0 8px rgba($uiColor, .6);
