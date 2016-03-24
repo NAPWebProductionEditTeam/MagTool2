@@ -1,5 +1,17 @@
 $uiResizableGrabSize: 32px;
 
+.ui-resizable:not(.ui-resizable-disabled) {
+    @extend %ui-interactable;
+    
+    &:hover {
+        @extend %ui-interacting;
+    }
+    
+    &.ui-resizable-resizing {
+        @extend %ui-interacted;
+    }
+}
+
 .ui-resizable-handle {
     opacity: 0;
     transition: opacity .3s;
