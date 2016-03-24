@@ -152,7 +152,7 @@
         };
         
         var trimBreakTags = function() {
-            getCloneContainer().find('br:first-child, br:last-child').remove();
+            getCloneContainer().find('br:last-child').remove();
         };
         
         var removeStyleAttributes = function() {
