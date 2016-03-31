@@ -152,7 +152,7 @@
         };
         
         var trimBreakTags = function() {
-            getCloneContainer().find('br:first-child, br:last-child').remove();
+            getCloneContainer().find('br:last-child').remove();
         };
         
         var removeStyleAttributes = function() {
@@ -277,7 +277,11 @@
             
             $a.hide().appendTo($('#magtoolComponents'));
             
-            if ($.inArray('infoBlocks', files) > -1) {
+            if (typeof files === 'string') {
+                files = files.split(/[,\s]+/);
+            }
+            
+            if ($.inArray('infoBlocks', files) > -1 || $.inArray('infoblocks', files) > -1) {
                 zip.file(page + '/' + lang + '/infoBlocks.html', getContentHtml());
             }
             

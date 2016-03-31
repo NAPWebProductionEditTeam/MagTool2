@@ -2355,6 +2355,20 @@ MediumEditor.extensions = {};
         },
 
         /**
+         *  Clear the current highlighted selection and set the caret to the start or the end of that prior selection, defaults to end.
+         *
+         *  @param {DomDocument} doc            Current document
+         *  @param {boolean} moveCursorToStart  A boolean representing whether or not to set the caret to the beginning of the prior selection.
+         */
+        clearSelection: function (doc, moveCursorToStart) {
+            if (moveCursorToStart) {
+                doc.getSelection().collapseToStart();
+            } else {
+                doc.getSelection().collapseToEnd();
+            }
+        },
+
+        /**
          * Move cursor to the given node with the given offset.
          *
          * @param  {DomDocument} doc     Current document
@@ -3409,6 +3423,11 @@ MediumEditor.extensions = {};
         formSaveLabel: '&#10003;',
         formCloseLabel: '&times;',
 
+        /* activeClass: [string]
+         * set class which added to shown form
+         */
+        activeClass: 'medium-editor-toolbar-form-active',
+
         /* hasForm: [boolean]
          *
          * Setting this to true will cause getForm() to be called
@@ -3431,14 +3450,34 @@ MediumEditor.extensions = {};
          * This function should return true/false reflecting
          * whether the form is currently displayed
          */
-        isDisplayed: function () {},
+        isDisplayed: function () {
+            if (this.hasForm) {
+                return this.getForm().classList.contains(this.activeClass);
+            }
+            return false;
+        },
+
+        /* hideForm: [function ()]
+         *
+         * This function should show the form element inside
+         * the toolbar container
+         */
+        showForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.add(this.activeClass);
+            }
+        },
 
         /* hideForm: [function ()]
          *
          * This function should hide the form element inside
          * the toolbar container
          */
-        hideForm: function () {},
+        hideForm: function () {
+            if (this.hasForm) {
+                this.getForm().classList.remove(this.activeClass);
+            }
+        },
 
         /************************ Helpers ************************
          * The following are helpers that are either set by MediumEditor
@@ -3627,11 +3666,11 @@ MediumEditor.extensions = {};
 
         // Used by medium-editor when the default toolbar is to be displayed
         isDisplayed: function () {
-            return this.getForm().style.display === 'block';
+            return MediumEditor.extensions.form.prototype.isDisplayed.apply(this);
         },
 
         hideForm: function () {
-            this.getForm().style.display = 'none';
+            MediumEditor.extensions.form.prototype.hideForm.apply(this);
             this.getInput().value = '';
         },
 
@@ -3651,7 +3690,7 @@ MediumEditor.extensions = {};
 
             this.base.saveSelection();
             this.hideToolbarDefaultActions();
-            this.getForm().style.display = 'block';
+            MediumEditor.extensions.form.prototype.showForm.apply(this);
             this.setToolbarPosition();
 
             input.value = opts.url;
@@ -4125,9 +4164,20 @@ MediumEditor.extensions = {};
             this.document.execCommand('AutoUrlDetect', false, false);
         },
 
+        isLastInstance: function () {
+            var activeInstances = 0;
+            for (var i = 0; i < this.window._mediumEditors.length; i++) {
+                var editor = this.window._mediumEditors[i];
+                if (editor !== null && editor.getExtensionByName('autoLink') !== undefined) {
+                    activeInstances++;
+                }
+            }
+            return activeInstances === 1;
+        },
+
         destroy: function () {
             // Turn AutoUrlDetect back on
-            if (this.document.queryCommandSupported('AutoUrlDetect')) {
+            if (this.document.queryCommandSupported('AutoUrlDetect') && this.isLastInstance()) {
                 this.document.execCommand('AutoUrlDetect', false, true);
             }
         },
@@ -7104,7 +7154,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.14.4'
+    'version': '5.15.0'
 }).version);
 
     return MediumEditor;
@@ -8652,7 +8702,60 @@ Dual licenced under the MIT license or GPLv3. See https://raw.github.com/Stuk/js
 JSZip uses the library pako released under the MIT license :
 https://github.com/nodeca/pako/blob/master/LICENSE
 */
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.JSZip=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.JSZip = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+var DataReader = require('./dataReader');
+
+function ArrayReader(data) {
+    if (data) {
+        this.data = data;
+        this.length = this.data.length;
+        this.index = 0;
+        this.zero = 0;
+
+        for(var i = 0; i < this.data.length; i++) {
+            data[i] = data[i] & 0xFF;
+        }
+    }
+}
+ArrayReader.prototype = new DataReader();
+/**
+ * @see DataReader.byteAt
+ */
+ArrayReader.prototype.byteAt = function(i) {
+    return this.data[this.zero + i];
+};
+/**
+ * @see DataReader.lastIndexOfSignature
+ */
+ArrayReader.prototype.lastIndexOfSignature = function(sig) {
+    var sig0 = sig.charCodeAt(0),
+        sig1 = sig.charCodeAt(1),
+        sig2 = sig.charCodeAt(2),
+        sig3 = sig.charCodeAt(3);
+    for (var i = this.length - 4; i >= 0; --i) {
+        if (this.data[i] === sig0 && this.data[i + 1] === sig1 && this.data[i + 2] === sig2 && this.data[i + 3] === sig3) {
+            return i - this.zero;
+        }
+    }
+
+    return -1;
+};
+/**
+ * @see DataReader.readData
+ */
+ArrayReader.prototype.readData = function(size) {
+    this.checkOffset(size);
+    if(size === 0) {
+        return [];
+    }
+    var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
+    this.index += size;
+    return result;
+};
+module.exports = ArrayReader;
+
+},{"./dataReader":6}],2:[function(require,module,exports){
 'use strict';
 // private property
 var _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -8724,7 +8827,7 @@ exports.decode = function(input, utf8) {
 
 };
 
-},{}],2:[function(_dereq_,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 function CompressedObject() {
     this.compressedSize = 0;
@@ -8754,7 +8857,7 @@ CompressedObject.prototype = {
 };
 module.exports = CompressedObject;
 
-},{}],3:[function(_dereq_,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
 exports.STORE = {
     magic: "\x00\x00",
@@ -8767,12 +8870,12 @@ exports.STORE = {
     compressInputType: null,
     uncompressInputType: null
 };
-exports.DEFLATE = _dereq_('./flate');
+exports.DEFLATE = require('./flate');
 
-},{"./flate":8}],4:[function(_dereq_,module,exports){
+},{"./flate":9}],5:[function(require,module,exports){
 'use strict';
 
-var utils = _dereq_('./utils');
+var utils = require('./utils');
 
 var table = [
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
@@ -8873,14 +8976,15 @@ module.exports = function crc32(input, crc) {
 };
 // vim: set shiftwidth=4 softtabstop=4:
 
-},{"./utils":21}],5:[function(_dereq_,module,exports){
+},{"./utils":22}],6:[function(require,module,exports){
 'use strict';
-var utils = _dereq_('./utils');
+var utils = require('./utils');
 
 function DataReader(data) {
     this.data = null; // type : see implementation
     this.length = 0;
     this.index = 0;
+    this.zero = 0;
 }
 DataReader.prototype = {
     /**
@@ -8897,7 +9001,7 @@ DataReader.prototype = {
      * @throws {Error} an Error if the index is out of bounds.
      */
     checkIndex: function(newIndex) {
-        if (this.length < newIndex || newIndex < 0) {
+        if (this.length < this.zero + newIndex || newIndex < 0) {
             throw new Error("End of data reached (data length = " + this.length + ", asked index = " + (newIndex) + "). Corrupted zip ?");
         }
     },
@@ -8982,7 +9086,7 @@ DataReader.prototype = {
 };
 module.exports = DataReader;
 
-},{"./utils":21}],6:[function(_dereq_,module,exports){
+},{"./utils":22}],7:[function(require,module,exports){
 'use strict';
 exports.base64 = false;
 exports.binary = false;
@@ -8995,9 +9099,9 @@ exports.comment = null;
 exports.unixPermissions = null;
 exports.dosPermissions = null;
 
-},{}],7:[function(_dereq_,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
-var utils = _dereq_('./utils');
+var utils = require('./utils');
 
 /**
  * @deprecated
@@ -9102,11 +9206,11 @@ exports.isRegExp = function (object) {
 };
 
 
-},{"./utils":21}],8:[function(_dereq_,module,exports){
+},{"./utils":22}],9:[function(require,module,exports){
 'use strict';
 var USE_TYPEDARRAY = (typeof Uint8Array !== 'undefined') && (typeof Uint16Array !== 'undefined') && (typeof Uint32Array !== 'undefined');
 
-var pako = _dereq_("pako");
+var pako = require("pako");
 exports.uncompressInputType = USE_TYPEDARRAY ? "uint8array" : "array";
 exports.compressInputType = USE_TYPEDARRAY ? "uint8array" : "array";
 
@@ -9120,10 +9224,10 @@ exports.uncompress =  function(input) {
     return pako.inflateRaw(input);
 };
 
-},{"pako":24}],9:[function(_dereq_,module,exports){
+},{"pako":25}],10:[function(require,module,exports){
 'use strict';
 
-var base64 = _dereq_('./base64');
+var base64 = require('./base64');
 
 /**
 Usage:
@@ -9171,16 +9275,16 @@ function JSZip(data, options) {
         return newObj;
     };
 }
-JSZip.prototype = _dereq_('./object');
-JSZip.prototype.load = _dereq_('./load');
-JSZip.support = _dereq_('./support');
-JSZip.defaults = _dereq_('./defaults');
+JSZip.prototype = require('./object');
+JSZip.prototype.load = require('./load');
+JSZip.support = require('./support');
+JSZip.defaults = require('./defaults');
 
 /**
  * @deprecated
  * This namespace will be removed in a future version without replacement.
  */
-JSZip.utils = _dereq_('./deprecatedPublicUtils');
+JSZip.utils = require('./deprecatedPublicUtils');
 
 JSZip.base64 = {
     /**
@@ -9198,16 +9302,24 @@ JSZip.base64 = {
         return base64.decode(input);
     }
 };
-JSZip.compressions = _dereq_('./compressions');
+JSZip.compressions = require('./compressions');
 module.exports = JSZip;
 
-},{"./base64":1,"./compressions":3,"./defaults":6,"./deprecatedPublicUtils":7,"./load":10,"./object":13,"./support":17}],10:[function(_dereq_,module,exports){
+},{"./base64":2,"./compressions":4,"./defaults":7,"./deprecatedPublicUtils":8,"./load":11,"./object":14,"./support":18}],11:[function(require,module,exports){
 'use strict';
-var base64 = _dereq_('./base64');
-var ZipEntries = _dereq_('./zipEntries');
+var base64 = require('./base64');
+var utf8 = require('./utf8');
+var utils = require('./utils');
+var ZipEntries = require('./zipEntries');
 module.exports = function(data, options) {
     var files, zipEntries, i, input;
-    options = options || {};
+    options = utils.extend(options || {}, {
+        base64: false,
+        checkCRC32: false,
+        optimizedBinaryString : false,
+        createFolders: false,
+        decodeFileName: utf8.utf8decode
+    });
     if (options.base64) {
         data = base64.decode(data);
     }
@@ -9216,12 +9328,12 @@ module.exports = function(data, options) {
     files = zipEntries.files;
     for (i = 0; i < files.length; i++) {
         input = files[i];
-        this.file(input.fileName, input.decompressed, {
+        this.file(input.fileNameStr, input.decompressed, {
             binary: true,
             optimizedBinaryString: true,
             date: input.date,
             dir: input.dir,
-            comment : input.fileComment.length ? input.fileComment : null,
+            comment : input.fileCommentStr.length ? input.fileCommentStr : null,
             unixPermissions : input.unixPermissions,
             dosPermissions : input.dosPermissions,
             createFolders: options.createFolders
@@ -9234,7 +9346,7 @@ module.exports = function(data, options) {
     return this;
 };
 
-},{"./base64":1,"./zipEntries":22}],11:[function(_dereq_,module,exports){
+},{"./base64":2,"./utf8":21,"./utils":22,"./zipEntries":23}],12:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 module.exports = function(data, encoding){
@@ -9245,14 +9357,15 @@ module.exports.test = function(b){
 };
 
 }).call(this,(typeof Buffer !== "undefined" ? Buffer : undefined))
-},{}],12:[function(_dereq_,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
-var Uint8ArrayReader = _dereq_('./uint8ArrayReader');
+var Uint8ArrayReader = require('./uint8ArrayReader');
 
 function NodeBufferReader(data) {
     this.data = data;
     this.length = this.data.length;
     this.index = 0;
+    this.zero = 0;
 }
 NodeBufferReader.prototype = new Uint8ArrayReader();
 
@@ -9261,26 +9374,26 @@ NodeBufferReader.prototype = new Uint8ArrayReader();
  */
 NodeBufferReader.prototype.readData = function(size) {
     this.checkOffset(size);
-    var result = this.data.slice(this.index, this.index + size);
+    var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
     this.index += size;
     return result;
 };
 module.exports = NodeBufferReader;
 
-},{"./uint8ArrayReader":18}],13:[function(_dereq_,module,exports){
+},{"./uint8ArrayReader":19}],14:[function(require,module,exports){
 'use strict';
-var support = _dereq_('./support');
-var utils = _dereq_('./utils');
-var crc32 = _dereq_('./crc32');
-var signature = _dereq_('./signature');
-var defaults = _dereq_('./defaults');
-var base64 = _dereq_('./base64');
-var compressions = _dereq_('./compressions');
-var CompressedObject = _dereq_('./compressedObject');
-var nodeBuffer = _dereq_('./nodeBuffer');
-var utf8 = _dereq_('./utf8');
-var StringWriter = _dereq_('./stringWriter');
-var Uint8ArrayWriter = _dereq_('./uint8ArrayWriter');
+var support = require('./support');
+var utils = require('./utils');
+var crc32 = require('./crc32');
+var signature = require('./signature');
+var defaults = require('./defaults');
+var base64 = require('./base64');
+var compressions = require('./compressions');
+var CompressedObject = require('./compressedObject');
+var nodeBuffer = require('./nodeBuffer');
+var utf8 = require('./utf8');
+var StringWriter = require('./stringWriter');
+var Uint8ArrayWriter = require('./uint8ArrayWriter');
 
 /**
  * Returns the raw data of a ZipObject, decompress the content if necessary.
@@ -9444,24 +9557,6 @@ var decToHex = function(dec, bytes) {
 };
 
 /**
- * Merge the objects passed as parameters into a new one.
- * @private
- * @param {...Object} var_args All objects to merge.
- * @return {Object} a new object with the data of the others.
- */
-var extend = function() {
-    var result = {}, i, attr;
-    for (i = 0; i < arguments.length; i++) { // arguments is not enumerable in some browsers
-        for (attr in arguments[i]) {
-            if (arguments[i].hasOwnProperty(attr) && typeof result[attr] === "undefined") {
-                result[attr] = arguments[i][attr];
-            }
-        }
-    }
-    return result;
-};
-
-/**
  * Transforms the (incomplete) options from the user into the complete
  * set of options to create a file.
  * @private
@@ -9473,7 +9568,7 @@ var prepareFileAttrs = function(o) {
     if (o.base64 === true && (o.binary === null || o.binary === undefined)) {
         o.binary = true;
     }
-    o = extend(o, defaults);
+    o = utils.extend(o, defaults);
     o.date = o.date || new Date();
     if (o.compression !== null) o.compression = o.compression.toUpperCase();
 
@@ -9708,12 +9803,16 @@ var generateDosExternalFileAttr = function (dosPermissions, isDir) {
  * @param {JSZip.CompressedObject} compressedObject the compressed object.
  * @param {number} offset the current offset from the start of the zip file.
  * @param {String} platform let's pretend we are this platform (change platform dependents fields)
+ * @param {Function} encodeFileName the function to encode the file name / comment.
  * @return {object} the zip parts.
  */
-var generateZipParts = function(name, file, compressedObject, offset, platform) {
+var generateZipParts = function(name, file, compressedObject, offset, platform, encodeFileName) {
     var data = compressedObject.compressedContent,
+        useCustomEncoding = encodeFileName !== utf8.utf8encode,
+        encodedFileName = utils.transformTo("string", encodeFileName(file.name)),
         utfEncodedFileName = utils.transformTo("string", utf8.utf8encode(file.name)),
         comment = file.comment || "",
+        encodedComment = utils.transformTo("string", encodeFileName(comment)),
         utfEncodedComment = utils.transformTo("string", utf8.utf8encode(comment)),
         useUTF8ForFileName = utfEncodedFileName.length !== file.name.length,
         useUTF8ForComment = utfEncodedComment.length !== comment.length,
@@ -9785,7 +9884,7 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
             // Version
             decToHex(1, 1) +
             // NameCRC32
-            decToHex(crc32(utfEncodedFileName), 4) +
+            decToHex(crc32(encodedFileName), 4) +
             // UnicodeName
             utfEncodedFileName;
 
@@ -9804,7 +9903,7 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
             // Version
             decToHex(1, 1) +
             // CommentCRC32
-            decToHex(this.crc32(utfEncodedComment), 4) +
+            decToHex(this.crc32(encodedComment), 4) +
             // UnicodeName
             utfEncodedComment;
 
@@ -9823,7 +9922,7 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
     header += "\x0A\x00";
     // general purpose bit flag
     // set bit 11 if utf8
-    header += (useUTF8ForFileName || useUTF8ForComment) ? "\x00\x08" : "\x00\x00";
+    header += !useCustomEncoding && (useUTF8ForFileName || useUTF8ForComment) ? "\x00\x08" : "\x00\x00";
     // compression method
     header += compressedObject.compressionMethod;
     // last mod file time
@@ -9837,12 +9936,12 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
     // uncompressed size
     header += decToHex(compressedObject.uncompressedSize, 4);
     // file name length
-    header += decToHex(utfEncodedFileName.length, 2);
+    header += decToHex(encodedFileName.length, 2);
     // extra field length
     header += decToHex(extraFields.length, 2);
 
 
-    var fileRecord = signature.LOCAL_FILE_HEADER + header + utfEncodedFileName + extraFields;
+    var fileRecord = signature.LOCAL_FILE_HEADER + header + encodedFileName + extraFields;
 
     var dirRecord = signature.CENTRAL_FILE_HEADER +
     // version made by (00: DOS)
@@ -9850,7 +9949,7 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
     // file header (common to file and central directory)
     header +
     // file comment length
-    decToHex(utfEncodedComment.length, 2) +
+    decToHex(encodedComment.length, 2) +
     // disk number start
     "\x00\x00" +
     // internal file attributes TODO
@@ -9860,11 +9959,11 @@ var generateZipParts = function(name, file, compressedObject, offset, platform) 
     // relative offset of local header
     decToHex(offset, 4) +
     // file name
-    utfEncodedFileName +
+    encodedFileName +
     // extra field
     extraFields +
     // file comment
-    utfEncodedComment;
+    encodedComment;
 
     return {
         fileRecord: fileRecord,
@@ -9904,7 +10003,7 @@ var out = {
             }
             file = this.files[filename];
             // return a new object, don't let the user mess with our internal objects :)
-            fileClone = new ZipObject(file.name, file._data, extend(file.options));
+            fileClone = new ZipObject(file.name, file._data, utils.extend(file.options));
             relativePath = filename.slice(this.root.length, filename.length);
             if (filename.slice(0, this.root.length) === this.root && // the file is in the current root
             search(relativePath, fileClone)) { // and the file matches the function
@@ -10011,14 +10110,15 @@ var out = {
      * @return {String|Uint8Array|ArrayBuffer|Buffer|Blob} the zip file
      */
     generate: function(options) {
-        options = extend(options || {}, {
+        options = utils.extend(options || {}, {
             base64: true,
             compression: "STORE",
             compressionOptions : null,
             type: "base64",
             platform: "DOS",
             comment: null,
-            mimeType: 'application/zip'
+            mimeType: 'application/zip',
+            encodeFileName: utf8.utf8encode
         });
 
         utils.checkSupport(options.type);
@@ -10040,7 +10140,7 @@ var out = {
             localDirLength = 0,
             centralDirLength = 0,
             writer, i,
-            utfEncodedComment = utils.transformTo("string", this.utf8encode(options.comment || this.comment || ""));
+            encodedComment = utils.transformTo("string", options.encodeFileName(options.comment || this.comment || ""));
 
         // first, generate all the zip parts.
         for (var name in this.files) {
@@ -10058,7 +10158,7 @@ var out = {
 
             var compressedObject = generateCompressedObjectFrom.call(this, file, compression, compressionOptions);
 
-            var zipPart = generateZipParts.call(this, name, file, compressedObject, localDirLength, options.platform);
+            var zipPart = generateZipParts.call(this, name, file, compressedObject, localDirLength, options.platform, options.encodeFileName);
             localDirLength += zipPart.fileRecord.length + compressedObject.compressedSize;
             centralDirLength += zipPart.dirRecord.length;
             zipData.push(zipPart);
@@ -10081,9 +10181,9 @@ var out = {
         // offset of start of central directory with respect to the starting disk number
         decToHex(localDirLength, 4) +
         // .ZIP file comment length
-        decToHex(utfEncodedComment.length, 2) +
+        decToHex(encodedComment.length, 2) +
         // .ZIP file comment
-        utfEncodedComment;
+        encodedComment;
 
 
         // we have all the parts (and the total length)
@@ -10152,7 +10252,7 @@ var out = {
 };
 module.exports = out;
 
-},{"./base64":1,"./compressedObject":2,"./compressions":3,"./crc32":4,"./defaults":6,"./nodeBuffer":11,"./signature":14,"./stringWriter":16,"./support":17,"./uint8ArrayWriter":19,"./utf8":20,"./utils":21}],14:[function(_dereq_,module,exports){
+},{"./base64":2,"./compressedObject":3,"./compressions":4,"./crc32":5,"./defaults":7,"./nodeBuffer":12,"./signature":15,"./stringWriter":17,"./support":18,"./uint8ArrayWriter":20,"./utf8":21,"./utils":22}],15:[function(require,module,exports){
 'use strict';
 exports.LOCAL_FILE_HEADER = "PK\x03\x04";
 exports.CENTRAL_FILE_HEADER = "PK\x01\x02";
@@ -10161,10 +10261,10 @@ exports.ZIP64_CENTRAL_DIRECTORY_LOCATOR = "PK\x06\x07";
 exports.ZIP64_CENTRAL_DIRECTORY_END = "PK\x06\x06";
 exports.DATA_DESCRIPTOR = "PK\x07\x08";
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
-var DataReader = _dereq_('./dataReader');
-var utils = _dereq_('./utils');
+var DataReader = require('./dataReader');
+var utils = require('./utils');
 
 function StringReader(data, optimizedBinaryString) {
     this.data = data;
@@ -10173,19 +10273,20 @@ function StringReader(data, optimizedBinaryString) {
     }
     this.length = this.data.length;
     this.index = 0;
+    this.zero = 0;
 }
 StringReader.prototype = new DataReader();
 /**
  * @see DataReader.byteAt
  */
 StringReader.prototype.byteAt = function(i) {
-    return this.data.charCodeAt(i);
+    return this.data.charCodeAt(this.zero + i);
 };
 /**
  * @see DataReader.lastIndexOfSignature
  */
 StringReader.prototype.lastIndexOfSignature = function(sig) {
-    return this.data.lastIndexOf(sig);
+    return this.data.lastIndexOf(sig) - this.zero;
 };
 /**
  * @see DataReader.readData
@@ -10193,16 +10294,16 @@ StringReader.prototype.lastIndexOfSignature = function(sig) {
 StringReader.prototype.readData = function(size) {
     this.checkOffset(size);
     // this will work because the constructor applied the "& 0xff" mask.
-    var result = this.data.slice(this.index, this.index + size);
+    var result = this.data.slice(this.zero + this.index, this.zero + this.index + size);
     this.index += size;
     return result;
 };
 module.exports = StringReader;
 
-},{"./dataReader":5,"./utils":21}],16:[function(_dereq_,module,exports){
+},{"./dataReader":6,"./utils":22}],17:[function(require,module,exports){
 'use strict';
 
-var utils = _dereq_('./utils');
+var utils = require('./utils');
 
 /**
  * An object to write any content to a string.
@@ -10231,7 +10332,7 @@ StringWriter.prototype = {
 
 module.exports = StringWriter;
 
-},{"./utils":21}],17:[function(_dereq_,module,exports){
+},{"./utils":22}],18:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 exports.base64 = true;
@@ -10269,40 +10370,19 @@ else {
 }
 
 }).call(this,(typeof Buffer !== "undefined" ? Buffer : undefined))
-},{}],18:[function(_dereq_,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
-var DataReader = _dereq_('./dataReader');
+var ArrayReader = require('./arrayReader');
 
 function Uint8ArrayReader(data) {
     if (data) {
         this.data = data;
         this.length = this.data.length;
         this.index = 0;
+        this.zero = 0;
     }
 }
-Uint8ArrayReader.prototype = new DataReader();
-/**
- * @see DataReader.byteAt
- */
-Uint8ArrayReader.prototype.byteAt = function(i) {
-    return this.data[i];
-};
-/**
- * @see DataReader.lastIndexOfSignature
- */
-Uint8ArrayReader.prototype.lastIndexOfSignature = function(sig) {
-    var sig0 = sig.charCodeAt(0),
-        sig1 = sig.charCodeAt(1),
-        sig2 = sig.charCodeAt(2),
-        sig3 = sig.charCodeAt(3);
-    for (var i = this.length - 4; i >= 0; --i) {
-        if (this.data[i] === sig0 && this.data[i + 1] === sig1 && this.data[i + 2] === sig2 && this.data[i + 3] === sig3) {
-            return i;
-        }
-    }
-
-    return -1;
-};
+Uint8ArrayReader.prototype = new ArrayReader();
 /**
  * @see DataReader.readData
  */
@@ -10312,16 +10392,16 @@ Uint8ArrayReader.prototype.readData = function(size) {
         // in IE10, when using subarray(idx, idx), we get the array [0x00] instead of [].
         return new Uint8Array(0);
     }
-    var result = this.data.subarray(this.index, this.index + size);
+    var result = this.data.subarray(this.zero + this.index, this.zero + this.index + size);
     this.index += size;
     return result;
 };
 module.exports = Uint8ArrayReader;
 
-},{"./dataReader":5}],19:[function(_dereq_,module,exports){
+},{"./arrayReader":1}],20:[function(require,module,exports){
 'use strict';
 
-var utils = _dereq_('./utils');
+var utils = require('./utils');
 
 /**
  * An object to write any content to an Uint8Array.
@@ -10356,12 +10436,12 @@ Uint8ArrayWriter.prototype = {
 
 module.exports = Uint8ArrayWriter;
 
-},{"./utils":21}],20:[function(_dereq_,module,exports){
+},{"./utils":22}],21:[function(require,module,exports){
 'use strict';
 
-var utils = _dereq_('./utils');
-var support = _dereq_('./support');
-var nodeBuffer = _dereq_('./nodeBuffer');
+var utils = require('./utils');
+var support = require('./support');
+var nodeBuffer = require('./nodeBuffer');
 
 /**
  * The following functions come from pako, from pako/lib/utils/strings
@@ -10565,11 +10645,11 @@ exports.utf8decode = function utf8decode(buf) {
 };
 // vim: set shiftwidth=4 softtabstop=4:
 
-},{"./nodeBuffer":11,"./support":17,"./utils":21}],21:[function(_dereq_,module,exports){
+},{"./nodeBuffer":12,"./support":18,"./utils":22}],22:[function(require,module,exports){
 'use strict';
-var support = _dereq_('./support');
-var compressions = _dereq_('./compressions');
-var nodeBuffer = _dereq_('./nodeBuffer');
+var support = require('./support');
+var compressions = require('./compressions');
+var nodeBuffer = require('./nodeBuffer');
 /**
  * Convert a string to a "binary string" : a string containing only char codes between 0 and 255.
  * @param {string} str the string to transform.
@@ -10892,17 +10972,36 @@ exports.isRegExp = function (object) {
     return Object.prototype.toString.call(object) === "[object RegExp]";
 };
 
+/**
+ * Merge the objects passed as parameters into a new one.
+ * @private
+ * @param {...Object} var_args All objects to merge.
+ * @return {Object} a new object with the data of the others.
+ */
+exports.extend = function() {
+    var result = {}, i, attr;
+    for (i = 0; i < arguments.length; i++) { // arguments is not enumerable in some browsers
+        for (attr in arguments[i]) {
+            if (arguments[i].hasOwnProperty(attr) && typeof result[attr] === "undefined") {
+                result[attr] = arguments[i][attr];
+            }
+        }
+    }
+    return result;
+};
 
-},{"./compressions":3,"./nodeBuffer":11,"./support":17}],22:[function(_dereq_,module,exports){
+
+},{"./compressions":4,"./nodeBuffer":12,"./support":18}],23:[function(require,module,exports){
 'use strict';
-var StringReader = _dereq_('./stringReader');
-var NodeBufferReader = _dereq_('./nodeBufferReader');
-var Uint8ArrayReader = _dereq_('./uint8ArrayReader');
-var utils = _dereq_('./utils');
-var sig = _dereq_('./signature');
-var ZipEntry = _dereq_('./zipEntry');
-var support = _dereq_('./support');
-var jszipProto = _dereq_('./object');
+var StringReader = require('./stringReader');
+var NodeBufferReader = require('./nodeBufferReader');
+var Uint8ArrayReader = require('./uint8ArrayReader');
+var ArrayReader = require('./arrayReader');
+var utils = require('./utils');
+var sig = require('./signature');
+var ZipEntry = require('./zipEntry');
+var support = require('./support');
+var jszipProto = require('./object');
 //  class ZipEntries {{{
 /**
  * All the entries in the zip file.
@@ -10930,6 +11029,20 @@ ZipEntries.prototype = {
         }
     },
     /**
+     * Check if the given signature is at the given index.
+     * @param {number} askedIndex the index to check.
+     * @param {string} expectedSignature the signature to expect.
+     * @return {boolean} true if the signature is here, false otherwise.
+     */
+    isSignature: function(askedIndex, expectedSignature) {
+        var currentIndex = this.reader.index;
+        this.reader.setIndex(askedIndex);
+        var signature = this.reader.readString(4);
+        var result = signature === expectedSignature;
+        this.reader.setIndex(currentIndex);
+        return result;
+    },
+    /**
      * Read the end of the central directory.
      */
     readBlockEndOfCentral: function() {
@@ -10944,10 +11057,12 @@ ZipEntries.prototype = {
         // warning : the encoding depends of the system locale
         // On a linux machine with LANG=en_US.utf8, this field is utf8 encoded.
         // On a windows machine, this field is encoded with the localized windows code page.
-        this.zipComment = this.reader.readString(this.zipCommentLength);
+        var zipComment = this.reader.readData(this.zipCommentLength);
+        var decodeParamType = support.uint8array ? "uint8array" : "array";
         // To get consistent behavior with the generation part, we will assume that
-        // this is utf8 encoded.
-        this.zipComment = jszipProto.utf8decode(this.zipComment);
+        // this is utf8 encoded unless specified otherwise.
+        var decodeContent = utils.transformTo(decodeParamType, zipComment);
+        this.zipComment = this.loadOptions.decodeFileName(decodeContent);
     },
     /**
      * Read the end of the Zip 64 central directory.
@@ -11022,24 +11137,31 @@ ZipEntries.prototype = {
             file.readCentralPart(this.reader);
             this.files.push(file);
         }
+
+        if (this.centralDirRecords !== this.files.length) {
+            if (this.centralDirRecords !== 0 && this.files.length === 0) {
+                // We expected some records but couldn't find ANY.
+                // This is really suspicious, as if something went wrong.
+                throw new Error("Corrupted zip or bug: expected " + this.centralDirRecords + " records in central dir, got " + this.files.length);
+            } else {
+                // We found some records but not all.
+                // Something is wrong but we got something for the user: no error here.
+                // console.warn("expected", this.centralDirRecords, "records in central dir, got", this.files.length);
+            }
+        }
     },
     /**
      * Read the end of central directory.
      */
     readEndOfCentral: function() {
         var offset = this.reader.lastIndexOfSignature(sig.CENTRAL_DIRECTORY_END);
-        if (offset === -1) {
+        if (offset < 0) {
             // Check if the content is a truncated zip or complete garbage.
             // A "LOCAL_FILE_HEADER" is not required at the beginning (auto
             // extractible zip for example) but it can give a good hint.
             // If an ajax request was used without responseType, we will also
             // get unreadable data.
-            var isGarbage = true;
-            try {
-                this.reader.setIndex(0);
-                this.checkSignature(sig.LOCAL_FILE_HEADER);
-                isGarbage = false;
-            } catch (e) {}
+            var isGarbage = !this.isSignature(0, sig.LOCAL_FILE_HEADER);
 
             if (isGarbage) {
                 throw new Error("Can't find end of central directory : is this a zip file ? " +
@@ -11049,6 +11171,7 @@ ZipEntries.prototype = {
             }
         }
         this.reader.setIndex(offset);
+        var endOfCentralDirOffset = offset;
         this.checkSignature(sig.CENTRAL_DIRECTORY_END);
         this.readBlockEndOfCentral();
 
@@ -11077,7 +11200,7 @@ ZipEntries.prototype = {
 
             // should look for a zip64 EOCD locator
             offset = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_LOCATOR);
-            if (offset === -1) {
+            if (offset < 0) {
                 throw new Error("Corrupted zip : can't find the ZIP64 end of central directory locator");
             }
             this.reader.setIndex(offset);
@@ -11085,21 +11208,55 @@ ZipEntries.prototype = {
             this.readBlockZip64EndOfCentralLocator();
 
             // now the zip64 EOCD record
+            if (!this.isSignature(this.relativeOffsetEndOfZip64CentralDir, sig.ZIP64_CENTRAL_DIRECTORY_END)) {
+                // console.warn("ZIP64 end of central directory not where expected.");
+                this.relativeOffsetEndOfZip64CentralDir = this.reader.lastIndexOfSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);
+                if (this.relativeOffsetEndOfZip64CentralDir < 0) {
+                    throw new Error("Corrupted zip : can't find the ZIP64 end of central directory");
+                }
+            }
             this.reader.setIndex(this.relativeOffsetEndOfZip64CentralDir);
             this.checkSignature(sig.ZIP64_CENTRAL_DIRECTORY_END);
             this.readBlockZip64EndOfCentral();
         }
+
+        var expectedEndOfCentralDirOffset = this.centralDirOffset + this.centralDirSize;
+        if (this.zip64) {
+            expectedEndOfCentralDirOffset += 20; // end of central dir 64 locator
+            expectedEndOfCentralDirOffset += 12 /* should not include the leading 12 bytes */ + this.zip64EndOfCentralSize;
+        }
+
+        var extraBytes = endOfCentralDirOffset - expectedEndOfCentralDirOffset;
+
+        if (extraBytes > 0) {
+            // console.warn(extraBytes, "extra bytes at beginning or within zipfile");
+            if (this.isSignature(endOfCentralDirOffset, sig.CENTRAL_FILE_HEADER)) {
+                // The offsets seem wrong, but we have something at the specified offset.
+                // So… we keep it.
+            } else {
+                // the offset is wrong, update the "zero" of the reader
+                // this happens if data has been prepended (crx files for example)
+                this.reader.zero = extraBytes;
+            }
+        } else if (extraBytes < 0) {
+            throw new Error("Corrupted zip: missing " + Math.abs(extraBytes) + " bytes.");
+        }
     },
     prepareReader: function(data) {
         var type = utils.getTypeOf(data);
+        utils.checkSupport(type);
         if (type === "string" && !support.uint8array) {
             this.reader = new StringReader(data, this.loadOptions.optimizedBinaryString);
         }
         else if (type === "nodebuffer") {
             this.reader = new NodeBufferReader(data);
         }
-        else {
+        else if (support.uint8array) {
             this.reader = new Uint8ArrayReader(utils.transformTo("uint8array", data));
+        } else if (support.array) {
+            this.reader = new ArrayReader(utils.transformTo("array", data));
+        } else {
+            throw new Error("Unexpected error: unsupported type '" + type + "'");
         }
     },
     /**
@@ -11116,12 +11273,13 @@ ZipEntries.prototype = {
 // }}} end of ZipEntries
 module.exports = ZipEntries;
 
-},{"./nodeBufferReader":12,"./object":13,"./signature":14,"./stringReader":15,"./support":17,"./uint8ArrayReader":18,"./utils":21,"./zipEntry":23}],23:[function(_dereq_,module,exports){
+},{"./arrayReader":1,"./nodeBufferReader":13,"./object":14,"./signature":15,"./stringReader":16,"./support":18,"./uint8ArrayReader":19,"./utils":22,"./zipEntry":24}],24:[function(require,module,exports){
 'use strict';
-var StringReader = _dereq_('./stringReader');
-var utils = _dereq_('./utils');
-var CompressedObject = _dereq_('./compressedObject');
-var jszipProto = _dereq_('./object');
+var StringReader = require('./stringReader');
+var utils = require('./utils');
+var CompressedObject = require('./compressedObject');
+var jszipProto = require('./object');
+var support = require('./support');
 
 var MADE_BY_DOS = 0x00;
 var MADE_BY_UNIX = 0x03;
@@ -11219,7 +11377,7 @@ ZipEntry.prototype = {
         // Unfortunately, this lead also to some issues : http://seclists.org/fulldisclosure/2009/Sep/394
         this.fileNameLength = reader.readInt(2);
         localExtraFieldsLength = reader.readInt(2); // can't be sure this will be the same as the central dir
-        this.fileName = reader.readString(this.fileNameLength);
+        this.fileName = reader.readData(this.fileNameLength);
         reader.skip(localExtraFieldsLength);
 
         if (this.compressedSize == -1 || this.uncompressedSize == -1) {
@@ -11228,7 +11386,7 @@ ZipEntry.prototype = {
 
         compression = utils.findCompression(this.compressionMethod);
         if (compression === null) { // no compression found
-            throw new Error("Corrupted zip : compression " + utils.pretty(this.compressionMethod) + " unknown (inner file : " + this.fileName + ")");
+            throw new Error("Corrupted zip : compression " + utils.pretty(this.compressionMethod) + " unknown (inner file : " +  utils.transformTo("string", this.fileName) + ")");
         }
         this.decompressed = new CompressedObject();
         this.decompressed.compressedSize = this.compressedSize;
@@ -11272,10 +11430,10 @@ ZipEntry.prototype = {
             throw new Error("Encrypted zip are not supported");
         }
 
-        this.fileName = reader.readString(this.fileNameLength);
+        this.fileName = reader.readData(this.fileNameLength);
         this.readExtraFields(reader);
         this.parseZIP64ExtraField(reader);
-        this.fileComment = reader.readString(this.fileCommentLength);
+        this.fileComment = reader.readData(this.fileCommentLength);
     },
 
     /**
@@ -11302,7 +11460,7 @@ ZipEntry.prototype = {
         }
 
         // fail safe : if the name ends with a / it probably means a folder
-        if (!this.dir && this.fileName.slice(-1) === '/') {
+        if (!this.dir && this.fileNameStr.slice(-1) === '/') {
             this.dir = true;
         }
     },
@@ -11363,17 +11521,25 @@ ZipEntry.prototype = {
      * Apply an UTF8 transformation if needed.
      */
     handleUTF8: function() {
+        var decodeParamType = support.uint8array ? "uint8array" : "array";
         if (this.useUTF8()) {
-            this.fileName = jszipProto.utf8decode(this.fileName);
-            this.fileComment = jszipProto.utf8decode(this.fileComment);
+            this.fileNameStr = jszipProto.utf8decode(this.fileName);
+            this.fileCommentStr = jszipProto.utf8decode(this.fileComment);
         } else {
             var upath = this.findExtraFieldUnicodePath();
             if (upath !== null) {
-                this.fileName = upath;
+                this.fileNameStr = upath;
+            } else {
+                var fileNameByteArray =  utils.transformTo(decodeParamType, this.fileName);
+                this.fileNameStr = this.loadOptions.decodeFileName(fileNameByteArray);
             }
+
             var ucomment = this.findExtraFieldUnicodeComment();
             if (ucomment !== null) {
-                this.fileComment = ucomment;
+                this.fileCommentStr = ucomment;
+            } else {
+                var commentByteArray =  utils.transformTo(decodeParamType, this.fileComment);
+                this.fileCommentStr = this.loadOptions.decodeFileName(commentByteArray);
             }
         }
     },
@@ -11428,31 +11594,33 @@ ZipEntry.prototype = {
 };
 module.exports = ZipEntry;
 
-},{"./compressedObject":2,"./object":13,"./stringReader":15,"./utils":21}],24:[function(_dereq_,module,exports){
+},{"./compressedObject":3,"./object":14,"./stringReader":16,"./support":18,"./utils":22}],25:[function(require,module,exports){
 // Top level file is just a mixin of submodules & constants
 'use strict';
 
-var assign    = _dereq_('./lib/utils/common').assign;
+var assign    = require('./lib/utils/common').assign;
 
-var deflate   = _dereq_('./lib/deflate');
-var inflate   = _dereq_('./lib/inflate');
-var constants = _dereq_('./lib/zlib/constants');
+var deflate   = require('./lib/deflate');
+var inflate   = require('./lib/inflate');
+var constants = require('./lib/zlib/constants');
 
 var pako = {};
 
 assign(pako, deflate, inflate, constants);
 
 module.exports = pako;
-},{"./lib/deflate":25,"./lib/inflate":26,"./lib/utils/common":27,"./lib/zlib/constants":30}],25:[function(_dereq_,module,exports){
+
+},{"./lib/deflate":26,"./lib/inflate":27,"./lib/utils/common":28,"./lib/zlib/constants":31}],26:[function(require,module,exports){
 'use strict';
 
 
-var zlib_deflate = _dereq_('./zlib/deflate.js');
-var utils = _dereq_('./utils/common');
-var strings = _dereq_('./utils/strings');
-var msg = _dereq_('./zlib/messages');
-var zstream = _dereq_('./zlib/zstream');
+var zlib_deflate = require('./zlib/deflate');
+var utils        = require('./utils/common');
+var strings      = require('./utils/strings');
+var msg          = require('./zlib/messages');
+var ZStream      = require('./zlib/zstream');
 
+var toString = Object.prototype.toString;
 
 /* Public constants ==========================================================*/
 /* ===========================================================================*/
@@ -11462,6 +11630,7 @@ var Z_FINISH        = 4;
 
 var Z_OK            = 0;
 var Z_STREAM_END    = 1;
+var Z_SYNC_FLUSH    = 2;
 
 var Z_DEFAULT_COMPRESSION = -1;
 
@@ -11491,7 +11660,9 @@ var Z_DEFLATED  = 8;
  *
  * Compressed result, generated by default [[Deflate#onData]]
  * and [[Deflate#onEnd]] handlers. Filled after you push last chunk
- * (call [[Deflate#push]] with `Z_FINISH` / `true` param).
+ * (call [[Deflate#push]] with `Z_FINISH` / `true` param)  or if you
+ * push a chunk with explicit flush (call [[Deflate#push]] with
+ * `Z_SYNC_FLUSH` param).
  **/
 
 /**
@@ -11558,7 +11729,8 @@ var Z_DEFLATED  = 8;
  * console.log(deflate.result);
  * ```
  **/
-var Deflate = function(options) {
+function Deflate(options) {
+  if (!(this instanceof Deflate)) return new Deflate(options);
 
   this.options = utils.assign({
     level: Z_DEFAULT_COMPRESSION,
@@ -11585,7 +11757,7 @@ var Deflate = function(options) {
   this.ended  = false;  // used to avoid multiple onEnd() calls
   this.chunks = [];     // chunks of compressed data
 
-  this.strm = new zstream();
+  this.strm = new ZStream();
   this.strm.avail_out = 0;
 
   var status = zlib_deflate.deflateInit2(
@@ -11604,19 +11776,20 @@ var Deflate = function(options) {
   if (opt.header) {
     zlib_deflate.deflateSetHeader(this.strm, opt.header);
   }
-};
+}
 
 /**
  * Deflate#push(data[, mode]) -> Boolean
- * - data (Uint8Array|Array|String): input data. Strings will be converted to
- *   utf8 byte sequence.
+ * - data (Uint8Array|Array|ArrayBuffer|String): input data. Strings will be
+ *   converted to utf8 byte sequence.
  * - mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE modes.
  *   See constants. Skipped or `false` means Z_NO_FLUSH, `true` meansh Z_FINISH.
  *
  * Sends input data to deflate pipe, generating [[Deflate#onData]] calls with
  * new compressed chunks. Returns `true` on success. The last data block must have
- * mode Z_FINISH (or `true`). That flush internal pending buffers and call
- * [[Deflate#onEnd]].
+ * mode Z_FINISH (or `true`). That will flush internal pending buffers and call
+ * [[Deflate#onEnd]]. For interim explicit flushes (without ending the stream) you
+ * can use mode Z_SYNC_FLUSH, keeping the compression context.
  *
  * On fail call [[Deflate#onEnd]] with error code and return false.
  *
@@ -11634,7 +11807,7 @@ var Deflate = function(options) {
  * push(chunk, true);  // push last chunk
  * ```
  **/
-Deflate.prototype.push = function(data, mode) {
+Deflate.prototype.push = function (data, mode) {
   var strm = this.strm;
   var chunkSize = this.options.chunkSize;
   var status, _mode;
@@ -11647,6 +11820,8 @@ Deflate.prototype.push = function(data, mode) {
   if (typeof data === 'string') {
     // If we need to compress text, change encoding to utf8.
     strm.input = strings.string2buf(data);
+  } else if (toString.call(data) === '[object ArrayBuffer]') {
+    strm.input = new Uint8Array(data);
   } else {
     strm.input = data;
   }
@@ -11667,7 +11842,7 @@ Deflate.prototype.push = function(data, mode) {
       this.ended = true;
       return false;
     }
-    if (strm.avail_out === 0 || (strm.avail_in === 0 && _mode === Z_FINISH)) {
+    if (strm.avail_out === 0 || (strm.avail_in === 0 && (_mode === Z_FINISH || _mode === Z_SYNC_FLUSH))) {
       if (this.options.to === 'string') {
         this.onData(strings.buf2binstring(utils.shrinkBuf(strm.output, strm.next_out)));
       } else {
@@ -11684,6 +11859,13 @@ Deflate.prototype.push = function(data, mode) {
     return status === Z_OK;
   }
 
+  // callback interim results if Z_SYNC_FLUSH.
+  if (_mode === Z_SYNC_FLUSH) {
+    this.onEnd(Z_OK);
+    strm.avail_out = 0;
+    return true;
+  }
+
   return true;
 };
 
@@ -11697,7 +11879,7 @@ Deflate.prototype.push = function(data, mode) {
  * By default, stores data blocks in `chunks[]` property and glue
  * those in `onEnd`. Override this handler, if you need another behaviour.
  **/
-Deflate.prototype.onData = function(chunk) {
+Deflate.prototype.onData = function (chunk) {
   this.chunks.push(chunk);
 };
 
@@ -11707,11 +11889,12 @@ Deflate.prototype.onData = function(chunk) {
  * - status (Number): deflate status. 0 (Z_OK) on success,
  *   other if not.
  *
- * Called once after you tell deflate that input stream complete
- * or error happenned. By default - join collected chunks,
+ * Called once after you tell deflate that the input stream is
+ * complete (Z_FINISH) or should be flushed (Z_SYNC_FLUSH)
+ * or if an error happened. By default - join collected chunks,
  * free memory and fill `results` / `err` properties.
  **/
-Deflate.prototype.onEnd = function(status) {
+Deflate.prototype.onEnd = function (status) {
   // On success - join
   if (status === Z_OK) {
     if (this.options.to === 'string') {
@@ -11731,7 +11914,7 @@ Deflate.prototype.onEnd = function(status) {
  * - data (Uint8Array|Array|String): input data to compress.
  * - options (Object): zlib deflate options.
  *
- * Compress `data` with deflate alrorythm and `options`.
+ * Compress `data` with deflate algorithm and `options`.
  *
  * Supported options are:
  *
@@ -11805,18 +11988,20 @@ exports.Deflate = Deflate;
 exports.deflate = deflate;
 exports.deflateRaw = deflateRaw;
 exports.gzip = gzip;
-},{"./utils/common":27,"./utils/strings":28,"./zlib/deflate.js":32,"./zlib/messages":37,"./zlib/zstream":39}],26:[function(_dereq_,module,exports){
+
+},{"./utils/common":28,"./utils/strings":29,"./zlib/deflate":33,"./zlib/messages":38,"./zlib/zstream":40}],27:[function(require,module,exports){
 'use strict';
 
 
-var zlib_inflate = _dereq_('./zlib/inflate.js');
-var utils = _dereq_('./utils/common');
-var strings = _dereq_('./utils/strings');
-var c = _dereq_('./zlib/constants');
-var msg = _dereq_('./zlib/messages');
-var zstream = _dereq_('./zlib/zstream');
-var gzheader = _dereq_('./zlib/gzheader');
+var zlib_inflate = require('./zlib/inflate');
+var utils        = require('./utils/common');
+var strings      = require('./utils/strings');
+var c            = require('./zlib/constants');
+var msg          = require('./zlib/messages');
+var ZStream      = require('./zlib/zstream');
+var GZheader     = require('./zlib/gzheader');
 
+var toString = Object.prototype.toString;
 
 /**
  * class Inflate
@@ -11837,7 +12022,9 @@ var gzheader = _dereq_('./zlib/gzheader');
  *
  * Uncompressed result, generated by default [[Inflate#onData]]
  * and [[Inflate#onEnd]] handlers. Filled after you push last chunk
- * (call [[Inflate#push]] with `Z_FINISH` / `true` param).
+ * (call [[Inflate#push]] with `Z_FINISH` / `true` param) or if you
+ * push a chunk with explicit flush (call [[Inflate#push]] with
+ * `Z_SYNC_FLUSH` param).
  **/
 
 /**
@@ -11894,7 +12081,8 @@ var gzheader = _dereq_('./zlib/gzheader');
  * console.log(inflate.result);
  * ```
  **/
-var Inflate = function(options) {
+function Inflate(options) {
+  if (!(this instanceof Inflate)) return new Inflate(options);
 
   this.options = utils.assign({
     chunkSize: 16384,
@@ -11932,7 +12120,7 @@ var Inflate = function(options) {
   this.ended  = false;  // used to avoid multiple onEnd() calls
   this.chunks = [];     // chunks of compressed data
 
-  this.strm   = new zstream();
+  this.strm   = new ZStream();
   this.strm.avail_out = 0;
 
   var status  = zlib_inflate.inflateInit2(
@@ -11944,21 +12132,22 @@ var Inflate = function(options) {
     throw new Error(msg[status]);
   }
 
-  this.header = new gzheader();
+  this.header = new GZheader();
 
   zlib_inflate.inflateGetHeader(this.strm, this.header);
-};
+}
 
 /**
  * Inflate#push(data[, mode]) -> Boolean
- * - data (Uint8Array|Array|String): input data
+ * - data (Uint8Array|Array|ArrayBuffer|String): input data
  * - mode (Number|Boolean): 0..6 for corresponding Z_NO_FLUSH..Z_TREE modes.
  *   See constants. Skipped or `false` means Z_NO_FLUSH, `true` meansh Z_FINISH.
  *
  * Sends input data to inflate pipe, generating [[Inflate#onData]] calls with
  * new output chunks. Returns `true` on success. The last data block must have
- * mode Z_FINISH (or `true`). That flush internal pending buffers and call
- * [[Inflate#onEnd]].
+ * mode Z_FINISH (or `true`). That will flush internal pending buffers and call
+ * [[Inflate#onEnd]]. For interim explicit flushes (without ending the stream) you
+ * can use mode Z_SYNC_FLUSH, keeping the decompression context.
  *
  * On fail call [[Inflate#onEnd]] with error code and return false.
  *
@@ -11976,11 +12165,15 @@ var Inflate = function(options) {
  * push(chunk, true);  // push last chunk
  * ```
  **/
-Inflate.prototype.push = function(data, mode) {
+Inflate.prototype.push = function (data, mode) {
   var strm = this.strm;
   var chunkSize = this.options.chunkSize;
   var status, _mode;
   var next_out_utf8, tail, utf8str;
+
+  // Flag to properly process Z_BUF_ERROR on testing inflate call
+  // when we check that all output data was flushed.
+  var allowBufError = false;
 
   if (this.ended) { return false; }
   _mode = (mode === ~~mode) ? mode : ((mode === true) ? c.Z_FINISH : c.Z_NO_FLUSH);
@@ -11989,6 +12182,8 @@ Inflate.prototype.push = function(data, mode) {
   if (typeof data === 'string') {
     // Only binary strings can be decompressed on practice
     strm.input = strings.binstring2buf(data);
+  } else if (toString.call(data) === '[object ArrayBuffer]') {
+    strm.input = new Uint8Array(data);
   } else {
     strm.input = data;
   }
@@ -12005,6 +12200,11 @@ Inflate.prototype.push = function(data, mode) {
 
     status = zlib_inflate.inflate(strm, c.Z_NO_FLUSH);    /* no bad return value */
 
+    if (status === c.Z_BUF_ERROR && allowBufError === true) {
+      status = c.Z_OK;
+      allowBufError = false;
+    }
+
     if (status !== c.Z_STREAM_END && status !== c.Z_OK) {
       this.onEnd(status);
       this.ended = true;
@@ -12012,7 +12212,7 @@ Inflate.prototype.push = function(data, mode) {
     }
 
     if (strm.next_out) {
-      if (strm.avail_out === 0 || status === c.Z_STREAM_END || (strm.avail_in === 0 && _mode === c.Z_FINISH)) {
+      if (strm.avail_out === 0 || status === c.Z_STREAM_END || (strm.avail_in === 0 && (_mode === c.Z_FINISH || _mode === c.Z_SYNC_FLUSH))) {
 
         if (this.options.to === 'string') {
 
@@ -12033,17 +12233,37 @@ Inflate.prototype.push = function(data, mode) {
         }
       }
     }
-  } while ((strm.avail_in > 0) && status !== c.Z_STREAM_END);
+
+    // When no more input data, we should check that internal inflate buffers
+    // are flushed. The only way to do it when avail_out = 0 - run one more
+    // inflate pass. But if output data not exists, inflate return Z_BUF_ERROR.
+    // Here we set flag to process this error properly.
+    //
+    // NOTE. Deflate does not return error in this case and does not needs such
+    // logic.
+    if (strm.avail_in === 0 && strm.avail_out === 0) {
+      allowBufError = true;
+    }
+
+  } while ((strm.avail_in > 0 || strm.avail_out === 0) && status !== c.Z_STREAM_END);
 
   if (status === c.Z_STREAM_END) {
     _mode = c.Z_FINISH;
   }
+
   // Finalize on the last chunk.
   if (_mode === c.Z_FINISH) {
     status = zlib_inflate.inflateEnd(this.strm);
     this.onEnd(status);
     this.ended = true;
     return status === c.Z_OK;
+  }
+
+  // callback interim results if Z_SYNC_FLUSH.
+  if (_mode === c.Z_SYNC_FLUSH) {
+    this.onEnd(c.Z_OK);
+    strm.avail_out = 0;
+    return true;
   }
 
   return true;
@@ -12059,7 +12279,7 @@ Inflate.prototype.push = function(data, mode) {
  * By default, stores data blocks in `chunks[]` property and glue
  * those in `onEnd`. Override this handler, if you need another behaviour.
  **/
-Inflate.prototype.onData = function(chunk) {
+Inflate.prototype.onData = function (chunk) {
   this.chunks.push(chunk);
 };
 
@@ -12069,11 +12289,12 @@ Inflate.prototype.onData = function(chunk) {
  * - status (Number): inflate status. 0 (Z_OK) on success,
  *   other if not.
  *
- * Called once after you tell inflate that input stream complete
- * or error happenned. By default - join collected chunks,
+ * Called either after you tell inflate that the input stream is
+ * complete (Z_FINISH) or should be flushed (Z_SYNC_FLUSH)
+ * or if an error happened. By default - join collected chunks,
  * free memory and fill `results` / `err` properties.
  **/
-Inflate.prototype.onEnd = function(status) {
+Inflate.prototype.onEnd = function (status) {
   // On success - join
   if (status === c.Z_OK) {
     if (this.options.to === 'string') {
@@ -12171,7 +12392,7 @@ exports.inflate = inflate;
 exports.inflateRaw = inflateRaw;
 exports.ungzip  = inflate;
 
-},{"./utils/common":27,"./utils/strings":28,"./zlib/constants":30,"./zlib/gzheader":33,"./zlib/inflate.js":35,"./zlib/messages":37,"./zlib/zstream":39}],27:[function(_dereq_,module,exports){
+},{"./utils/common":28,"./utils/strings":29,"./zlib/constants":31,"./zlib/gzheader":34,"./zlib/inflate":36,"./zlib/messages":38,"./zlib/zstream":40}],28:[function(require,module,exports){
 'use strict';
 
 
@@ -12186,7 +12407,7 @@ exports.assign = function (obj /*from1, from2, from3, ...*/) {
     var source = sources.shift();
     if (!source) { continue; }
 
-    if (typeof(source) !== 'object') {
+    if (typeof source !== 'object') {
       throw new TypeError(source + 'must be non-object');
     }
 
@@ -12213,28 +12434,28 @@ exports.shrinkBuf = function (buf, size) {
 var fnTyped = {
   arraySet: function (dest, src, src_offs, len, dest_offs) {
     if (src.subarray && dest.subarray) {
-      dest.set(src.subarray(src_offs, src_offs+len), dest_offs);
+      dest.set(src.subarray(src_offs, src_offs + len), dest_offs);
       return;
     }
     // Fallback to ordinary array
-    for(var i=0; i<len; i++) {
+    for (var i = 0; i < len; i++) {
       dest[dest_offs + i] = src[src_offs + i];
     }
   },
   // Join array of chunks to single array.
-  flattenChunks: function(chunks) {
+  flattenChunks: function (chunks) {
     var i, l, len, pos, chunk, result;
 
     // calculate data length
     len = 0;
-    for (i=0, l=chunks.length; i<l; i++) {
+    for (i = 0, l = chunks.length; i < l; i++) {
       len += chunks[i].length;
     }
 
     // join chunks
     result = new Uint8Array(len);
     pos = 0;
-    for (i=0, l=chunks.length; i<l; i++) {
+    for (i = 0, l = chunks.length; i < l; i++) {
       chunk = chunks[i];
       result.set(chunk, pos);
       pos += chunk.length;
@@ -12246,12 +12467,12 @@ var fnTyped = {
 
 var fnUntyped = {
   arraySet: function (dest, src, src_offs, len, dest_offs) {
-    for(var i=0; i<len; i++) {
+    for (var i = 0; i < len; i++) {
       dest[dest_offs + i] = src[src_offs + i];
     }
   },
   // Join array of chunks to single array.
-  flattenChunks: function(chunks) {
+  flattenChunks: function (chunks) {
     return [].concat.apply([], chunks);
   }
 };
@@ -12274,12 +12495,13 @@ exports.setTyped = function (on) {
 };
 
 exports.setTyped(TYPED_OK);
-},{}],28:[function(_dereq_,module,exports){
+
+},{}],29:[function(require,module,exports){
 // String encode/decode helpers
 'use strict';
 
 
-var utils = _dereq_('./common');
+var utils = require('./common');
 
 
 // Quick check if we can use fast array to bin string conversion
@@ -12290,18 +12512,18 @@ var utils = _dereq_('./common');
 var STR_APPLY_OK = true;
 var STR_APPLY_UIA_OK = true;
 
-try { String.fromCharCode.apply(null, [0]); } catch(__) { STR_APPLY_OK = false; }
-try { String.fromCharCode.apply(null, new Uint8Array(1)); } catch(__) { STR_APPLY_UIA_OK = false; }
+try { String.fromCharCode.apply(null, [ 0 ]); } catch (__) { STR_APPLY_OK = false; }
+try { String.fromCharCode.apply(null, new Uint8Array(1)); } catch (__) { STR_APPLY_UIA_OK = false; }
 
 
 // Table with utf8 lengths (calculated by first byte of sequence)
 // Note, that 5 & 6-byte values and some 4-byte values can not be represented in JS,
 // because max possible codepoint is 0x10ffff
 var _utf8len = new utils.Buf8(256);
-for (var i=0; i<256; i++) {
-  _utf8len[i] = (i >= 252 ? 6 : i >= 248 ? 5 : i >= 240 ? 4 : i >= 224 ? 3 : i >= 192 ? 2 : 1);
+for (var q = 0; q < 256; q++) {
+  _utf8len[q] = (q >= 252 ? 6 : q >= 248 ? 5 : q >= 240 ? 4 : q >= 224 ? 3 : q >= 192 ? 2 : 1);
 }
-_utf8len[254]=_utf8len[254]=1; // Invalid sequence start
+_utf8len[254] = _utf8len[254] = 1; // Invalid sequence start
 
 
 // convert string to array (typed, when possible)
@@ -12311,8 +12533,8 @@ exports.string2buf = function (str) {
   // count binary size
   for (m_pos = 0; m_pos < str_len; m_pos++) {
     c = str.charCodeAt(m_pos);
-    if ((c & 0xfc00) === 0xd800 && (m_pos+1 < str_len)) {
-      c2 = str.charCodeAt(m_pos+1);
+    if ((c & 0xfc00) === 0xd800 && (m_pos + 1 < str_len)) {
+      c2 = str.charCodeAt(m_pos + 1);
       if ((c2 & 0xfc00) === 0xdc00) {
         c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
         m_pos++;
@@ -12325,10 +12547,10 @@ exports.string2buf = function (str) {
   buf = new utils.Buf8(buf_len);
 
   // convert
-  for (i=0, m_pos = 0; i < buf_len; m_pos++) {
+  for (i = 0, m_pos = 0; i < buf_len; m_pos++) {
     c = str.charCodeAt(m_pos);
-    if ((c & 0xfc00) === 0xd800 && (m_pos+1 < str_len)) {
-      c2 = str.charCodeAt(m_pos+1);
+    if ((c & 0xfc00) === 0xd800 && (m_pos + 1 < str_len)) {
+      c2 = str.charCodeAt(m_pos + 1);
       if ((c2 & 0xfc00) === 0xdc00) {
         c = 0x10000 + ((c - 0xd800) << 10) + (c2 - 0xdc00);
         m_pos++;
@@ -12368,7 +12590,7 @@ function buf2binstring(buf, len) {
   }
 
   var result = '';
-  for(var i=0; i < len; i++) {
+  for (var i = 0; i < len; i++) {
     result += String.fromCharCode(buf[i]);
   }
   return result;
@@ -12376,15 +12598,15 @@ function buf2binstring(buf, len) {
 
 
 // Convert byte array to binary string
-exports.buf2binstring = function(buf) {
+exports.buf2binstring = function (buf) {
   return buf2binstring(buf, buf.length);
 };
 
 
 // Convert binary string (typed, when possible)
-exports.binstring2buf = function(str) {
+exports.binstring2buf = function (str) {
   var buf = new utils.Buf8(str.length);
-  for(var i=0, len=buf.length; i < len; i++) {
+  for (var i = 0, len = buf.length; i < len; i++) {
     buf[i] = str.charCodeAt(i);
   }
   return buf;
@@ -12399,16 +12621,16 @@ exports.buf2string = function (buf, max) {
   // Reserve max possible length (2 words per char)
   // NB: by unknown reasons, Array is significantly faster for
   //     String.fromCharCode.apply than Uint16Array.
-  var utf16buf = new Array(len*2);
+  var utf16buf = new Array(len * 2);
 
-  for (out=0, i=0; i<len;) {
+  for (out = 0, i = 0; i < len;) {
     c = buf[i++];
     // quick process ascii
     if (c < 0x80) { utf16buf[out++] = c; continue; }
 
     c_len = _utf8len[c];
     // skip 5 & 6 byte codes
-    if (c_len > 4) { utf16buf[out++] = 0xfffd; i += c_len-1; continue; }
+    if (c_len > 4) { utf16buf[out++] = 0xfffd; i += c_len - 1; continue; }
 
     // apply mask on first byte
     c &= c_len === 2 ? 0x1f : c_len === 3 ? 0x0f : 0x07;
@@ -12440,14 +12662,14 @@ exports.buf2string = function (buf, max) {
 //
 // buf[] - utf8 bytes array
 // max   - length limit (mandatory);
-exports.utf8border = function(buf, max) {
+exports.utf8border = function (buf, max) {
   var pos;
 
   max = max || buf.length;
   if (max > buf.length) { max = buf.length; }
 
   // go back from last position, until start of sequence found
-  pos = max-1;
+  pos = max - 1;
   while (pos >= 0 && (buf[pos] & 0xC0) === 0x80) { pos--; }
 
   // Fuckup - very small and broken sequence,
@@ -12461,7 +12683,7 @@ exports.utf8border = function(buf, max) {
   return (pos + _utf8len[buf[pos]] > max) ? pos : max;
 };
 
-},{"./common":27}],29:[function(_dereq_,module,exports){
+},{"./common":28}],30:[function(require,module,exports){
 'use strict';
 
 // Note: adler32 takes 12% for level 0 and 2% for level 6.
@@ -12469,9 +12691,9 @@ exports.utf8border = function(buf, max) {
 // Small size is preferable.
 
 function adler32(adler, buf, len, pos) {
-  var s1 = (adler & 0xffff) |0
-    , s2 = ((adler >>> 16) & 0xffff) |0
-    , n = 0;
+  var s1 = (adler & 0xffff) |0,
+      s2 = ((adler >>> 16) & 0xffff) |0,
+      n = 0;
 
   while (len !== 0) {
     // Set limit ~ twice less than 5552, to keep
@@ -12494,7 +12716,11 @@ function adler32(adler, buf, len, pos) {
 
 
 module.exports = adler32;
-},{}],30:[function(_dereq_,module,exports){
+
+},{}],31:[function(require,module,exports){
+'use strict';
+
+
 module.exports = {
 
   /* Allowed flush values; see deflate() and inflate() below for details */
@@ -12542,7 +12768,8 @@ module.exports = {
   Z_DEFLATED:               8
   //Z_NULL:                 null // Use -1 or null inline, depending on var type
 };
-},{}],31:[function(_dereq_,module,exports){
+
+},{}],32:[function(require,module,exports){
 'use strict';
 
 // Note: we can't get significant speed boost here.
@@ -12554,10 +12781,10 @@ module.exports = {
 function makeTable() {
   var c, table = [];
 
-  for(var n =0; n < 256; n++){
+  for (var n = 0; n < 256; n++) {
     c = n;
-    for(var k =0; k < 8; k++){
-      c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+    for (var k = 0; k < 8; k++) {
+      c = ((c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
     }
     table[n] = c;
   }
@@ -12570,12 +12797,12 @@ var crcTable = makeTable();
 
 
 function crc32(crc, buf, len, pos) {
-  var t = crcTable
-    , end = pos + len;
+  var t = crcTable,
+      end = pos + len;
 
-  crc = crc ^ (-1);
+  crc ^= -1;
 
-  for (var i = pos; i < end; i++ ) {
+  for (var i = pos; i < end; i++) {
     crc = (crc >>> 8) ^ t[(crc ^ buf[i]) & 0xFF];
   }
 
@@ -12584,14 +12811,15 @@ function crc32(crc, buf, len, pos) {
 
 
 module.exports = crc32;
-},{}],32:[function(_dereq_,module,exports){
+
+},{}],33:[function(require,module,exports){
 'use strict';
 
-var utils   = _dereq_('../utils/common');
-var trees   = _dereq_('./trees');
-var adler32 = _dereq_('./adler32');
-var crc32   = _dereq_('./crc32');
-var msg   = _dereq_('./messages');
+var utils   = require('../utils/common');
+var trees   = require('./trees');
+var adler32 = require('./adler32');
+var crc32   = require('./crc32');
+var msg     = require('./messages');
 
 /* Public constants ==========================================================*/
 /* ===========================================================================*/
@@ -12664,7 +12892,7 @@ var D_CODES       = 30;
 /* number of distance codes */
 var BL_CODES      = 19;
 /* number of codes used to transfer the bit lengths */
-var HEAP_SIZE     = 2*L_CODES + 1;
+var HEAP_SIZE     = 2 * L_CODES + 1;
 /* maximum heap size */
 var MAX_BITS  = 15;
 /* All codes must not exceed MAX_BITS bits */
@@ -12730,7 +12958,7 @@ function flush_pending(strm) {
 }
 
 
-function flush_block_only (s, last) {
+function flush_block_only(s, last) {
   trees._tr_flush_block(s, (s.block_start >= 0 ? s.block_start : -1), s.strstart - s.block_start, last);
   s.block_start = s.strstart;
   flush_pending(s.strm);
@@ -13000,7 +13228,7 @@ function fill_window(s) {
 //#endif
       while (s.insert) {
         /* UPDATE_HASH(s, s->ins_h, s->window[str + MIN_MATCH-1]); */
-        s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[str + MIN_MATCH-1]) & s.hash_mask;
+        s.ins_h = ((s.ins_h << s.hash_shift) ^ s.window[str + MIN_MATCH - 1]) & s.hash_mask;
 
         s.prev[str & s.w_mask] = s.head[s.ins_h];
         s.head[s.ins_h] = str;
@@ -13264,7 +13492,7 @@ function deflate_fast(s, flush) {
       /***/
     }
   }
-  s.insert = ((s.strstart < (MIN_MATCH-1)) ? s.strstart : MIN_MATCH-1);
+  s.insert = ((s.strstart < (MIN_MATCH - 1)) ? s.strstart : MIN_MATCH - 1);
   if (flush === Z_FINISH) {
     /*** FLUSH_BLOCK(s, 1); ***/
     flush_block_only(s, true);
@@ -13327,10 +13555,10 @@ function deflate_slow(s, flush) {
      */
     s.prev_length = s.match_length;
     s.prev_match = s.match_start;
-    s.match_length = MIN_MATCH-1;
+    s.match_length = MIN_MATCH - 1;
 
     if (hash_head !== 0/*NIL*/ && s.prev_length < s.max_lazy_match &&
-        s.strstart - hash_head <= (s.w_size-MIN_LOOKAHEAD)/*MAX_DIST(s)*/) {
+        s.strstart - hash_head <= (s.w_size - MIN_LOOKAHEAD)/*MAX_DIST(s)*/) {
       /* To simplify the code, we prevent matches with the string
        * of window index 0 (in particular we have to avoid a match
        * of the string with itself at the start of the input file).
@@ -13344,7 +13572,7 @@ function deflate_slow(s, flush) {
         /* If prev_match is also MIN_MATCH, match_start is garbage
          * but we will ignore the current match anyway.
          */
-        s.match_length = MIN_MATCH-1;
+        s.match_length = MIN_MATCH - 1;
       }
     }
     /* If there was a match at the previous step and the current
@@ -13358,13 +13586,13 @@ function deflate_slow(s, flush) {
 
       /***_tr_tally_dist(s, s.strstart - 1 - s.prev_match,
                      s.prev_length - MIN_MATCH, bflush);***/
-      bflush = trees._tr_tally(s, s.strstart - 1- s.prev_match, s.prev_length - MIN_MATCH);
+      bflush = trees._tr_tally(s, s.strstart - 1 - s.prev_match, s.prev_length - MIN_MATCH);
       /* Insert in hash table all strings up to the end of the match.
        * strstart-1 and strstart are already inserted. If there is not
        * enough lookahead, the last two strings are not inserted in
        * the hash table.
        */
-      s.lookahead -= s.prev_length-1;
+      s.lookahead -= s.prev_length - 1;
       s.prev_length -= 2;
       do {
         if (++s.strstart <= max_insert) {
@@ -13376,7 +13604,7 @@ function deflate_slow(s, flush) {
         }
       } while (--s.prev_length !== 0);
       s.match_available = 0;
-      s.match_length = MIN_MATCH-1;
+      s.match_length = MIN_MATCH - 1;
       s.strstart++;
 
       if (bflush) {
@@ -13395,7 +13623,7 @@ function deflate_slow(s, flush) {
        */
       //Tracevv((stderr,"%c", s->window[s->strstart-1]));
       /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/
-      bflush = trees._tr_tally(s, 0, s.window[s.strstart-1]);
+      bflush = trees._tr_tally(s, 0, s.window[s.strstart - 1]);
 
       if (bflush) {
         /*** FLUSH_BLOCK_ONLY(s, 0) ***/
@@ -13420,11 +13648,11 @@ function deflate_slow(s, flush) {
   if (s.match_available) {
     //Tracevv((stderr,"%c", s->window[s->strstart-1]));
     /*** _tr_tally_lit(s, s.window[s.strstart-1], bflush); ***/
-    bflush = trees._tr_tally(s, 0, s.window[s.strstart-1]);
+    bflush = trees._tr_tally(s, 0, s.window[s.strstart - 1]);
 
     s.match_available = 0;
   }
-  s.insert = s.strstart < MIN_MATCH-1 ? s.strstart : MIN_MATCH-1;
+  s.insert = s.strstart < MIN_MATCH - 1 ? s.strstart : MIN_MATCH - 1;
   if (flush === Z_FINISH) {
     /*** FLUSH_BLOCK(s, 1); ***/
     flush_block_only(s, true);
@@ -13604,13 +13832,13 @@ function deflate_huff(s, flush) {
  * exclude worst case performance for pathological files. Better values may be
  * found for specific files.
  */
-var Config = function (good_length, max_lazy, nice_length, max_chain, func) {
+function Config(good_length, max_lazy, nice_length, max_chain, func) {
   this.good_length = good_length;
   this.max_lazy = max_lazy;
   this.nice_length = nice_length;
   this.max_chain = max_chain;
   this.func = func;
-};
+}
 
 var configuration_table;
 
@@ -13760,8 +13988,8 @@ function DeflateState() {
   // Use flat array of DOUBLE size, with interleaved fata,
   // because JS does not support effective
   this.dyn_ltree  = new utils.Buf16(HEAP_SIZE * 2);
-  this.dyn_dtree  = new utils.Buf16((2*D_CODES+1) * 2);
-  this.bl_tree    = new utils.Buf16((2*BL_CODES+1) * 2);
+  this.dyn_dtree  = new utils.Buf16((2 * D_CODES + 1) * 2);
+  this.bl_tree    = new utils.Buf16((2 * BL_CODES + 1) * 2);
   zero(this.dyn_ltree);
   zero(this.dyn_dtree);
   zero(this.bl_tree);
@@ -13771,11 +13999,11 @@ function DeflateState() {
   this.bl_desc  = null;         /* desc. for bit length tree */
 
   //ush bl_count[MAX_BITS+1];
-  this.bl_count = new utils.Buf16(MAX_BITS+1);
+  this.bl_count = new utils.Buf16(MAX_BITS + 1);
   /* number of codes at each bit length for an optimal tree */
 
   //int heap[2*L_CODES+1];      /* heap used to build the Huffman trees */
-  this.heap = new utils.Buf16(2*L_CODES+1);  /* heap used to build the Huffman trees */
+  this.heap = new utils.Buf16(2 * L_CODES + 1);  /* heap used to build the Huffman trees */
   zero(this.heap);
 
   this.heap_len = 0;               /* number of elements in the heap */
@@ -13784,7 +14012,7 @@ function DeflateState() {
    * The same heap array is used to build all trees.
    */
 
-  this.depth = new utils.Buf16(2*L_CODES+1); //uch depth[2*L_CODES+1];
+  this.depth = new utils.Buf16(2 * L_CODES + 1); //uch depth[2*L_CODES+1];
   zero(this.depth);
   /* Depth of each subtree used as tie breaker for trees of equal frequency
    */
@@ -14121,7 +14349,7 @@ function deflate(strm, flush) {
         put_byte(s, val);
       } while (val !== 0);
 
-      if (s.gzhead.hcrc && s.pending > beg){
+      if (s.gzhead.hcrc && s.pending > beg) {
         strm.adler = crc32(strm.adler, s.pending_buf, s.pending - beg, beg);
       }
       if (val === 0) {
@@ -14350,7 +14578,8 @@ exports.deflatePending = deflatePending;
 exports.deflatePrime = deflatePrime;
 exports.deflateTune = deflateTune;
 */
-},{"../utils/common":27,"./adler32":29,"./crc32":31,"./messages":37,"./trees":38}],33:[function(_dereq_,module,exports){
+
+},{"../utils/common":28,"./adler32":30,"./crc32":32,"./messages":38,"./trees":39}],34:[function(require,module,exports){
 'use strict';
 
 
@@ -14370,7 +14599,7 @@ function GZheader() {
                        // but leave for few code modifications
 
   //
-  // Setup limits is not necessary because in js we should not preallocate memory 
+  // Setup limits is not necessary because in js we should not preallocate memory
   // for inflate use constant limit in 65536 bytes
   //
 
@@ -14391,7 +14620,8 @@ function GZheader() {
 }
 
 module.exports = GZheader;
-},{}],34:[function(_dereq_,module,exports){
+
+},{}],35:[function(require,module,exports){
 'use strict';
 
 // See state defs from inflate.js
@@ -14446,7 +14676,8 @@ module.exports = function inflate_fast(strm, start) {
   var wsize;                  /* window size or zero if not using window */
   var whave;                  /* valid bytes in the window */
   var wnext;                  /* window write index */
-  var window;                 /* allocated sliding window, if wsize != 0 */
+  // Use `s_window` instead `window`, avoid conflict with instrumentation tools
+  var s_window;               /* allocated sliding window, if wsize != 0 */
   var hold;                   /* local strm.hold */
   var bits;                   /* local strm.bits */
   var lcode;                  /* local strm.lencode */
@@ -14480,7 +14711,7 @@ module.exports = function inflate_fast(strm, start) {
   wsize = state.wsize;
   whave = state.whave;
   wnext = state.wnext;
-  window = state.window;
+  s_window = state.window;
   hold = state.hold;
   bits = state.bits;
   lcode = state.lencode;
@@ -14598,13 +14829,13 @@ module.exports = function inflate_fast(strm, start) {
 //#endif
               }
               from = 0; // window index
-              from_source = window;
+              from_source = s_window;
               if (wnext === 0) {           /* very common case */
                 from += wsize - op;
                 if (op < len) {         /* some from window */
                   len -= op;
                   do {
-                    output[_out++] = window[from++];
+                    output[_out++] = s_window[from++];
                   } while (--op);
                   from = _out - dist;  /* rest from output */
                   from_source = output;
@@ -14616,14 +14847,14 @@ module.exports = function inflate_fast(strm, start) {
                 if (op < len) {         /* some from end of window */
                   len -= op;
                   do {
-                    output[_out++] = window[from++];
+                    output[_out++] = s_window[from++];
                   } while (--op);
                   from = 0;
                   if (wnext < len) {  /* some from start of window */
                     op = wnext;
                     len -= op;
                     do {
-                      output[_out++] = window[from++];
+                      output[_out++] = s_window[from++];
                     } while (--op);
                     from = _out - dist;      /* rest from output */
                     from_source = output;
@@ -14635,7 +14866,7 @@ module.exports = function inflate_fast(strm, start) {
                 if (op < len) {         /* some from window */
                   len -= op;
                   do {
-                    output[_out++] = window[from++];
+                    output[_out++] = s_window[from++];
                   } while (--op);
                   from = _out - dist;  /* rest from output */
                   from_source = output;
@@ -14718,15 +14949,15 @@ module.exports = function inflate_fast(strm, start) {
   return;
 };
 
-},{}],35:[function(_dereq_,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 
-var utils = _dereq_('../utils/common');
-var adler32 = _dereq_('./adler32');
-var crc32   = _dereq_('./crc32');
-var inflate_fast = _dereq_('./inffast');
-var inflate_table = _dereq_('./inftrees');
+var utils         = require('../utils/common');
+var adler32       = require('./adler32');
+var crc32         = require('./crc32');
+var inflate_fast  = require('./inffast');
+var inflate_table = require('./inftrees');
 
 var CODES = 0;
 var LENS = 1;
@@ -14813,7 +15044,7 @@ var MAX_WBITS = 15;
 var DEF_WBITS = MAX_WBITS;
 
 
-function ZSWAP32(q) {
+function zswap32(q) {
   return  (((q >>> 24) & 0xff) +
           ((q >>> 8) & 0xff00) +
           ((q & 0xff00) << 8) +
@@ -15006,13 +15237,13 @@ function fixedtables(state) {
     while (sym < 280) { state.lens[sym++] = 7; }
     while (sym < 288) { state.lens[sym++] = 8; }
 
-    inflate_table(LENS,  state.lens, 0, 288, lenfix,   0, state.work, {bits: 9});
+    inflate_table(LENS,  state.lens, 0, 288, lenfix,   0, state.work, { bits: 9 });
 
     /* distance table */
     sym = 0;
     while (sym < 32) { state.lens[sym++] = 5; }
 
-    inflate_table(DISTS, state.lens, 0, 32,   distfix, 0, state.work, {bits: 5});
+    inflate_table(DISTS, state.lens, 0, 32,   distfix, 0, state.work, { bits: 5 });
 
     /* do this just once */
     virgin = false;
@@ -15054,7 +15285,7 @@ function updatewindow(strm, src, end, copy) {
 
   /* copy state->wsize or less output bytes into the circular window */
   if (copy >= state.wsize) {
-    utils.arraySet(state.window,src, end - state.wsize, state.wsize, 0);
+    utils.arraySet(state.window, src, end - state.wsize, state.wsize, 0);
     state.wnext = 0;
     state.whave = state.wsize;
   }
@@ -15064,11 +15295,11 @@ function updatewindow(strm, src, end, copy) {
       dist = copy;
     }
     //zmemcpy(state->window + state->wnext, end - copy, dist);
-    utils.arraySet(state.window,src, end - copy, dist, state.wnext);
+    utils.arraySet(state.window, src, end - copy, dist, state.wnext);
     copy -= dist;
     if (copy) {
       //zmemcpy(state->window, end - copy, copy);
-      utils.arraySet(state.window,src, end - copy, copy, 0);
+      utils.arraySet(state.window, src, end - copy, copy, 0);
       state.wnext = copy;
       state.whave = state.wsize;
     }
@@ -15105,7 +15336,7 @@ function inflate(strm, flush) {
   var n; // temporary var for NEED_BITS
 
   var order = /* permutation of code lengths */
-    [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+    [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ];
 
 
   if (!strm || !strm.state || !strm.output ||
@@ -15432,7 +15663,7 @@ function inflate(strm, flush) {
         state.head.hcrc = ((state.flags >> 9) & 1);
         state.head.done = true;
       }
-      strm.adler = state.check = 0 /*crc32(0L, Z_NULL, 0)*/;
+      strm.adler = state.check = 0;
       state.mode = TYPE;
       break;
     case DICTID:
@@ -15444,7 +15675,7 @@ function inflate(strm, flush) {
         bits += 8;
       }
       //===//
-      strm.adler = state.check = ZSWAP32(hold);
+      strm.adler = state.check = zswap32(hold);
       //=== INITBITS();
       hold = 0;
       bits = 0;
@@ -15636,7 +15867,7 @@ function inflate(strm, flush) {
       state.lencode = state.lendyn;
       state.lenbits = 7;
 
-      opts = {bits: state.lenbits};
+      opts = { bits: state.lenbits };
       ret = inflate_table(CODES, state.lens, 0, 19, state.lencode, 0, state.work, opts);
       state.lenbits = opts.bits;
 
@@ -15767,7 +15998,7 @@ function inflate(strm, flush) {
          concerning the ENOUGH constants, which depend on those values */
       state.lenbits = 9;
 
-      opts = {bits: state.lenbits};
+      opts = { bits: state.lenbits };
       ret = inflate_table(LENS, state.lens, 0, state.nlen, state.lencode, 0, state.work, opts);
       // We have separate tables & no pointers. 2 commented lines below not needed.
       // state.next_index = opts.table_index;
@@ -15784,7 +16015,7 @@ function inflate(strm, flush) {
       //state.distcode.copy(state.codes);
       // Switch to use dynamic table
       state.distcode = state.distdyn;
-      opts = {bits: state.distbits};
+      opts = { bits: state.distbits };
       ret = inflate_table(DISTS, state.lens, state.nlen, state.ndist, state.distcode, 0, state.work, opts);
       // We have separate tables & no pointers. 2 commented lines below not needed.
       // state.next_index = opts.table_index;
@@ -15832,7 +16063,7 @@ function inflate(strm, flush) {
       }
       state.back = 0;
       for (;;) {
-        here = state.lencode[hold & ((1 << state.lenbits) -1)];  /*BITS(state.lenbits)*/
+        here = state.lencode[hold & ((1 << state.lenbits) - 1)];  /*BITS(state.lenbits)*/
         here_bits = here >>> 24;
         here_op = (here >>> 16) & 0xff;
         here_val = here & 0xffff;
@@ -15851,7 +16082,7 @@ function inflate(strm, flush) {
         last_val = here_val;
         for (;;) {
           here = state.lencode[last_val +
-                  ((hold & ((1 << (last_bits + last_op)) -1))/*BITS(last.bits + last.op)*/ >> last_bits)];
+                  ((hold & ((1 << (last_bits + last_op)) - 1))/*BITS(last.bits + last.op)*/ >> last_bits)];
           here_bits = here >>> 24;
           here_op = (here >>> 16) & 0xff;
           here_val = here & 0xffff;
@@ -15908,7 +16139,7 @@ function inflate(strm, flush) {
           bits += 8;
         }
         //===//
-        state.length += hold & ((1 << state.extra) -1)/*BITS(state.extra)*/;
+        state.length += hold & ((1 << state.extra) - 1)/*BITS(state.extra)*/;
         //--- DROPBITS(state.extra) ---//
         hold >>>= state.extra;
         bits -= state.extra;
@@ -15921,7 +16152,7 @@ function inflate(strm, flush) {
       /* falls through */
     case DIST:
       for (;;) {
-        here = state.distcode[hold & ((1 << state.distbits) -1)];/*BITS(state.distbits)*/
+        here = state.distcode[hold & ((1 << state.distbits) - 1)];/*BITS(state.distbits)*/
         here_bits = here >>> 24;
         here_op = (here >>> 16) & 0xff;
         here_val = here & 0xffff;
@@ -15940,7 +16171,7 @@ function inflate(strm, flush) {
         last_val = here_val;
         for (;;) {
           here = state.distcode[last_val +
-                  ((hold & ((1 << (last_bits + last_op)) -1))/*BITS(last.bits + last.op)*/ >> last_bits)];
+                  ((hold & ((1 << (last_bits + last_op)) - 1))/*BITS(last.bits + last.op)*/ >> last_bits)];
           here_bits = here >>> 24;
           here_op = (here >>> 16) & 0xff;
           here_val = here & 0xffff;
@@ -15984,7 +16215,7 @@ function inflate(strm, flush) {
           bits += 8;
         }
         //===//
-        state.offset += hold & ((1 << state.extra) -1)/*BITS(state.extra)*/;
+        state.offset += hold & ((1 << state.extra) - 1)/*BITS(state.extra)*/;
         //--- DROPBITS(state.extra) ---//
         hold >>>= state.extra;
         bits -= state.extra;
@@ -16078,8 +16309,8 @@ function inflate(strm, flush) {
 
         }
         _out = left;
-        // NB: crc32 stored as signed 32-bit int, ZSWAP32 returns signed too
-        if ((state.flags ? hold : ZSWAP32(hold)) !== state.check) {
+        // NB: crc32 stored as signed 32-bit int, zswap32 returns signed too
+        if ((state.flags ? hold : zswap32(hold)) !== state.check) {
           strm.msg = 'incorrect data check';
           state.mode = BAD;
           break;
@@ -16222,11 +16453,12 @@ exports.inflateSync = inflateSync;
 exports.inflateSyncPoint = inflateSyncPoint;
 exports.inflateUndermine = inflateUndermine;
 */
-},{"../utils/common":27,"./adler32":29,"./crc32":31,"./inffast":34,"./inftrees":36}],36:[function(_dereq_,module,exports){
+
+},{"../utils/common":28,"./adler32":30,"./crc32":32,"./inffast":35,"./inftrees":37}],37:[function(require,module,exports){
 'use strict';
 
 
-var utils = _dereq_('../utils/common');
+var utils = require('../utils/common');
 
 var MAXBITS = 15;
 var ENOUGH_LENS = 852;
@@ -16282,8 +16514,8 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   var base_index = 0;
 //  var shoextra;    /* extra bits table to use */
   var end;                    /* use base and extra for symbol > end */
-  var count = new utils.Buf16(MAXBITS+1); //[MAXBITS+1];    /* number of codes of each length */
-  var offs = new utils.Buf16(MAXBITS+1); //[MAXBITS+1];     /* offsets in table for each length */
+  var count = new utils.Buf16(MAXBITS + 1); //[MAXBITS+1];    /* number of codes of each length */
+  var offs = new utils.Buf16(MAXBITS + 1); //[MAXBITS+1];     /* offsets in table for each length */
   var extra = null;
   var extra_index = 0;
 
@@ -16419,18 +16651,20 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   // poor man optimization - use if-else instead of switch,
   // to avoid deopts in old v8
   if (type === CODES) {
-      base = extra = work;    /* dummy value--not used */
-      end = 19;
+    base = extra = work;    /* dummy value--not used */
+    end = 19;
+
   } else if (type === LENS) {
-      base = lbase;
-      base_index -= 257;
-      extra = lext;
-      extra_index -= 257;
-      end = 256;
+    base = lbase;
+    base_index -= 257;
+    extra = lext;
+    extra_index -= 257;
+    end = 256;
+
   } else {                    /* DISTS */
-      base = dbase;
-      extra = dext;
-      end = -1;
+    base = dbase;
+    extra = dext;
+    end = -1;
   }
 
   /* initialize opts for loop */
@@ -16450,7 +16684,7 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
     return 1;
   }
 
-  var i=0;
+  var i = 0;
   /* process all codes and make table entries */
   for (;;) {
     i++;
@@ -16549,13 +16783,13 @@ module.exports = function inflate_table(type, lens, lens_index, codes, table, ta
   return 0;
 };
 
-},{"../utils/common":27}],37:[function(_dereq_,module,exports){
+},{"../utils/common":28}],38:[function(require,module,exports){
 'use strict';
 
 module.exports = {
-  '2':    'need dictionary',     /* Z_NEED_DICT       2  */
-  '1':    'stream end',          /* Z_STREAM_END      1  */
-  '0':    '',                    /* Z_OK              0  */
+  2:      'need dictionary',     /* Z_NEED_DICT       2  */
+  1:      'stream end',          /* Z_STREAM_END      1  */
+  0:      '',                    /* Z_OK              0  */
   '-1':   'file error',          /* Z_ERRNO         (-1) */
   '-2':   'stream error',        /* Z_STREAM_ERROR  (-2) */
   '-3':   'data error',          /* Z_DATA_ERROR    (-3) */
@@ -16563,11 +16797,12 @@ module.exports = {
   '-5':   'buffer error',        /* Z_BUF_ERROR     (-5) */
   '-6':   'incompatible version' /* Z_VERSION_ERROR (-6) */
 };
-},{}],38:[function(_dereq_,module,exports){
+
+},{}],39:[function(require,module,exports){
 'use strict';
 
 
-var utils = _dereq_('../utils/common');
+var utils = require('../utils/common');
 
 /* Public constants ==========================================================*/
 /* ===========================================================================*/
@@ -16621,7 +16856,7 @@ var D_CODES       = 30;
 var BL_CODES      = 19;
 /* number of codes used to transfer the bit lengths */
 
-var HEAP_SIZE     = 2*L_CODES + 1;
+var HEAP_SIZE     = 2 * L_CODES + 1;
 /* maximum heap size */
 
 var MAX_BITS      = 15;
@@ -16650,6 +16885,7 @@ var REPZ_3_10   = 17;
 var REPZ_11_138 = 18;
 /* repeat a zero length 11-138 times  (7 bits of repeat count) */
 
+/* eslint-disable comma-spacing,array-bracket-spacing */
 var extra_lbits =   /* extra bits for each length code */
   [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0];
 
@@ -16661,6 +16897,8 @@ var extra_blbits =  /* extra bits for each bit length code */
 
 var bl_order =
   [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
+/* eslint-enable comma-spacing,array-bracket-spacing */
+
 /* The lengths of the bit length codes are sent in order of decreasing
  * probability, to avoid transmitting the lengths for unused bit length codes.
  */
@@ -16674,7 +16912,7 @@ var bl_order =
 var DIST_CODE_LEN = 512; /* see definition of array dist_code below */
 
 // !!!! Use flat array insdead of structure, Freq = i*2, Len = i*2+1
-var static_ltree  = new Array((L_CODES+2) * 2);
+var static_ltree  = new Array((L_CODES + 2) * 2);
 zero(static_ltree);
 /* The static literal tree. Since the bit lengths are imposed, there is no
  * need for the L_CODES extra codes used during heap construction. However
@@ -16695,7 +16933,7 @@ zero(_dist_code);
  * the 15 bit distances.
  */
 
-var _length_code  = new Array(MAX_MATCH-MIN_MATCH+1);
+var _length_code  = new Array(MAX_MATCH - MIN_MATCH + 1);
 zero(_length_code);
 /* length code for each normalized match length (0 == MIN_MATCH) */
 
@@ -16708,7 +16946,7 @@ zero(base_dist);
 /* First normalized distance for each code (0 = distance of 1) */
 
 
-var StaticTreeDesc = function (static_tree, extra_bits, extra_base, elems, max_length) {
+function StaticTreeDesc(static_tree, extra_bits, extra_base, elems, max_length) {
 
   this.static_tree  = static_tree;  /* static tree or NULL */
   this.extra_bits   = extra_bits;   /* extra bits for each code or NULL */
@@ -16718,7 +16956,7 @@ var StaticTreeDesc = function (static_tree, extra_bits, extra_base, elems, max_l
 
   // show if `static_tree` has data or dummy - needed for monomorphic objects
   this.has_stree    = static_tree && static_tree.length;
-};
+}
 
 
 var static_l_desc;
@@ -16726,11 +16964,11 @@ var static_d_desc;
 var static_bl_desc;
 
 
-var TreeDesc = function(dyn_tree, stat_desc) {
+function TreeDesc(dyn_tree, stat_desc) {
   this.dyn_tree = dyn_tree;     /* the dynamic tree */
   this.max_code = 0;            /* largest code with non zero frequency */
   this.stat_desc = stat_desc;   /* the corresponding static tree */
-};
+}
 
 
 
@@ -16743,7 +16981,7 @@ function d_code(dist) {
  * Output a short LSB first on the stream.
  * IN assertion: there is enough room in pendingBuf.
  */
-function put_short (s, w) {
+function put_short(s, w) {
 //    put_byte(s, (uch)((w) & 0xff));
 //    put_byte(s, (uch)((ush)(w) >> 8));
   s.pending_buf[s.pending++] = (w) & 0xff;
@@ -16769,7 +17007,7 @@ function send_bits(s, value, length) {
 
 
 function send_code(s, c, tree) {
-  send_bits(s, tree[c*2]/*.Code*/, tree[c*2 + 1]/*.Len*/);
+  send_bits(s, tree[c * 2]/*.Code*/, tree[c * 2 + 1]/*.Len*/);
 }
 
 
@@ -16841,16 +17079,16 @@ function gen_bitlen(s, desc)
   /* In a first pass, compute the optimal bit lengths (which may
    * overflow in the case of the bit length tree).
    */
-  tree[s.heap[s.heap_max]*2 + 1]/*.Len*/ = 0; /* root of the heap */
+  tree[s.heap[s.heap_max] * 2 + 1]/*.Len*/ = 0; /* root of the heap */
 
-  for (h = s.heap_max+1; h < HEAP_SIZE; h++) {
+  for (h = s.heap_max + 1; h < HEAP_SIZE; h++) {
     n = s.heap[h];
-    bits = tree[tree[n*2 +1]/*.Dad*/ * 2 + 1]/*.Len*/ + 1;
+    bits = tree[tree[n * 2 + 1]/*.Dad*/ * 2 + 1]/*.Len*/ + 1;
     if (bits > max_length) {
       bits = max_length;
       overflow++;
     }
-    tree[n*2 + 1]/*.Len*/ = bits;
+    tree[n * 2 + 1]/*.Len*/ = bits;
     /* We overwrite tree[n].Dad which is no longer needed */
 
     if (n > max_code) { continue; } /* not a leaf node */
@@ -16858,12 +17096,12 @@ function gen_bitlen(s, desc)
     s.bl_count[bits]++;
     xbits = 0;
     if (n >= base) {
-      xbits = extra[n-base];
+      xbits = extra[n - base];
     }
     f = tree[n * 2]/*.Freq*/;
     s.opt_len += f * (bits + xbits);
     if (has_stree) {
-      s.static_len += f * (stree[n*2 + 1]/*.Len*/ + xbits);
+      s.static_len += f * (stree[n * 2 + 1]/*.Len*/ + xbits);
     }
   }
   if (overflow === 0) { return; }
@@ -16873,10 +17111,10 @@ function gen_bitlen(s, desc)
 
   /* Find the first bit length which could increase: */
   do {
-    bits = max_length-1;
+    bits = max_length - 1;
     while (s.bl_count[bits] === 0) { bits--; }
     s.bl_count[bits]--;      /* move one leaf down the tree */
-    s.bl_count[bits+1] += 2; /* move one overflow item as its brother */
+    s.bl_count[bits + 1] += 2; /* move one overflow item as its brother */
     s.bl_count[max_length]--;
     /* The brother of the overflow item also moves one step up,
      * but this does not affect bl_count[max_length]
@@ -16894,10 +17132,10 @@ function gen_bitlen(s, desc)
     while (n !== 0) {
       m = s.heap[--h];
       if (m > max_code) { continue; }
-      if (tree[m*2 + 1]/*.Len*/ !== bits) {
+      if (tree[m * 2 + 1]/*.Len*/ !== bits) {
         // Trace((stderr,"code %d bits %d->%d\n", m, tree[m].Len, bits));
-        s.opt_len += (bits - tree[m*2 + 1]/*.Len*/)*tree[m*2]/*.Freq*/;
-        tree[m*2 + 1]/*.Len*/ = bits;
+        s.opt_len += (bits - tree[m * 2 + 1]/*.Len*/) * tree[m * 2]/*.Freq*/;
+        tree[m * 2 + 1]/*.Len*/ = bits;
       }
       n--;
     }
@@ -16918,7 +17156,7 @@ function gen_codes(tree, max_code, bl_count)
 //    int max_code;              /* largest code with non zero frequency */
 //    ushf *bl_count;            /* number of codes at each bit length */
 {
-  var next_code = new Array(MAX_BITS+1); /* next code value for each bit length */
+  var next_code = new Array(MAX_BITS + 1); /* next code value for each bit length */
   var code = 0;              /* running code value */
   var bits;                  /* bit index */
   var n;                     /* code index */
@@ -16927,7 +17165,7 @@ function gen_codes(tree, max_code, bl_count)
    * without bit reversal.
    */
   for (bits = 1; bits <= MAX_BITS; bits++) {
-    next_code[bits] = code = (code + bl_count[bits-1]) << 1;
+    next_code[bits] = code = (code + bl_count[bits - 1]) << 1;
   }
   /* Check that the bit counts in bl_count are consistent. The last code
    * must be all ones.
@@ -16937,10 +17175,10 @@ function gen_codes(tree, max_code, bl_count)
   //Tracev((stderr,"\ngen_codes: max_code %d ", max_code));
 
   for (n = 0;  n <= max_code; n++) {
-    var len = tree[n*2 + 1]/*.Len*/;
+    var len = tree[n * 2 + 1]/*.Len*/;
     if (len === 0) { continue; }
     /* Now reverse the bits */
-    tree[n*2]/*.Code*/ = bi_reverse(next_code[len]++, len);
+    tree[n * 2]/*.Code*/ = bi_reverse(next_code[len]++, len);
 
     //Tracecv(tree != static_ltree, (stderr,"\nn %3d %c l %2d c %4x (%x) ",
     //     n, (isgraph(n) ? n : ' '), len, tree[n].Code, next_code[len]-1));
@@ -16957,7 +17195,7 @@ function tr_static_init() {
   var length;   /* length value */
   var code;     /* code value */
   var dist;     /* distance index */
-  var bl_count = new Array(MAX_BITS+1);
+  var bl_count = new Array(MAX_BITS + 1);
   /* number of codes at each bit length for an optimal tree */
 
   // do check in _tr_init()
@@ -16974,9 +17212,9 @@ function tr_static_init() {
 
   /* Initialize the mapping length (0..255) -> length code (0..28) */
   length = 0;
-  for (code = 0; code < LENGTH_CODES-1; code++) {
+  for (code = 0; code < LENGTH_CODES - 1; code++) {
     base_length[code] = length;
-    for (n = 0; n < (1<<extra_lbits[code]); n++) {
+    for (n = 0; n < (1 << extra_lbits[code]); n++) {
       _length_code[length++] = code;
     }
   }
@@ -16985,21 +17223,21 @@ function tr_static_init() {
    * in two different ways: code 284 + 5 bits or code 285, so we
    * overwrite length_code[255] to use the best encoding:
    */
-  _length_code[length-1] = code;
+  _length_code[length - 1] = code;
 
   /* Initialize the mapping dist (0..32K) -> dist code (0..29) */
   dist = 0;
-  for (code = 0 ; code < 16; code++) {
+  for (code = 0; code < 16; code++) {
     base_dist[code] = dist;
-    for (n = 0; n < (1<<extra_dbits[code]); n++) {
+    for (n = 0; n < (1 << extra_dbits[code]); n++) {
       _dist_code[dist++] = code;
     }
   }
   //Assert (dist == 256, "tr_static_init: dist != 256");
   dist >>= 7; /* from now on, all distances are divided by 128 */
-  for ( ; code < D_CODES; code++) {
+  for (; code < D_CODES; code++) {
     base_dist[code] = dist << 7;
-    for (n = 0; n < (1<<(extra_dbits[code]-7)); n++) {
+    for (n = 0; n < (1 << (extra_dbits[code] - 7)); n++) {
       _dist_code[256 + dist++] = code;
     }
   }
@@ -17012,22 +17250,22 @@ function tr_static_init() {
 
   n = 0;
   while (n <= 143) {
-    static_ltree[n*2 + 1]/*.Len*/ = 8;
+    static_ltree[n * 2 + 1]/*.Len*/ = 8;
     n++;
     bl_count[8]++;
   }
   while (n <= 255) {
-    static_ltree[n*2 + 1]/*.Len*/ = 9;
+    static_ltree[n * 2 + 1]/*.Len*/ = 9;
     n++;
     bl_count[9]++;
   }
   while (n <= 279) {
-    static_ltree[n*2 + 1]/*.Len*/ = 7;
+    static_ltree[n * 2 + 1]/*.Len*/ = 7;
     n++;
     bl_count[7]++;
   }
   while (n <= 287) {
-    static_ltree[n*2 + 1]/*.Len*/ = 8;
+    static_ltree[n * 2 + 1]/*.Len*/ = 8;
     n++;
     bl_count[8]++;
   }
@@ -17035,18 +17273,18 @@ function tr_static_init() {
    * tree construction to get a canonical Huffman tree (longest code
    * all ones)
    */
-  gen_codes(static_ltree, L_CODES+1, bl_count);
+  gen_codes(static_ltree, L_CODES + 1, bl_count);
 
   /* The static distance tree is trivial: */
   for (n = 0; n < D_CODES; n++) {
-    static_dtree[n*2 + 1]/*.Len*/ = 5;
-    static_dtree[n*2]/*.Code*/ = bi_reverse(n, 5);
+    static_dtree[n * 2 + 1]/*.Len*/ = 5;
+    static_dtree[n * 2]/*.Code*/ = bi_reverse(n, 5);
   }
 
   // Now data ready and we can init static trees
-  static_l_desc = new StaticTreeDesc(static_ltree, extra_lbits, LITERALS+1, L_CODES, MAX_BITS);
+  static_l_desc = new StaticTreeDesc(static_ltree, extra_lbits, LITERALS + 1, L_CODES, MAX_BITS);
   static_d_desc = new StaticTreeDesc(static_dtree, extra_dbits, 0,          D_CODES, MAX_BITS);
-  static_bl_desc =new StaticTreeDesc(new Array(0), extra_blbits, 0,         BL_CODES, MAX_BL_BITS);
+  static_bl_desc = new StaticTreeDesc(new Array(0), extra_blbits, 0,         BL_CODES, MAX_BL_BITS);
 
   //static_init_done = true;
 }
@@ -17059,11 +17297,11 @@ function init_block(s) {
   var n; /* iterates over tree elements */
 
   /* Initialize the trees. */
-  for (n = 0; n < L_CODES;  n++) { s.dyn_ltree[n*2]/*.Freq*/ = 0; }
-  for (n = 0; n < D_CODES;  n++) { s.dyn_dtree[n*2]/*.Freq*/ = 0; }
-  for (n = 0; n < BL_CODES; n++) { s.bl_tree[n*2]/*.Freq*/ = 0; }
+  for (n = 0; n < L_CODES;  n++) { s.dyn_ltree[n * 2]/*.Freq*/ = 0; }
+  for (n = 0; n < D_CODES;  n++) { s.dyn_dtree[n * 2]/*.Freq*/ = 0; }
+  for (n = 0; n < BL_CODES; n++) { s.bl_tree[n * 2]/*.Freq*/ = 0; }
 
-  s.dyn_ltree[END_BLOCK*2]/*.Freq*/ = 1;
+  s.dyn_ltree[END_BLOCK * 2]/*.Freq*/ = 1;
   s.opt_len = s.static_len = 0;
   s.last_lit = s.matches = 0;
 }
@@ -17112,8 +17350,8 @@ function copy_block(s, buf, len, header)
  * the subtrees have equal frequency. This minimizes the worst case length.
  */
 function smaller(tree, n, m, depth) {
-  var _n2 = n*2;
-  var _m2 = m*2;
+  var _n2 = n * 2;
+  var _m2 = m * 2;
   return (tree[_n2]/*.Freq*/ < tree[_m2]/*.Freq*/ ||
          (tree[_n2]/*.Freq*/ === tree[_m2]/*.Freq*/ && depth[n] <= depth[m]));
 }
@@ -17134,7 +17372,7 @@ function pqdownheap(s, tree, k)
   while (j <= s.heap_len) {
     /* Set j to the smallest of the two sons: */
     if (j < s.heap_len &&
-      smaller(tree, s.heap[j+1], s.heap[j], s.depth)) {
+      smaller(tree, s.heap[j + 1], s.heap[j], s.depth)) {
       j++;
     }
     /* Exit if v is smaller than both sons */
@@ -17170,7 +17408,7 @@ function compress_block(s, ltree, dtree)
 
   if (s.last_lit !== 0) {
     do {
-      dist = (s.pending_buf[s.d_buf + lx*2] << 8) | (s.pending_buf[s.d_buf + lx*2 + 1]);
+      dist = (s.pending_buf[s.d_buf + lx * 2] << 8) | (s.pending_buf[s.d_buf + lx * 2 + 1]);
       lc = s.pending_buf[s.l_buf + lx];
       lx++;
 
@@ -17180,7 +17418,7 @@ function compress_block(s, ltree, dtree)
       } else {
         /* Here, lc is the match length - MIN_MATCH */
         code = _length_code[lc];
-        send_code(s, code+LITERALS+1, ltree); /* send the length code */
+        send_code(s, code + LITERALS + 1, ltree); /* send the length code */
         extra = extra_lbits[code];
         if (extra !== 0) {
           lc -= base_length[code];
@@ -17242,7 +17480,7 @@ function build_tree(s, desc)
       s.depth[n] = 0;
 
     } else {
-      tree[n*2 + 1]/*.Len*/ = 0;
+      tree[n * 2 + 1]/*.Len*/ = 0;
     }
   }
 
@@ -17258,7 +17496,7 @@ function build_tree(s, desc)
     s.opt_len--;
 
     if (has_stree) {
-      s.static_len -= stree[node*2 + 1]/*.Len*/;
+      s.static_len -= stree[node * 2 + 1]/*.Len*/;
     }
     /* node is 0 or 1 so it does not have extra bits */
   }
@@ -17289,7 +17527,7 @@ function build_tree(s, desc)
     /* Create a new node father of n and m */
     tree[node * 2]/*.Freq*/ = tree[n * 2]/*.Freq*/ + tree[m * 2]/*.Freq*/;
     s.depth[node] = (s.depth[n] >= s.depth[m] ? s.depth[n] : s.depth[m]) + 1;
-    tree[n*2 + 1]/*.Dad*/ = tree[m*2 + 1]/*.Dad*/ = node;
+    tree[n * 2 + 1]/*.Dad*/ = tree[m * 2 + 1]/*.Dad*/ = node;
 
     /* and insert the new node in the heap */
     s.heap[1/*SMALLEST*/] = node++;
@@ -17322,7 +17560,7 @@ function scan_tree(s, tree, max_code)
   var prevlen = -1;          /* last emitted length */
   var curlen;                /* length of current code */
 
-  var nextlen = tree[0*2 + 1]/*.Len*/; /* length of next code */
+  var nextlen = tree[0 * 2 + 1]/*.Len*/; /* length of next code */
 
   var count = 0;             /* repeat count of the current code */
   var max_count = 7;         /* max repeat count */
@@ -17332,11 +17570,11 @@ function scan_tree(s, tree, max_code)
     max_count = 138;
     min_count = 3;
   }
-  tree[(max_code+1)*2 + 1]/*.Len*/ = 0xffff; /* guard */
+  tree[(max_code + 1) * 2 + 1]/*.Len*/ = 0xffff; /* guard */
 
   for (n = 0; n <= max_code; n++) {
     curlen = nextlen;
-    nextlen = tree[(n+1)*2 + 1]/*.Len*/;
+    nextlen = tree[(n + 1) * 2 + 1]/*.Len*/;
 
     if (++count < max_count && curlen === nextlen) {
       continue;
@@ -17347,13 +17585,13 @@ function scan_tree(s, tree, max_code)
     } else if (curlen !== 0) {
 
       if (curlen !== prevlen) { s.bl_tree[curlen * 2]/*.Freq*/++; }
-      s.bl_tree[REP_3_6*2]/*.Freq*/++;
+      s.bl_tree[REP_3_6 * 2]/*.Freq*/++;
 
     } else if (count <= 10) {
-      s.bl_tree[REPZ_3_10*2]/*.Freq*/++;
+      s.bl_tree[REPZ_3_10 * 2]/*.Freq*/++;
 
     } else {
-      s.bl_tree[REPZ_11_138*2]/*.Freq*/++;
+      s.bl_tree[REPZ_11_138 * 2]/*.Freq*/++;
     }
 
     count = 0;
@@ -17388,7 +17626,7 @@ function send_tree(s, tree, max_code)
   var prevlen = -1;          /* last emitted length */
   var curlen;                /* length of current code */
 
-  var nextlen = tree[0*2 + 1]/*.Len*/; /* length of next code */
+  var nextlen = tree[0 * 2 + 1]/*.Len*/; /* length of next code */
 
   var count = 0;             /* repeat count of the current code */
   var max_count = 7;         /* max repeat count */
@@ -17402,7 +17640,7 @@ function send_tree(s, tree, max_code)
 
   for (n = 0; n <= max_code; n++) {
     curlen = nextlen;
-    nextlen = tree[(n+1)*2 + 1]/*.Len*/;
+    nextlen = tree[(n + 1) * 2 + 1]/*.Len*/;
 
     if (++count < max_count && curlen === nextlen) {
       continue;
@@ -17417,15 +17655,15 @@ function send_tree(s, tree, max_code)
       }
       //Assert(count >= 3 && count <= 6, " 3_6?");
       send_code(s, REP_3_6, s.bl_tree);
-      send_bits(s, count-3, 2);
+      send_bits(s, count - 3, 2);
 
     } else if (count <= 10) {
       send_code(s, REPZ_3_10, s.bl_tree);
-      send_bits(s, count-3, 3);
+      send_bits(s, count - 3, 3);
 
     } else {
       send_code(s, REPZ_11_138, s.bl_tree);
-      send_bits(s, count-11, 7);
+      send_bits(s, count - 11, 7);
     }
 
     count = 0;
@@ -17467,13 +17705,13 @@ function build_bl_tree(s) {
    * requires that at least 4 bit length codes be sent. (appnote.txt says
    * 3 but the actual value used is 4.)
    */
-  for (max_blindex = BL_CODES-1; max_blindex >= 3; max_blindex--) {
-    if (s.bl_tree[bl_order[max_blindex]*2 + 1]/*.Len*/ !== 0) {
+  for (max_blindex = BL_CODES - 1; max_blindex >= 3; max_blindex--) {
+    if (s.bl_tree[bl_order[max_blindex] * 2 + 1]/*.Len*/ !== 0) {
       break;
     }
   }
   /* Update opt_len to include the bit length tree and counts */
-  s.opt_len += 3*(max_blindex+1) + 5+5+4;
+  s.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
   //Tracev((stderr, "\ndyn trees: dyn %ld, stat %ld",
   //        s->opt_len, s->static_len));
 
@@ -17496,19 +17734,19 @@ function send_all_trees(s, lcodes, dcodes, blcodes)
   //Assert (lcodes <= L_CODES && dcodes <= D_CODES && blcodes <= BL_CODES,
   //        "too many codes");
   //Tracev((stderr, "\nbl counts: "));
-  send_bits(s, lcodes-257, 5); /* not +255 as stated in appnote.txt */
-  send_bits(s, dcodes-1,   5);
-  send_bits(s, blcodes-4,  4); /* not -3 as stated in appnote.txt */
+  send_bits(s, lcodes - 257, 5); /* not +255 as stated in appnote.txt */
+  send_bits(s, dcodes - 1,   5);
+  send_bits(s, blcodes - 4,  4); /* not -3 as stated in appnote.txt */
   for (rank = 0; rank < blcodes; rank++) {
     //Tracev((stderr, "\nbl code %2d ", bl_order[rank]));
-    send_bits(s, s.bl_tree[bl_order[rank]*2 + 1]/*.Len*/, 3);
+    send_bits(s, s.bl_tree[bl_order[rank] * 2 + 1]/*.Len*/, 3);
   }
   //Tracev((stderr, "\nbl tree: sent %ld", s->bits_sent));
 
-  send_tree(s, s.dyn_ltree, lcodes-1); /* literal tree */
+  send_tree(s, s.dyn_ltree, lcodes - 1); /* literal tree */
   //Tracev((stderr, "\nlit tree: sent %ld", s->bits_sent));
 
-  send_tree(s, s.dyn_dtree, dcodes-1); /* distance tree */
+  send_tree(s, s.dyn_dtree, dcodes - 1); /* distance tree */
   //Tracev((stderr, "\ndist tree: sent %ld", s->bits_sent));
 }
 
@@ -17536,7 +17774,7 @@ function detect_data_type(s) {
 
   /* Check for non-textual ("black-listed") bytes. */
   for (n = 0; n <= 31; n++, black_mask >>>= 1) {
-    if ((black_mask & 1) && (s.dyn_ltree[n*2]/*.Freq*/ !== 0)) {
+    if ((black_mask & 1) && (s.dyn_ltree[n * 2]/*.Freq*/ !== 0)) {
       return Z_BINARY;
     }
   }
@@ -17593,7 +17831,7 @@ function _tr_stored_block(s, buf, stored_len, last)
 //ulg stored_len;   /* length of input block */
 //int last;         /* one if this is the last block for a file */
 {
-  send_bits(s, (STORED_BLOCK<<1)+(last ? 1 : 0), 3);    /* send block type */
+  send_bits(s, (STORED_BLOCK << 1) + (last ? 1 : 0), 3);    /* send block type */
   copy_block(s, buf, stored_len, true); /* with header */
 }
 
@@ -17603,7 +17841,7 @@ function _tr_stored_block(s, buf, stored_len, last)
  * This takes 10 bits, of which 7 may remain in the bit buffer.
  */
 function _tr_align(s) {
-  send_bits(s, STATIC_TREES<<1, 3);
+  send_bits(s, STATIC_TREES << 1, 3);
   send_code(s, END_BLOCK, static_ltree);
   bi_flush(s);
 }
@@ -17648,8 +17886,8 @@ function _tr_flush_block(s, buf, stored_len, last)
     max_blindex = build_bl_tree(s);
 
     /* Determine the best encoding. Compute the block lengths in bytes. */
-    opt_lenb = (s.opt_len+3+7) >>> 3;
-    static_lenb = (s.static_len+3+7) >>> 3;
+    opt_lenb = (s.opt_len + 3 + 7) >>> 3;
+    static_lenb = (s.static_len + 3 + 7) >>> 3;
 
     // Tracev((stderr, "\nopt %lu(%lu) stat %lu(%lu) stored %lu lit %u ",
     //        opt_lenb, s->opt_len, static_lenb, s->static_len, stored_len,
@@ -17662,7 +17900,7 @@ function _tr_flush_block(s, buf, stored_len, last)
     opt_lenb = static_lenb = stored_len + 5; /* force a stored block */
   }
 
-  if ((stored_len+4 <= opt_lenb) && (buf !== -1)) {
+  if ((stored_len + 4 <= opt_lenb) && (buf !== -1)) {
     /* 4: two words for the lengths */
 
     /* The test buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.
@@ -17675,12 +17913,12 @@ function _tr_flush_block(s, buf, stored_len, last)
 
   } else if (s.strategy === Z_FIXED || static_lenb === opt_lenb) {
 
-    send_bits(s, (STATIC_TREES<<1) + (last ? 1 : 0), 3);
+    send_bits(s, (STATIC_TREES << 1) + (last ? 1 : 0), 3);
     compress_block(s, static_ltree, static_dtree);
 
   } else {
-    send_bits(s, (DYN_TREES<<1) + (last ? 1 : 0), 3);
-    send_all_trees(s, s.l_desc.max_code+1, s.d_desc.max_code+1, max_blindex+1);
+    send_bits(s, (DYN_TREES << 1) + (last ? 1 : 0), 3);
+    send_all_trees(s, s.l_desc.max_code + 1, s.d_desc.max_code + 1, max_blindex + 1);
     compress_block(s, s.dyn_ltree, s.dyn_dtree);
   }
   // Assert (s->compressed_len == s->bits_sent, "bad compressed size");
@@ -17715,7 +17953,7 @@ function _tr_tally(s, dist, lc)
 
   if (dist === 0) {
     /* lc is the unmatched char */
-    s.dyn_ltree[lc*2]/*.Freq*/++;
+    s.dyn_ltree[lc * 2]/*.Freq*/++;
   } else {
     s.matches++;
     /* Here, lc is the match length - MIN_MATCH */
@@ -17724,7 +17962,7 @@ function _tr_tally(s, dist, lc)
     //       (ush)lc <= (ush)(MAX_MATCH-MIN_MATCH) &&
     //       (ush)d_code(dist) < (ush)D_CODES,  "_tr_tally: bad match");
 
-    s.dyn_ltree[(_length_code[lc]+LITERALS+1) * 2]/*.Freq*/++;
+    s.dyn_ltree[(_length_code[lc] + LITERALS + 1) * 2]/*.Freq*/++;
     s.dyn_dtree[d_code(dist) * 2]/*.Freq*/++;
   }
 
@@ -17751,7 +17989,7 @@ function _tr_tally(s, dist, lc)
 //  }
 //#endif
 
-  return (s.last_lit === s.lit_bufsize-1);
+  return (s.last_lit === s.lit_bufsize - 1);
   /* We avoid equality with lit_bufsize because of wraparound at 64K
    * on 16 bit machines and because stored blocks are restricted to
    * 64K-1 bytes.
@@ -17763,7 +18001,8 @@ exports._tr_stored_block = _tr_stored_block;
 exports._tr_flush_block  = _tr_flush_block;
 exports._tr_tally = _tr_tally;
 exports._tr_align = _tr_align;
-},{"../utils/common":27}],39:[function(_dereq_,module,exports){
+
+},{"../utils/common":28}],40:[function(require,module,exports){
 'use strict';
 
 
@@ -17793,8 +18032,8 @@ function ZStream() {
 }
 
 module.exports = ZStream;
-},{}]},{},[9])
-(9)
+
+},{}]},{},[10])(10)
 });
 (function($) {
     $.postJson = function(url, data) {
@@ -18113,7 +18352,7 @@ function amdefine(module, requireFn) {
 module.exports = amdefine;
 
 }).call(this,require('_process'),"/node_modules/amdefine/amdefine.js")
-},{"_process":78,"path":76}],2:[function(require,module,exports){
+},{"_process":79,"path":77}],2:[function(require,module,exports){
 'use strict'
 
 exports.toByteArray = toByteArray
@@ -19699,7 +19938,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":2,"ieee754":70,"isarray":73}],6:[function(require,module,exports){
+},{"base64-js":2,"ieee754":71,"isarray":74}],6:[function(require,module,exports){
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -19999,7 +20238,7 @@ function minify(context, data) {
 }
 
 }).call(this,require('_process'))
-},{"./imports/inliner":11,"./properties/validator":25,"./selectors/advanced":28,"./selectors/simple":41,"./stringifier/simple":45,"./stringifier/source-maps":46,"./text/comments-processor":47,"./text/expressions-processor":49,"./text/free-text-processor":50,"./text/urls-processor":51,"./tokenizer/tokenize":54,"./urls/rebase":55,"./utils/compatibility":59,"./utils/input-source-map-tracker":60,"./utils/object":61,"./utils/source-reader":63,"./utils/source-tracker":64,"_process":78,"fs":4,"path":76,"url":138}],8:[function(require,module,exports){
+},{"./imports/inliner":11,"./properties/validator":25,"./selectors/advanced":28,"./selectors/simple":41,"./stringifier/simple":45,"./stringifier/source-maps":46,"./text/comments-processor":47,"./text/expressions-processor":49,"./text/free-text-processor":50,"./text/urls-processor":51,"./tokenizer/tokenize":54,"./urls/rebase":55,"./utils/compatibility":59,"./utils/input-source-map-tracker":60,"./utils/object":61,"./utils/source-reader":63,"./utils/source-tracker":64,"_process":79,"fs":4,"path":77,"url":139}],8:[function(require,module,exports){
 var HexNameShortener = {};
 
 var COLORS = {
@@ -20669,7 +20908,7 @@ function restoreImport(importedUrl, mediaQuery, context) {
 module.exports = ImportInliner;
 
 }).call(this,require('_process'))
-},{"../urls/rewrite":57,"../utils/object.js":61,"../utils/split":65,"_process":78,"fs":4,"http":121,"https":69,"path":76,"url":138}],12:[function(require,module,exports){
+},{"../urls/rewrite":57,"../utils/object.js":61,"../utils/split":65,"_process":79,"fs":4,"http":122,"https":70,"path":77,"url":139}],12:[function(require,module,exports){
 var wrapSingle = require('./wrap-for-optimizing').single;
 
 var split = require('../utils/split');
@@ -24827,7 +25066,7 @@ module.exports = {
   value: value
 };
 
-},{"os":75}],44:[function(require,module,exports){
+},{"os":76}],44:[function(require,module,exports){
 var helpers = require('./helpers');
 
 function store(token, context) {
@@ -25003,7 +25242,7 @@ function stringify(tokens, options, restoreCallback, inputMapTracker) {
 module.exports = stringify;
 
 }).call(this,require('_process'))
-},{"./helpers":43,"_process":78,"source-map":109}],47:[function(require,module,exports){
+},{"./helpers":43,"_process":79,"source-map":110}],47:[function(require,module,exports){
 var EscapeStore = require('./escape-store');
 var QuoteScanner = require('../utils/quote-scanner');
 
@@ -25136,7 +25375,7 @@ CommentsProcessor.prototype.restore = function (data) {
 
 module.exports = CommentsProcessor;
 
-},{"../utils/quote-scanner":62,"./escape-store":48,"os":75}],48:[function(require,module,exports){
+},{"../utils/quote-scanner":62,"./escape-store":48,"os":76}],48:[function(require,module,exports){
 var placeholderBrace = '__';
 
 function EscapeStore(placeholderRoot) {
@@ -25310,7 +25549,7 @@ ExpressionsProcessor.prototype.restore = function (data) {
 
 module.exports = ExpressionsProcessor;
 
-},{"./escape-store":48,"os":75}],50:[function(require,module,exports){
+},{"./escape-store":48,"os":76}],50:[function(require,module,exports){
 var EscapeStore = require('./escape-store');
 var QuoteScanner = require('../utils/quote-scanner');
 
@@ -25410,7 +25649,7 @@ FreeTextProcessor.prototype.restore = function (data, prefixContext) {
 
 module.exports = FreeTextProcessor;
 
-},{"../utils/quote-scanner":62,"./escape-store":48,"os":75}],51:[function(require,module,exports){
+},{"../utils/quote-scanner":62,"./escape-store":48,"os":76}],51:[function(require,module,exports){
 var EscapeStore = require('./escape-store');
 var reduceUrls = require('../urls/reduce');
 
@@ -25484,7 +25723,7 @@ UrlsProcessor.prototype.restore = function (data) {
 
 module.exports = UrlsProcessor;
 
-},{"../urls/reduce":56,"./escape-store":48,"os":75}],52:[function(require,module,exports){
+},{"../urls/reduce":56,"./escape-store":48,"os":76}],52:[function(require,module,exports){
 var split = require('../utils/split');
 
 var COMMA = ',';
@@ -25959,7 +26198,7 @@ function intoTokens(context) {
 
 module.exports = tokenize;
 
-},{"../source-maps/track":42,"../utils/split":65,"./extract-properties":52,"./extract-selectors":53,"path":76}],55:[function(require,module,exports){
+},{"../source-maps/track":42,"../utils/split":65,"./extract-properties":52,"./extract-selectors":53,"path":77}],55:[function(require,module,exports){
 var path = require('path');
 
 var rewriteUrls = require('./rewrite');
@@ -25991,7 +26230,7 @@ function rebaseUrls(data, context) {
 
 module.exports = rebaseUrls;
 
-},{"./rewrite":57,"path":76}],56:[function(require,module,exports){
+},{"./rewrite":57,"path":77}],56:[function(require,module,exports){
 var URL_PREFIX = 'url(';
 var UPPERCASE_URL_PREFIX = 'URL(';
 var URL_SUFFIX = ')';
@@ -26256,7 +26495,7 @@ function rewriteUrls(data, options, context) {
 module.exports = rewriteUrls;
 
 }).call(this,require('_process'))
-},{"./reduce":56,"_process":78,"path":76,"url":138}],58:[function(require,module,exports){
+},{"./reduce":56,"_process":79,"path":77,"url":139}],58:[function(require,module,exports){
 function cloneArray(array) {
   var cloned = array.slice(0);
 
@@ -26434,7 +26673,7 @@ Compatibility.prototype.toOptions = function () {
 
 module.exports = Compatibility;
 
-},{"util":142}],60:[function(require,module,exports){
+},{"util":143}],60:[function(require,module,exports){
 (function (process,global,Buffer){
 var SourceMapConsumer = require('source-map').SourceMapConsumer;
 
@@ -26722,7 +26961,7 @@ InputSourceMapStore.prototype.resolveSources = function (whenDone) {
 module.exports = InputSourceMapStore;
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"../utils/object.js":61,"_process":78,"buffer":5,"fs":4,"http":121,"https":69,"path":76,"source-map":109,"url":138}],61:[function(require,module,exports){
+},{"../utils/object.js":61,"_process":79,"buffer":5,"fs":4,"http":122,"https":70,"path":77,"source-map":110,"url":139}],61:[function(require,module,exports){
 module.exports = {
   override: function (source1, source2) {
     var target = {};
@@ -26939,7 +27178,7 @@ function fromHash(self) {
 module.exports = SourceReader;
 
 }).call(this,{"isBuffer":require("../../../is-buffer/index.js")})
-},{"../../../is-buffer/index.js":72,"../urls/rewrite":57,"path":76}],64:[function(require,module,exports){
+},{"../../../is-buffer/index.js":73,"../urls/rewrite":57,"path":77}],64:[function(require,module,exports){
 function SourceTracker() {
   this.sources = [];
 }
@@ -27134,7 +27373,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":72}],67:[function(require,module,exports){
+},{"../../is-buffer/index.js":73}],67:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -27465,503 +27704,525 @@ function isUndefined(arg) {
 
  /* global ActiveXObject, DOMDocument */
 
-(function(global) {
-  'use strict';
+'use strict';
 
-  // Regular Expressions for parsing tags and attributes
-  var singleAttrIdentifier = /([^\s"'<>\/=]+)/,
-      singleAttrAssign = /=/,
-      singleAttrAssigns = [ singleAttrAssign ],
-      singleAttrValues = [
-        // attr value double quotes
-        /"([^"]*)"+/.source,
-        // attr value, single quotes
-        /'([^']*)'+/.source,
-        // attr value, no quotes
-        /([^\s"'=<>`]+)/.source
-      ],
-      // https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
-      qnameCapture = (function() {
-        var ncname;
-        if (typeof require === 'function') {
-          ncname = require('ncname');
-        }
-        else {
-          ncname = global.NCName;
-        }
-        if (ncname) {
-          ncname = ncname.source.slice(1, -1);
-        }
-        else {
-          ncname = '[:A-Za-z_][:\\w\\-\\.]*';
-        }
-        return '((?:' + ncname + '\\:)?' + ncname + ')';
-      })(),
-      startTagOpen = new RegExp('^<' + qnameCapture),
-      startTagClose = /^\s*(\/?)>/,
-      endTag = new RegExp('^<\\/' + qnameCapture + '[^>]*>'),
-      doctype = /^<!DOCTYPE [^>]+>/i;
+var createMapFromString = require('./utils').createMapFromString;
 
-  var IS_REGEX_CAPTURING_BROKEN = false;
-  'x'.replace(/x(.)?/g, function(m, g) {
-    IS_REGEX_CAPTURING_BROKEN = g === '';
-  });
+function makeMap(values) {
+  return createMapFromString(values, true);
+}
 
-  // Empty Elements
-  var empty = makeMap('area,base,basefont,br,col,embed,frame,hr,img,input,isindex,keygen,link,meta,param,source,track,wbr');
+// Regular Expressions for parsing tags and attributes
+var singleAttrIdentifier = /([^\s"'<>\/=]+)/,
+    singleAttrAssign = /=/,
+    singleAttrAssigns = [ singleAttrAssign ],
+    singleAttrValues = [
+      // attr value double quotes
+      /"([^"]*)"+/.source,
+      // attr value, single quotes
+      /'([^']*)'+/.source,
+      // attr value, no quotes
+      /([^\s"'=<>`]+)/.source
+    ],
+    // https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
+    qnameCapture = (function() {
+      var ncname = require('ncname').source.slice(1, -1);
+      return '((?:' + ncname + '\\:)?' + ncname + ')';
+    })(),
+    startTagOpen = new RegExp('^<' + qnameCapture),
+    startTagClose = /^\s*(\/?)>/,
+    endTag = new RegExp('^<\\/' + qnameCapture + '[^>]*>'),
+    doctype = /^<!DOCTYPE [^>]+>/i;
 
-  // Inline Elements
-  var inline = makeMap('a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,noscript,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,svg,textarea,tt,u,var');
+var IS_REGEX_CAPTURING_BROKEN = false;
+'x'.replace(/x(.)?/g, function(m, g) {
+  IS_REGEX_CAPTURING_BROKEN = g === '';
+});
 
-  // Elements that you can, intentionally, leave open
-  // (and which close themselves)
-  var closeSelf = makeMap('colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr,source');
+// Empty Elements
+var empty = makeMap('area,base,basefont,br,col,embed,frame,hr,img,input,isindex,keygen,link,meta,param,source,track,wbr');
 
-  // Attributes that have their values filled in disabled='disabled'
-  var fillAttrs = makeMap('checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected');
+// Inline Elements
+var inline = makeMap('a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,noscript,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,svg,textarea,tt,u,var');
 
-  // Special Elements (can contain anything)
-  var special = makeMap('script,style');
+// Elements that you can, intentionally, leave open
+// (and which close themselves)
+var closeSelf = makeMap('colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr,source');
 
-  // Phrasing Content https://html.spec.whatwg.org/multipage/dom.html#phrasing-content
-  var phrasingOnly = makeMap('abbr,b,bdi,bdo,button,cite,code,data,dfn,em,h1,h2,h3,h4,h5,h6,i,kbd,label,legend,mark,meter,output,p,pre,progress,q,rp,rt,s,samp,small,span,strong,sub,sup,time,u,var');
-  var phrasing = makeMap('a,abbr,area,audio,b,bdi,bdo,br,button,canvas,cite,code,data,datalist,del,dfn,em,embed,i,iframe,img,input,ins,kbd,keygen,label,link,main,map,mark,math,menu,meter,nav,noscript,object,ol,output,p,picture,pre,progress,q,ruby,s,samp,script,section,select,small,span,strong,sub,sup,svg,table,template,textarea,time,u,ul,var,video,wbr');
+// Attributes that have their values filled in disabled='disabled'
+var fillAttrs = makeMap('checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected');
 
-  var reCache = {};
+// Special Elements (can contain anything)
+var special = makeMap('script,style');
 
-  function attrForHandler(handler) {
-    var pattern = singleAttrIdentifier.source
-      + '(?:\\s*(' + joinSingleAttrAssigns(handler) + ')'
-      + '\\s*(?:' + singleAttrValues.join('|') + '))?';
-    if (handler.customAttrSurround) {
-      var attrClauses = [];
-      for ( var i = handler.customAttrSurround.length - 1; i >= 0; i-- ) {
-        attrClauses[i] = '(?:'
-          + '(' + handler.customAttrSurround[i][0].source + ')\\s*'
-          + pattern
-          + '\\s*(' + handler.customAttrSurround[i][1].source + ')'
-          + ')';
-      }
-      attrClauses.push('(?:' + pattern + ')');
-      pattern = '(?:' + attrClauses.join('|') + ')';
+// HTML5 tags https://html.spec.whatwg.org/multipage/indices.html#elements-3
+// Phrasing Content https://html.spec.whatwg.org/multipage/dom.html#phrasing-content
+var nonPhrasing = makeMap('address,article,aside,base,blockquote,body,caption,col,colgroup,dd,details,dialog,div,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,legend,li,menuitem,meta,optgroup,option,param,rp,rt,source,style,summary,tbody,td,tfoot,th,thead,title,tr,track');
+
+var reCache = {};
+
+function attrForHandler(handler) {
+  var pattern = singleAttrIdentifier.source
+    + '(?:\\s*(' + joinSingleAttrAssigns(handler) + ')'
+    + '\\s*(?:' + singleAttrValues.join('|') + '))?';
+  if (handler.customAttrSurround) {
+    var attrClauses = [];
+    for ( var i = handler.customAttrSurround.length - 1; i >= 0; i-- ) {
+      attrClauses[i] = '(?:'
+        + '(' + handler.customAttrSurround[i][0].source + ')\\s*'
+        + pattern
+        + '\\s*(' + handler.customAttrSurround[i][1].source + ')'
+        + ')';
     }
-    return new RegExp('^\\s*' + pattern);
+    attrClauses.push('(?:' + pattern + ')');
+    pattern = '(?:' + attrClauses.join('|') + ')';
   }
+  return new RegExp('^\\s*' + pattern);
+}
 
-  function joinSingleAttrAssigns( handler ) {
-    return singleAttrAssigns.concat(
-      handler.customAttrAssign || []
-    ).map(function (assign) {
-      return '(?:' + assign.source + ')';
-    }).join('|');
-  }
+function joinSingleAttrAssigns( handler ) {
+  return singleAttrAssigns.concat(
+    handler.customAttrAssign || []
+  ).map(function (assign) {
+    return '(?:' + assign.source + ')';
+  }).join('|');
+}
 
-  var HTMLParser = global.HTMLParser = function( html, handler ) {
-    var stack = [], lastTag;
-    var attribute = attrForHandler(handler);
-    var last, prevTag, nextTag;
-    while ( html ) {
-      last = html;
-      // Make sure we're not in a script or style element
-      if ( !lastTag || !special[ lastTag ] ) {
-        var textEnd = html.indexOf('<');
-        if (textEnd === 0) {
-          // Comment:
-          if ( /^<!--/.test( html ) ) {
-            var commentEnd = html.indexOf('-->');
+function HTMLParser( html, handler ) {
+  var stack = [], lastTag;
+  var attribute = attrForHandler(handler);
+  var last, prevTag, nextTag;
+  while ( html ) {
+    last = html;
+    // Make sure we're not in a script or style element
+    if ( !lastTag || !special(lastTag) ) {
+      var textEnd = html.indexOf('<');
+      if (textEnd === 0) {
+        // Comment:
+        if ( /^<!--/.test( html ) ) {
+          var commentEnd = html.indexOf('-->');
 
-            if ( commentEnd >= 0 ) {
-              if ( handler.comment ) {
-                handler.comment( html.substring( 4, commentEnd ) );
-              }
-              html = html.substring( commentEnd + 3 );
-              prevTag = '';
-              continue;
+          if ( commentEnd >= 0 ) {
+            if ( handler.comment ) {
+              handler.comment( html.substring( 4, commentEnd ) );
             }
-          }
-
-          // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
-          if ( /^<!\[/.test( html ) ) {
-            var conditionalEnd = html.indexOf(']>');
-
-            if (conditionalEnd >= 0) {
-              if ( handler.comment ) {
-                handler.comment( html.substring(2, conditionalEnd + 1 ), true /* non-standard */ );
-              }
-              html = html.substring( conditionalEnd + 2 );
-              prevTag = '';
-              continue;
-            }
-          }
-
-          // Doctype:
-          var doctypeMatch = html.match( doctype );
-          if ( doctypeMatch ) {
-            if ( handler.doctype ) {
-              handler.doctype( doctypeMatch[0] );
-            }
-            html = html.substring( doctypeMatch[0].length );
+            html = html.substring( commentEnd + 3 );
             prevTag = '';
             continue;
           }
+        }
 
-          // End tag:
-          var endTagMatch = html.match( endTag );
-          if ( endTagMatch ) {
-            html = html.substring( endTagMatch[0].length );
-            endTagMatch[0].replace( endTag, parseEndTag );
-            prevTag = '/' + endTagMatch[1].toLowerCase();
-            continue;
-          }
+        // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
+        if ( /^<!\[/.test( html ) ) {
+          var conditionalEnd = html.indexOf(']>');
 
-          // Start tag:
-          var startTagMatch = parseStartTag(html);
-          if ( startTagMatch ) {
-            html = startTagMatch.rest;
-            handleStartTag(startTagMatch);
-            prevTag = startTagMatch.tagName.toLowerCase();
+          if (conditionalEnd >= 0) {
+            if ( handler.comment ) {
+              handler.comment( html.substring(2, conditionalEnd + 1 ), true /* non-standard */ );
+            }
+            html = html.substring( conditionalEnd + 2 );
+            prevTag = '';
             continue;
           }
         }
 
-        var text;
-        if (textEnd >= 0) {
-          text = html.substring( 0, textEnd );
-          html = html.substring( textEnd );
-        }
-        else {
-          text = html;
-          html = '';
+        // Doctype:
+        var doctypeMatch = html.match( doctype );
+        if ( doctypeMatch ) {
+          if ( handler.doctype ) {
+            handler.doctype( doctypeMatch[0] );
+          }
+          html = html.substring( doctypeMatch[0].length );
+          prevTag = '';
+          continue;
         }
 
-        // next tag
-        var nextTagMatch = parseStartTag(html);
+        // End tag:
+        var endTagMatch = html.match( endTag );
+        if ( endTagMatch ) {
+          html = html.substring( endTagMatch[0].length );
+          endTagMatch[0].replace( endTag, parseEndTag );
+          prevTag = '/' + endTagMatch[1].toLowerCase();
+          continue;
+        }
+
+        // Start tag:
+        var startTagMatch = parseStartTag(html);
+        if ( startTagMatch ) {
+          html = startTagMatch.rest;
+          handleStartTag(startTagMatch);
+          prevTag = startTagMatch.tagName.toLowerCase();
+          continue;
+        }
+      }
+
+      var text;
+      if (textEnd >= 0) {
+        text = html.substring( 0, textEnd );
+        html = html.substring( textEnd );
+      }
+      else {
+        text = html;
+        html = '';
+      }
+
+      // next tag
+      var nextTagMatch = parseStartTag(html);
+      if (nextTagMatch) {
+        nextTag = nextTagMatch.tagName;
+      }
+      else {
+        nextTagMatch = html.match( endTag );
         if (nextTagMatch) {
-          nextTag = nextTagMatch.tagName;
+          nextTag = '/' + nextTagMatch[1];
         }
         else {
-          nextTagMatch = html.match( endTag );
-          if (nextTagMatch) {
-            nextTag = '/' + nextTagMatch[1];
-          }
-          else {
-            nextTag = '';
-          }
+          nextTag = '';
+        }
+      }
+
+      if ( handler.chars ) {
+        handler.chars(text, prevTag, nextTag);
+      }
+      prevTag = '';
+
+    }
+    else {
+      var stackedTag = lastTag.toLowerCase();
+      var reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)<\/' + stackedTag + '[^>]*>', 'i'));
+
+      html = html.replace(reStackedTag, function(all, text) {
+        if (stackedTag !== 'script' && stackedTag !== 'style' && stackedTag !== 'noscript') {
+          text = text
+            .replace(/<!--([\s\S]*?)-->/g, '$1')
+            .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
         }
 
         if ( handler.chars ) {
-          handler.chars(text, prevTag, nextTag);
-        }
-        prevTag = '';
-
-      }
-      else {
-        var stackedTag = lastTag.toLowerCase();
-        var reStackedTag = reCache[stackedTag] || (reCache[stackedTag] = new RegExp('([\\s\\S]*?)<\/' + stackedTag + '[^>]*>', 'i'));
-
-        html = html.replace(reStackedTag, function(all, text) {
-          if (stackedTag !== 'script' && stackedTag !== 'style' && stackedTag !== 'noscript') {
-            text = text
-              .replace(/<!--([\s\S]*?)-->/g, '$1')
-              .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
-          }
-
-          if ( handler.chars ) {
-            handler.chars( text );
-          }
-
-          return '';
-        });
-
-        parseEndTag( '</' + stackedTag + '>', stackedTag );
-      }
-
-      if ( html === last ) {
-        throw 'Parse Error: ' + html;
-      }
-    }
-
-    if (!handler.partialMarkup) {
-      // Clean up any remaining tags
-      parseEndTag();
-    }
-
-    function parseStartTag(input) {
-      var start = input.match(startTagOpen);
-      if (start) {
-        var match = {
-          tagName: start[1],
-          attrs: []
-        };
-        input = input.slice(start[0].length);
-        var end, attr;
-        while (!(end = input.match(startTagClose)) && (attr = input.match(attribute))) {
-          input = input.slice(attr[0].length);
-          match.attrs.push(attr);
-        }
-        if (end) {
-          match.unarySlash = end[1];
-          match.rest = input.slice(end[0].length);
-          return match;
-        }
-      }
-    }
-
-    function handleStartTag(match) {
-      var tagName = match.tagName;
-      var unarySlash = match.unarySlash;
-
-      if (handler.html5 && lastTag && phrasingOnly[lastTag] && !phrasing[tagName]) {
-        parseEndTag( '', lastTag );
-      }
-
-      if (!handler.html5) {
-        while (lastTag && inline[ lastTag ]) {
-          parseEndTag( '', lastTag );
-        }
-      }
-
-      if ( closeSelf[ tagName ] && lastTag === tagName ) {
-        parseEndTag( '', tagName );
-      }
-
-      var unary = empty[ tagName ] || tagName === 'html' && lastTag === 'head' || !!unarySlash;
-
-      var attrs = match.attrs.map(function(args) {
-        var name, value, fallbackValue, customOpen, customClose, customAssign, quote;
-        var ncp = 7; // number of captured parts, scalar
-
-        // hackish work around FF bug https://bugzilla.mozilla.org/show_bug.cgi?id=369778
-        if (IS_REGEX_CAPTURING_BROKEN && args[0].indexOf('""') === -1) {
-          if (args[3] === '') { args[3] = undefined; }
-          if (args[4] === '') { args[4] = undefined; }
-          if (args[5] === '') { args[5] = undefined; }
+          handler.chars( text );
         }
 
-        var j = 1;
-        if (handler.customAttrSurround) {
-          for (var i = 0, l = handler.customAttrSurround.length; i < l; i++, j += ncp) {
-            name = args[j + 1];
-            customAssign = args[j + 2];
-            if (name) {
-              fallbackValue = args[j + 3];
-              value = fallbackValue || args[j + 4] || args[j + 5];
-              quote = fallbackValue ? '"' : value ? '\'' : '';
-              customOpen = args[j];
-              customClose = args[j + 6];
-              break;
-            }
-          }
-        }
-
-        if (!name && (name = args[j])) {
-          customAssign = args[j + 1];
-          fallbackValue = args[j + 2];
-          value = fallbackValue || args[j + 3] || args[j + 4];
-          quote = fallbackValue ? '"' : value ? '\'' : '';
-        }
-
-        if (value === undefined) {
-          value = fillAttrs[name] ? name : fallbackValue;
-        }
-
-        return {
-          name: name,
-          value: value,
-          customAssign: customAssign || '=',
-          customOpen:  customOpen || '',
-          customClose: customClose || '',
-          quote: quote || ''
-        };
+        return '';
       });
 
-      if ( !unary ) {
-        stack.push( { tag: tagName, attrs: attrs } );
-        lastTag = tagName;
-        unarySlash = '';
-      }
+      parseEndTag( '</' + stackedTag + '>', stackedTag );
+    }
 
-      if ( handler.start ) {
-        handler.start( tagName, attrs, unary, unarySlash );
+    if ( html === last ) {
+      throw new Error('Parse Error: ' + html);
+    }
+  }
+
+  if (!handler.partialMarkup) {
+    // Clean up any remaining tags
+    parseEndTag();
+  }
+
+  function parseStartTag(input) {
+    var start = input.match(startTagOpen);
+    if (start) {
+      var match = {
+        tagName: start[1],
+        attrs: []
+      };
+      input = input.slice(start[0].length);
+      var end, attr;
+      while (!(end = input.match(startTagClose)) && (attr = input.match(attribute))) {
+        input = input.slice(attr[0].length);
+        match.attrs.push(attr);
+      }
+      if (end) {
+        match.unarySlash = end[1];
+        match.rest = input.slice(end[0].length);
+        return match;
+      }
+    }
+  }
+
+  function handleStartTag(match) {
+    var tagName = match.tagName;
+    var unarySlash = match.unarySlash;
+
+    if (handler.html5 && lastTag === 'p' && nonPhrasing(tagName)) {
+      parseEndTag( '', lastTag );
+    }
+
+    if (!handler.html5) {
+      while (lastTag && inline(lastTag)) {
+        parseEndTag( '', lastTag );
       }
     }
 
-    function parseEndTag( tag, tagName ) {
-      var pos;
+    if ( closeSelf(tagName) && lastTag === tagName ) {
+      parseEndTag( '', tagName );
+    }
 
-      // If no tag name is provided, clean shop
-      if ( !tagName ) {
-        pos = 0;
+    var unary = empty(tagName) || tagName === 'html' && lastTag === 'head' || !!unarySlash;
+
+    var attrs = match.attrs.map(function(args) {
+      var name, value, fallbackValue, customOpen, customClose, customAssign, quote;
+      var ncp = 7; // number of captured parts, scalar
+
+      // hackish work around FF bug https://bugzilla.mozilla.org/show_bug.cgi?id=369778
+      if (IS_REGEX_CAPTURING_BROKEN && args[0].indexOf('""') === -1) {
+        if (args[3] === '') { args[3] = undefined; }
+        if (args[4] === '') { args[4] = undefined; }
+        if (args[5] === '') { args[5] = undefined; }
       }
-      else {
-        // Find the closest opened tag of the same type
-        var needle = tagName.toLowerCase();
-        for ( pos = stack.length - 1; pos >= 0; pos-- ) {
-          if ( stack[ pos ].tag.toLowerCase() === needle ) {
+
+      var j = 1;
+      if (handler.customAttrSurround) {
+        for (var i = 0, l = handler.customAttrSurround.length; i < l; i++, j += ncp) {
+          name = args[j + 1];
+          customAssign = args[j + 2];
+          if (name) {
+            fallbackValue = args[j + 3];
+            value = fallbackValue || args[j + 4] || args[j + 5];
+            quote = fallbackValue ? '"' : value ? '\'' : '';
+            customOpen = args[j];
+            customClose = args[j + 6];
             break;
           }
         }
       }
 
-      if ( pos >= 0 ) {
-        // Close all the open elements, up the stack
-        for ( var i = stack.length - 1; i >= pos; i-- ) {
-          if ( handler.end ) {
-            handler.end( stack[ i ].tag, stack[ i ].attrs, i > pos || !tag );
-          }
-        }
-
-        // Remove the open elements from the stack
-        stack.length = pos;
-        lastTag = pos && stack[ pos - 1 ].tag;
+      if (!name && (name = args[j])) {
+        customAssign = args[j + 1];
+        fallbackValue = args[j + 2];
+        value = fallbackValue || args[j + 3] || args[j + 4];
+        quote = fallbackValue ? '"' : value ? '\'' : '';
       }
-    }
-  };
 
-  global.HTMLtoXML = function( html ) {
-    var results = '';
-
-    new HTMLParser(html, {
-      start: function( tag, attrs, unary ) {
-        results += '<' + tag;
-
-        for ( var i = 0; i < attrs.length; i++ ) {
-          results += ' ' + attrs[i].name + '="' + (attrs[i].value || '').replace(/"/g, '&#34;') + '"';
-        }
-
-        results += (unary ? '/' : '') + '>';
-      },
-      end: function( tag ) {
-        results += '</' + tag + '>';
-      },
-      chars: function( text ) {
-        results += text;
-      },
-      comment: function( text ) {
-        results += '<!--' + text + '-->';
-      },
-      ignore: function(text) {
-        results += text;
+      if (value === undefined) {
+        value = fillAttrs(name) ? name : fallbackValue;
       }
+
+      return {
+        name: name,
+        value: value,
+        customAssign: customAssign || '=',
+        customOpen: customOpen || '',
+        customClose: customClose || '',
+        quote: quote || ''
+      };
     });
 
-    return results;
-  };
+    if ( !unary ) {
+      stack.push( { tag: tagName, attrs: attrs } );
+      lastTag = tagName;
+      unarySlash = '';
+    }
 
-  global.HTMLtoDOM = function( html, doc ) {
-    // There can be only one of these elements
-    var one = makeMap('html,head,body,title');
+    if ( handler.start ) {
+      handler.start( tagName, attrs, unary, unarySlash );
+    }
+  }
 
-    // Enforce a structure for the document
-    var structure = {
-      link: 'head',
-      base: 'head'
-    };
+  function parseEndTag( tag, tagName ) {
+    var pos;
 
-    if ( !doc ) {
-      if ( typeof DOMDocument !== 'undefined' ) {
-        doc = new DOMDocument();
-      }
-      else if ( typeof document !== 'undefined' && document.implementation && document.implementation.createDocument ) {
-        doc = document.implementation.createDocument('', '', null);
-      }
-      else if ( typeof ActiveX !== 'undefined' ) {
-        doc = new ActiveXObject('Msxml.DOMDocument');
-      }
-
+    // If no tag name is provided, clean shop
+    if ( !tagName ) {
+      pos = 0;
     }
     else {
-      doc = doc.ownerDocument ||
-        doc.getOwnerDocument && doc.getOwnerDocument() ||
-        doc;
+      // Find the closest opened tag of the same type
+      var needle = tagName.toLowerCase();
+      for ( pos = stack.length - 1; pos >= 0; pos-- ) {
+        if ( stack[ pos ].tag.toLowerCase() === needle ) {
+          break;
+        }
+      }
     }
 
-    var elems = [],
+    if ( pos >= 0 ) {
+      // Close all the open elements, up the stack
+      for ( var i = stack.length - 1; i >= pos; i-- ) {
+        if ( handler.end ) {
+          handler.end( stack[ i ].tag, stack[ i ].attrs, i > pos || !tag );
+        }
+      }
+
+      // Remove the open elements from the stack
+      stack.length = pos;
+      lastTag = pos && stack[ pos - 1 ].tag;
+    }
+    else if (tagName.toLowerCase() === 'br') {
+      if (handler.start) {
+        handler.start(tagName, [], true, '');
+      }
+    }
+    else if (tagName.toLowerCase() === 'p') {
+      if (handler.start) {
+        handler.start(tagName, [], false, '', true);
+      }
+      if (handler.end) {
+        handler.end(tagName, []);
+      }
+    }
+  }
+}
+
+exports.HTMLParser = HTMLParser;
+exports.HTMLtoXML = function( html ) {
+  var results = '';
+
+  new HTMLParser(html, {
+    start: function( tag, attrs, unary ) {
+      results += '<' + tag;
+
+      for ( var i = 0; i < attrs.length; i++ ) {
+        results += ' ' + attrs[i].name + '="' + (attrs[i].value || '').replace(/"/g, '&#34;') + '"';
+      }
+
+      results += (unary ? '/' : '') + '>';
+    },
+    end: function( tag ) {
+      results += '</' + tag + '>';
+    },
+    chars: function( text ) {
+      results += text;
+    },
+    comment: function( text ) {
+      results += '<!--' + text + '-->';
+    },
+    ignore: function(text) {
+      results += text;
+    }
+  });
+
+  return results;
+};
+
+exports.HTMLtoDOM = function( html, doc ) {
+  // There can be only one of these elements
+  var one = {
+    html: true,
+    head: true,
+    body: true,
+    title: true
+  };
+
+  // Enforce a structure for the document
+  var structure = {
+    link: 'head',
+    base: 'head'
+  };
+
+  if ( !doc ) {
+    if ( typeof DOMDocument !== 'undefined' ) {
+      doc = new DOMDocument();
+    }
+    else if ( typeof document !== 'undefined' && document.implementation && document.implementation.createDocument ) {
+      doc = document.implementation.createDocument('', '', null);
+    }
+    else if ( typeof ActiveX !== 'undefined' ) {
+      doc = new ActiveXObject('Msxml.DOMDocument');
+    }
+
+  }
+  else {
+    doc = doc.ownerDocument ||
+      doc.getOwnerDocument && doc.getOwnerDocument() ||
+      doc;
+  }
+
+  var elems = [],
       documentElement = doc.documentElement ||
         doc.getDocumentElement && doc.getDocumentElement();
 
-    // If we're dealing with an empty document then we
-    // need to pre-populate it with the HTML document structure
-    if ( !documentElement && doc.createElement ) {
-      (function() {
-        var html = doc.createElement('html');
-        var head = doc.createElement('head');
-        head.appendChild( doc.createElement('title') );
-        html.appendChild( head );
-        html.appendChild( doc.createElement('body') );
-        doc.appendChild( html );
-      })();
-    }
-
-    // Find all the unique elements
-    if ( doc.getElementsByTagName ) {
-      for ( var i in one ) {
-        one[ i ] = doc.getElementsByTagName( i )[0];
-      }
-    }
-
-    // If we're working with a document, inject contents into
-    // the body element
-    var curParentNode = one.body;
-
-    new HTMLParser( html, {
-      start: function( tagName, attrs, unary ) {
-        // If it's a pre-built element, then we can ignore
-        // its construction
-        if ( one[ tagName ] ) {
-          curParentNode = one[ tagName ];
-          return;
-        }
-
-        var elem = doc.createElement( tagName );
-
-        for ( var attr in attrs ) {
-          elem.setAttribute( attrs[ attr ].name, attrs[ attr ].value );
-        }
-
-        if ( structure[ tagName ] && typeof one[ structure[ tagName ] ] !== 'boolean' ) {
-          one[ structure[ tagName ] ].appendChild( elem );
-        }
-        else if ( curParentNode && curParentNode.appendChild ) {
-          curParentNode.appendChild( elem );
-        }
-
-        if ( !unary ) {
-          elems.push( elem );
-          curParentNode = elem;
-        }
-      },
-      end: function( /* tag */ ) {
-        elems.length -= 1;
-
-        // Init the new parentNode
-        curParentNode = elems[ elems.length - 1 ];
-      },
-      chars: function( text ) {
-        curParentNode.appendChild( doc.createTextNode( text ) );
-      },
-      comment: function( /*text*/ ) {
-        // create comment node
-      },
-      ignore: function( /* text */ ) {
-        // What to do here?
-      }
-    });
-
-    return doc;
-  };
-
-  function makeMap(str) {
-    var obj = {}, items = str.split(',');
-    for ( var i = 0; i < items.length; i++ ) {
-      obj[ items[i] ] = true;
-      obj[ items[i].toUpperCase() ] = true;
-    }
-    return obj;
+  // If we're dealing with an empty document then we
+  // need to pre-populate it with the HTML document structure
+  if ( !documentElement && doc.createElement ) {
+    (function() {
+      var html = doc.createElement('html');
+      var head = doc.createElement('head');
+      head.appendChild( doc.createElement('title') );
+      html.appendChild( head );
+      html.appendChild( doc.createElement('body') );
+      doc.appendChild( html );
+    })();
   }
-})(typeof exports === 'undefined' ? this : exports);
 
-},{"ncname":74}],69:[function(require,module,exports){
+  // Find all the unique elements
+  if ( doc.getElementsByTagName ) {
+    for ( var i in one ) {
+      one[ i ] = doc.getElementsByTagName( i )[0];
+    }
+  }
+
+  // If we're working with a document, inject contents into
+  // the body element
+  var curParentNode = one.body;
+
+  new HTMLParser( html, {
+    start: function( tagName, attrs, unary ) {
+      // If it's a pre-built element, then we can ignore
+      // its construction
+      if ( one[ tagName ] ) {
+        curParentNode = one[ tagName ];
+        return;
+      }
+
+      var elem = doc.createElement( tagName );
+
+      for ( var attr in attrs ) {
+        elem.setAttribute( attrs[ attr ].name, attrs[ attr ].value );
+      }
+
+      if ( structure[ tagName ] && typeof one[ structure[ tagName ] ] !== 'boolean' ) {
+        one[ structure[ tagName ] ].appendChild( elem );
+      }
+      else if ( curParentNode && curParentNode.appendChild ) {
+        curParentNode.appendChild( elem );
+      }
+
+      if ( !unary ) {
+        elems.push( elem );
+        curParentNode = elem;
+      }
+    },
+    end: function( /* tag */ ) {
+      elems.length -= 1;
+
+      // Init the new parentNode
+      curParentNode = elems[ elems.length - 1 ];
+    },
+    chars: function( text ) {
+      curParentNode.appendChild( doc.createTextNode( text ) );
+    },
+    comment: function( /* text */ ) {
+      // create comment node
+    },
+    ignore: function( /* text */ ) {
+      // What to do here?
+    }
+  });
+
+  return doc;
+};
+
+},{"./utils":69,"ncname":75}],69:[function(require,module,exports){
+'use strict';
+
+function createMap(values, ignoreCase) {
+  var map = {};
+  values.forEach(function(value) {
+    map[value] = 1;
+  });
+  return ignoreCase ? function(value) {
+    return map[value.toLowerCase()] === 1;
+  } : function(value) {
+    return map[value] === 1;
+  };
+}
+
+exports.createMap = createMap;
+exports.createMapFromString = function(values, ignoreCase) {
+  return createMap(values.split(/,/), ignoreCase);
+};
+
+},{}],70:[function(require,module,exports){
 var http = require('http');
 
 var https = module.exports;
@@ -27977,7 +28238,7 @@ https.request = function (params, cb) {
     return http.request.call(this, params, cb);
 }
 
-},{"http":121}],70:[function(require,module,exports){
+},{"http":122}],71:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -28063,7 +28324,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -28088,7 +28349,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  * Determine if an object is Buffer
  *
@@ -28107,14 +28368,14 @@ module.exports = function (obj) {
     ))
 }
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 var xmlChars = require('xml-char-classes');
 
@@ -28125,7 +28386,7 @@ function getRange(re) {
 // http://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-NCName
 module.exports = new RegExp('^[' + getRange(xmlChars.letter) + '_][' + getRange(xmlChars.letter) + getRange(xmlChars.digit) + '\\.\\-_' + getRange(xmlChars.combiningChar) + getRange(xmlChars.extender) + ']*$');
 
-},{"xml-char-classes":143}],75:[function(require,module,exports){
+},{"xml-char-classes":144}],76:[function(require,module,exports){
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -28172,7 +28433,7 @@ exports.tmpdir = exports.tmpDir = function () {
 
 exports.EOL = '\n';
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -28400,7 +28661,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":78}],77:[function(require,module,exports){
+},{"_process":79}],78:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -28424,7 +28685,7 @@ function nextTick(fn) {
 }
 
 }).call(this,require('_process'))
-},{"_process":78}],78:[function(require,module,exports){
+},{"_process":79}],79:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -28517,7 +28778,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/punycode v1.4.1 by @mathias */
 ;(function(root) {
@@ -29054,7 +29315,7 @@ process.umask = function() { return 0; };
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29140,7 +29401,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -29227,16 +29488,16 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":80,"./encode":81}],83:[function(require,module,exports){
+},{"./decode":81,"./encode":82}],84:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":84}],84:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":85}],85:[function(require,module,exports){
 // a duplex stream is just a stream that is both readable and writable.
 // Since JS doesn't have multiple prototypal inheritance, this class
 // prototypally inherits from Readable, and then parasitically from
@@ -29312,7 +29573,7 @@ function forEach(xs, f) {
     f(xs[i], i);
   }
 }
-},{"./_stream_readable":86,"./_stream_writable":88,"core-util-is":66,"inherits":71,"process-nextick-args":77}],85:[function(require,module,exports){
+},{"./_stream_readable":87,"./_stream_writable":89,"core-util-is":66,"inherits":72,"process-nextick-args":78}],86:[function(require,module,exports){
 // a passthrough stream.
 // basically just the most minimal sort of Transform stream.
 // Every written chunk gets output as-is.
@@ -29339,7 +29600,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":87,"core-util-is":66,"inherits":71}],86:[function(require,module,exports){
+},{"./_stream_transform":88,"core-util-is":66,"inherits":72}],87:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -30222,7 +30483,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":84,"_process":78,"buffer":5,"core-util-is":66,"events":67,"inherits":71,"isarray":73,"process-nextick-args":77,"string_decoder/":125,"util":3}],87:[function(require,module,exports){
+},{"./_stream_duplex":85,"_process":79,"buffer":5,"core-util-is":66,"events":67,"inherits":72,"isarray":74,"process-nextick-args":78,"string_decoder/":126,"util":3}],88:[function(require,module,exports){
 // a transform stream is a readable/writable stream where you do
 // something with the data.  Sometimes it's called a "filter",
 // but that's not a great name for it, since that implies a thing where
@@ -30403,7 +30664,7 @@ function done(stream, er) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":84,"core-util-is":66,"inherits":71}],88:[function(require,module,exports){
+},{"./_stream_duplex":85,"core-util-is":66,"inherits":72}],89:[function(require,module,exports){
 (function (process){
 // A bit simpler than readable streams.
 // Implement an async ._write(chunk, encoding, cb), and it'll handle all
@@ -30922,10 +31183,10 @@ function CorkedRequest(state) {
   };
 }
 }).call(this,require('_process'))
-},{"./_stream_duplex":84,"_process":78,"buffer":5,"core-util-is":66,"events":67,"inherits":71,"process-nextick-args":77,"util-deprecate":140}],89:[function(require,module,exports){
+},{"./_stream_duplex":85,"_process":79,"buffer":5,"core-util-is":66,"events":67,"inherits":72,"process-nextick-args":78,"util-deprecate":141}],90:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":85}],90:[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":86}],91:[function(require,module,exports){
 var Stream = (function (){
   try {
     return require('st' + 'ream'); // hack to fix a circular dependency issue when used with browserify
@@ -30939,13 +31200,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":84,"./lib/_stream_passthrough.js":85,"./lib/_stream_readable.js":86,"./lib/_stream_transform.js":87,"./lib/_stream_writable.js":88}],91:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":85,"./lib/_stream_passthrough.js":86,"./lib/_stream_readable.js":87,"./lib/_stream_transform.js":88,"./lib/_stream_writable.js":89}],92:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":87}],92:[function(require,module,exports){
+},{"./lib/_stream_transform.js":88}],93:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":88}],93:[function(require,module,exports){
+},{"./lib/_stream_writable.js":89}],94:[function(require,module,exports){
 "use strict";
 
 module.exports =
@@ -30957,7 +31218,7 @@ module.exports =
 	SHORTEST:      "shortest"
 };
 
-},{}],94:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 "use strict";
 
 var constants = require("./constants");
@@ -31133,7 +31394,7 @@ function showResource(urlObj, options)
 
 module.exports = formatUrl;
 
-},{"./constants":93}],95:[function(require,module,exports){
+},{"./constants":94}],96:[function(require,module,exports){
 "use strict";
 
 var objUtils = require("./util/object");
@@ -31192,7 +31453,7 @@ function mergeOption(newValues, defaultValues)
 
 module.exports = getOptions;
 
-},{"./util/object":107}],96:[function(require,module,exports){
+},{"./util/object":108}],97:[function(require,module,exports){
 "use strict";
 
 function parseHost(urlObj, options)
@@ -31220,7 +31481,7 @@ function parseHost(urlObj, options)
 
 module.exports = parseHost;
 
-},{}],97:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 "use strict";
 
 function hrefInfo(urlObj)
@@ -31242,7 +31503,7 @@ function hrefInfo(urlObj)
 
 module.exports = hrefInfo;
 
-},{}],98:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 "use strict";
 
 var hrefInfo   = require("./hrefInfo");
@@ -31302,7 +31563,7 @@ module.exports =
 	to:   parseUrl
 };
 
-},{"../util/path":108,"./host":96,"./hrefInfo":97,"./path":99,"./port":100,"./query":101,"./urlstring":102}],99:[function(require,module,exports){
+},{"../util/path":109,"./host":97,"./hrefInfo":98,"./path":100,"./port":101,"./query":102,"./urlstring":103}],100:[function(require,module,exports){
 "use strict";
 
 function isDirectoryIndex(resource, options)
@@ -31404,7 +31665,7 @@ function splitPath(path)
 
 module.exports = parsePath;
 
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 "use strict";
 
 function parsePort(urlObj, options)
@@ -31438,7 +31699,7 @@ function parsePort(urlObj, options)
 
 module.exports = parsePort;
 
-},{}],101:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 "use strict";
 
 function parseQuery(urlObj, options)
@@ -31490,7 +31751,7 @@ function stringify(queryObj, removeEmptyQueries)
 
 module.exports = parseQuery;
 
-},{}],102:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 "use strict";
 
 var _parseUrl = require("url").parse;
@@ -31638,7 +31899,7 @@ function parseUrlString(url, options)
 
 module.exports = parseUrlString;
 
-},{"url":138}],103:[function(require,module,exports){
+},{"url":139}],104:[function(require,module,exports){
 "use strict";
 
 var findRelation = require("./findRelation");
@@ -31729,7 +31990,7 @@ function copyResource(urlObj, siteUrlObj)
 
 module.exports = absolutize;
 
-},{"../util/object":107,"../util/path":108,"./findRelation":104}],104:[function(require,module,exports){
+},{"../util/object":108,"../util/path":109,"./findRelation":105}],105:[function(require,module,exports){
 "use strict";
 
 function findRelation_upToPath(urlObj, siteUrlObj, options)
@@ -31810,7 +32071,7 @@ module.exports =
 	upToPath: findRelation_upToPath
 };
 
-},{}],105:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 "use strict";
 
 var absolutize = require("./absolutize");
@@ -31830,7 +32091,7 @@ function relateUrl(siteUrlObj, urlObj, options)
 
 module.exports = relateUrl;
 
-},{"./absolutize":103,"./relativize":106}],106:[function(require,module,exports){
+},{"./absolutize":104,"./relativize":107}],107:[function(require,module,exports){
 "use strict";
 
 var pathUtils = require("../util/path");
@@ -31899,7 +32160,7 @@ function relativize(urlObj, siteUrlObj, options)
 
 module.exports = relativize;
 
-},{"../util/path":108}],107:[function(require,module,exports){
+},{"../util/path":109}],108:[function(require,module,exports){
 "use strict";
 
 /*
@@ -31965,7 +32226,7 @@ module.exports =
 	shallowMerge: shallowMerge
 };
 
-},{}],108:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 "use strict";
 
 function joinPath(pathArray)
@@ -32016,7 +32277,7 @@ module.exports =
 	resolveDotSegments: resolveDotSegments
 };
 
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 /*
  * Copyright 2009-2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE.txt or:
@@ -32026,7 +32287,7 @@ exports.SourceMapGenerator = require('./source-map/source-map-generator').Source
 exports.SourceMapConsumer = require('./source-map/source-map-consumer').SourceMapConsumer;
 exports.SourceNode = require('./source-map/source-node').SourceNode;
 
-},{"./source-map/source-map-consumer":116,"./source-map/source-map-generator":117,"./source-map/source-node":118}],110:[function(require,module,exports){
+},{"./source-map/source-map-consumer":117,"./source-map/source-map-generator":118,"./source-map/source-node":119}],111:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -32135,7 +32396,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./util":119,"amdefine":1}],111:[function(require,module,exports){
+},{"./util":120,"amdefine":1}],112:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -32283,7 +32544,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./base64":112,"amdefine":1}],112:[function(require,module,exports){
+},{"./base64":113,"amdefine":1}],113:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -32358,7 +32619,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":1}],113:[function(require,module,exports){
+},{"amdefine":1}],114:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -32477,7 +32738,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":1}],114:[function(require,module,exports){
+},{"amdefine":1}],115:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2014 Mozilla Foundation and contributors
@@ -32565,7 +32826,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./util":119,"amdefine":1}],115:[function(require,module,exports){
+},{"./util":120,"amdefine":1}],116:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -32687,7 +32948,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":1}],116:[function(require,module,exports){
+},{"amdefine":1}],117:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -33766,7 +34027,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./array-set":110,"./base64-vlq":111,"./binary-search":113,"./quick-sort":115,"./util":119,"amdefine":1}],117:[function(require,module,exports){
+},{"./array-set":111,"./base64-vlq":112,"./binary-search":114,"./quick-sort":116,"./util":120,"amdefine":1}],118:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -34167,7 +34428,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./array-set":110,"./base64-vlq":111,"./mapping-list":114,"./util":119,"amdefine":1}],118:[function(require,module,exports){
+},{"./array-set":111,"./base64-vlq":112,"./mapping-list":115,"./util":120,"amdefine":1}],119:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -34583,7 +34844,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"./source-map-generator":117,"./util":119,"amdefine":1}],119:[function(require,module,exports){
+},{"./source-map-generator":118,"./util":120,"amdefine":1}],120:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -34955,7 +35216,7 @@ define(function (require, exports, module) {
 
 });
 
-},{"amdefine":1}],120:[function(require,module,exports){
+},{"amdefine":1}],121:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -35084,7 +35345,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":67,"inherits":71,"readable-stream/duplex.js":83,"readable-stream/passthrough.js":89,"readable-stream/readable.js":90,"readable-stream/transform.js":91,"readable-stream/writable.js":92}],121:[function(require,module,exports){
+},{"events":67,"inherits":72,"readable-stream/duplex.js":84,"readable-stream/passthrough.js":90,"readable-stream/readable.js":91,"readable-stream/transform.js":92,"readable-stream/writable.js":93}],122:[function(require,module,exports){
 (function (global){
 var ClientRequest = require('./lib/request')
 var extend = require('xtend')
@@ -35166,7 +35427,7 @@ http.METHODS = [
 	'UNSUBSCRIBE'
 ]
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./lib/request":123,"builtin-status-codes":6,"url":138,"xtend":144}],122:[function(require,module,exports){
+},{"./lib/request":124,"builtin-status-codes":6,"url":139,"xtend":145}],123:[function(require,module,exports){
 (function (global){
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableByteStream)
 
@@ -35210,7 +35471,7 @@ function isFunction (value) {
 xhr = null // Help gc
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],123:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 (function (process,global,Buffer){
 // var Base64 = require('Base64')
 var capability = require('./capability')
@@ -35492,7 +35753,7 @@ var unsafeHeaders = [
 ]
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":122,"./response":124,"_process":78,"buffer":5,"inherits":71,"stream":120,"to-arraybuffer":126}],124:[function(require,module,exports){
+},{"./capability":123,"./response":125,"_process":79,"buffer":5,"inherits":72,"stream":121,"to-arraybuffer":127}],125:[function(require,module,exports){
 (function (process,global,Buffer){
 var capability = require('./capability')
 var inherits = require('inherits')
@@ -35674,7 +35935,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"./capability":122,"_process":78,"buffer":5,"inherits":71,"stream":120}],125:[function(require,module,exports){
+},{"./capability":123,"_process":79,"buffer":5,"inherits":72,"stream":121}],126:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -35897,7 +36158,7 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":5}],126:[function(require,module,exports){
+},{"buffer":5}],127:[function(require,module,exports){
 var Buffer = require('buffer').Buffer
 
 module.exports = function (buf) {
@@ -35926,7 +36187,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":5}],127:[function(require,module,exports){
+},{"buffer":5}],128:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -36032,7 +36293,7 @@ module.exports = function (buf) {
   exports.ArraySet = ArraySet;
 }
 
-},{"./util":136}],128:[function(require,module,exports){
+},{"./util":137}],129:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -36175,7 +36436,7 @@ module.exports = function (buf) {
   };
 }
 
-},{"./base64":129}],129:[function(require,module,exports){
+},{"./base64":130}],130:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -36245,7 +36506,7 @@ module.exports = function (buf) {
   };
 }
 
-},{}],130:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -36359,7 +36620,7 @@ module.exports = function (buf) {
   };
 }
 
-},{}],131:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2014 Mozilla Foundation and contributors
@@ -36441,7 +36702,7 @@ module.exports = function (buf) {
   exports.MappingList = MappingList;
 }
 
-},{"./util":136}],132:[function(require,module,exports){
+},{"./util":137}],133:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -36558,7 +36819,7 @@ module.exports = function (buf) {
   };
 }
 
-},{}],133:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -37642,7 +37903,7 @@ module.exports = function (buf) {
   exports.IndexedSourceMapConsumer = IndexedSourceMapConsumer;
 }
 
-},{"./array-set":127,"./base64-vlq":128,"./binary-search":130,"./quick-sort":132,"./util":136}],134:[function(require,module,exports){
+},{"./array-set":128,"./base64-vlq":129,"./binary-search":131,"./quick-sort":133,"./util":137}],135:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -38040,7 +38301,7 @@ module.exports = function (buf) {
   exports.SourceMapGenerator = SourceMapGenerator;
 }
 
-},{"./array-set":127,"./base64-vlq":128,"./mapping-list":131,"./util":136}],135:[function(require,module,exports){
+},{"./array-set":128,"./base64-vlq":129,"./mapping-list":132,"./util":137}],136:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -38450,7 +38711,7 @@ module.exports = function (buf) {
   exports.SourceNode = SourceNode;
 }
 
-},{"./source-map-generator":134,"./util":136}],136:[function(require,module,exports){
+},{"./source-map-generator":135,"./util":137}],137:[function(require,module,exports){
 /* -*- Mode: js; js-indent-level: 2; -*- */
 /*
  * Copyright 2011 Mozilla Foundation and contributors
@@ -38821,7 +39082,7 @@ module.exports = function (buf) {
   exports.compareByGeneratedPositionsInflated = compareByGeneratedPositionsInflated;
 }
 
-},{}],137:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 /*
  * Copyright 2009-2011 Mozilla Foundation and contributors
  * Licensed under the New BSD license. See LICENSE.txt or:
@@ -38831,7 +39092,7 @@ exports.SourceMapGenerator = require('./lib/source-map-generator').SourceMapGene
 exports.SourceMapConsumer = require('./lib/source-map-consumer').SourceMapConsumer;
 exports.SourceNode = require('./lib/source-node').SourceNode;
 
-},{"./lib/source-map-consumer":133,"./lib/source-map-generator":134,"./lib/source-node":135}],138:[function(require,module,exports){
+},{"./lib/source-map-consumer":134,"./lib/source-map-generator":135,"./lib/source-node":136}],139:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -39565,7 +39826,7 @@ Url.prototype.parseHost = function() {
   if (host) this.hostname = host;
 };
 
-},{"./util":139,"punycode":79,"querystring":82}],139:[function(require,module,exports){
+},{"./util":140,"punycode":80,"querystring":83}],140:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -39583,7 +39844,7 @@ module.exports = {
   }
 };
 
-},{}],140:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 (function (global){
 
 /**
@@ -39654,14 +39915,14 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],141:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],142:[function(require,module,exports){
+},{}],143:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -40251,7 +40512,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":141,"_process":78,"inherits":71}],143:[function(require,module,exports){
+},{"./support/isBuffer":142,"_process":79,"inherits":72}],144:[function(require,module,exports){
 exports.baseChar = /[A-Za-z\xC0-\xD6\xD8-\xF6\xF8-\u0131\u0134-\u013E\u0141-\u0148\u014A-\u017E\u0180-\u01C3\u01CD-\u01F0\u01F4\u01F5\u01FA-\u0217\u0250-\u02A8\u02BB-\u02C1\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03CE\u03D0-\u03D6\u03DA\u03DC\u03DE\u03E0\u03E2-\u03F3\u0401-\u040C\u040E-\u044F\u0451-\u045C\u045E-\u0481\u0490-\u04C4\u04C7\u04C8\u04CB\u04CC\u04D0-\u04EB\u04EE-\u04F5\u04F8\u04F9\u0531-\u0556\u0559\u0561-\u0586\u05D0-\u05EA\u05F0-\u05F2\u0621-\u063A\u0641-\u064A\u0671-\u06B7\u06BA-\u06BE\u06C0-\u06CE\u06D0-\u06D3\u06D5\u06E5\u06E6\u0905-\u0939\u093D\u0958-\u0961\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8B\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AE0\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B36-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB5\u0BB7-\u0BB9\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C60\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CDE\u0CE0\u0CE1\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D28\u0D2A-\u0D39\u0D60\u0D61\u0E01-\u0E2E\u0E30\u0E32\u0E33\u0E40-\u0E45\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD\u0EAE\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0F40-\u0F47\u0F49-\u0F69\u10A0-\u10C5\u10D0-\u10F6\u1100\u1102\u1103\u1105-\u1107\u1109\u110B\u110C\u110E-\u1112\u113C\u113E\u1140\u114C\u114E\u1150\u1154\u1155\u1159\u115F-\u1161\u1163\u1165\u1167\u1169\u116D\u116E\u1172\u1173\u1175\u119E\u11A8\u11AB\u11AE\u11AF\u11B7\u11B8\u11BA\u11BC-\u11C2\u11EB\u11F0\u11F9\u1E00-\u1E9B\u1EA0-\u1EF9\u1F00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2126\u212A\u212B\u212E\u2180-\u2182\u3041-\u3094\u30A1-\u30FA\u3105-\u312C\uAC00-\uD7A3]/;
 
 exports.ideographic = /[\u3007\u3021-\u3029\u4E00-\u9FA5]/;
@@ -40263,7 +40524,7 @@ exports.combiningChar = /[\u0300-\u0345\u0360\u0361\u0483-\u0486\u0591-\u05A1\u0
 exports.digit = /[0-9\u0660-\u0669\u06F0-\u06F9\u0966-\u096F\u09E6-\u09EF\u0A66-\u0A6F\u0AE6-\u0AEF\u0B66-\u0B6F\u0BE7-\u0BEF\u0C66-\u0C6F\u0CE6-\u0CEF\u0D66-\u0D6F\u0E50-\u0E59\u0ED0-\u0ED9\u0F20-\u0F29]/;
 
 exports.extender = /[\xB7\u02D0\u02D1\u0387\u0640\u0E46\u0EC6\u3005\u3031-\u3035\u309D\u309E\u30FC-\u30FE]/;
-},{}],144:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -40288,1175 +40549,1116 @@ function extend() {
 module.exports = require('./lib/clean');
 
 },{"./lib/clean":7}],"html-minifier":[function(require,module,exports){
-(function(global) {
-  'use strict';
+'use strict';
 
-  var log, HTMLParser;
-  if (global.console && global.console.log) {
-    log = function(message) {
-      // "preserving" `this`
-      global.console.log(message);
-    };
-  }
-  else {
-    log = function() {};
-  }
+var CleanCSS = require('clean-css');
+var HTMLParser = require('./htmlparser').HTMLParser;
+var RelateUrl = require('relateurl');
+var UglifyJS = require('uglify-js');
+var utils = require('./utils');
 
-  if (global.HTMLParser) {
-    HTMLParser = global.HTMLParser;
-  }
-  else if (typeof require === 'function') {
-    HTMLParser = require('./htmlparser').HTMLParser;
-  }
+var log;
+if (typeof window !== 'undefined' && typeof console !== 'undefined' && typeof console.log === 'function') {
+  log = function(message) {
+    // "preserving" `this`
+    console.log(message);
+  };
+}
+else {
+  log = function() {};
+}
 
-  var trimWhitespace = function(str) {
+var trimWhitespace = function(str) {
+  if (typeof str !== 'string') {
+    return str;
+  }
+  return str.replace(/^\s+/, '').replace(/\s+$/, '');
+};
+if (String.prototype.trim) {
+  trimWhitespace = function(str) {
     if (typeof str !== 'string') {
       return str;
     }
-    return str.replace(/^\s+/, '').replace(/\s+$/, '');
+    return str.trim();
   };
-  if (String.prototype.trim) {
-    trimWhitespace = function(str) {
-      if (typeof str !== 'string') {
-        return str;
-      }
-      return str.trim();
-    };
-  }
+}
 
-  function compressWhitespace(spaces) {
-    return spaces === '\t' ? spaces : ' ';
-  }
+function compressWhitespace(spaces) {
+  return spaces === '\t' ? spaces : ' ';
+}
 
-  function collapseWhitespaceAll(str) {
-    return str ? str.replace(/[\t\n\r ]+/g, compressWhitespace) : str;
-  }
+function collapseWhitespaceAll(str) {
+  return str ? str.replace(/[\t\n\r ]+/g, compressWhitespace) : str;
+}
 
-  function createMap(values) {
-    var map = {};
-    values.forEach(function(value) {
-      map[value] = 1;
+function collapseWhitespace(str, options, trimLeft, trimRight, collapseAll) {
+  var lineBreakBefore = '', lineBreakAfter = '';
+
+  if (options.preserveLineBreaks) {
+    str = str.replace(/^[\t ]*[\n\r][\t\n\r ]*/, function() {
+      lineBreakBefore = '\n';
+      return '';
+    }).replace(/[\t\n\r ]*[\n\r][\t ]*$/, function() {
+      lineBreakAfter = '\n';
+      return '';
     });
-    return function(value) {
-      return map[value] === 1;
-    };
   }
 
-  function createMapFromString(values) {
-    return createMap(values.split(/,/));
+  if (trimLeft) {
+    str = str.replace(/^\s+/, !lineBreakBefore && options.conservativeCollapse ? compressWhitespace : '');
   }
 
-  function collapseWhitespace(str, options, trimLeft, trimRight, collapseAll) {
-    var lineBreakBefore = '', lineBreakAfter = '';
-
-    if (options.preserveLineBreaks) {
-      str = str.replace(/^[\t ]*[\n\r][\t\n\r ]*/, function() {
-        lineBreakBefore = '\n';
-        return '';
-      }).replace(/[\t\n\r ]*[\n\r][\t ]*$/, function() {
-        lineBreakAfter = '\n';
-        return '';
-      });
-    }
-
-    if (trimLeft) {
-      str = str.replace(/^\s+/, !lineBreakBefore && options.conservativeCollapse ? compressWhitespace : '');
-    }
-
-    if (trimRight) {
-      str = str.replace(/\s+$/, !lineBreakAfter && options.conservativeCollapse ? compressWhitespace : '');
-    }
-
-    if (collapseAll) {
-      // strip non space whitespace then compress spaces to one
-      str = collapseWhitespaceAll(str);
-    }
-
-    return lineBreakBefore + str + lineBreakAfter;
+  if (trimRight) {
+    str = str.replace(/\s+$/, !lineBreakAfter && options.conservativeCollapse ? compressWhitespace : '');
   }
 
-  // non-empty tags that will maintain whitespace around them
-  var inlineTags = createMapFromString('a,abbr,acronym,b,bdi,bdo,big,button,cite,code,del,dfn,em,font,i,ins,kbd,mark,math,q,rt,rp,s,samp,small,span,strike,strong,sub,sup,svg,time,tt,u,var');
-  // non-empty tags that will maintain whitespace within them
-  var inlineTextTags = createMapFromString('a,abbr,acronym,b,big,del,em,font,i,ins,kbd,mark,s,samp,small,span,strike,strong,sub,sup,time,tt,u,var');
-  // self-closing tags that will maintain whitespace around them
-  var selfClosingInlineTags = createMapFromString('comment,img,input');
-
-  function collapseWhitespaceSmart(str, prevTag, nextTag, options) {
-    var trimLeft = prevTag && !selfClosingInlineTags(prevTag);
-    if (trimLeft && !options.collapseInlineTagWhitespace) {
-      trimLeft = prevTag.charAt(0) === '/' ? !inlineTags(prevTag.slice(1)) : !inlineTextTags(prevTag);
-    }
-    var trimRight = nextTag && !selfClosingInlineTags(nextTag);
-    if (trimRight && !options.collapseInlineTagWhitespace) {
-      trimRight = nextTag.charAt(0) === '/' ? !inlineTextTags(nextTag.slice(1)) : !inlineTags(nextTag);
-    }
-    return collapseWhitespace(str, options, trimLeft, trimRight, prevTag && nextTag);
+  if (collapseAll) {
+    // strip non space whitespace then compress spaces to one
+    str = collapseWhitespaceAll(str);
   }
 
-  function isConditionalComment(text) {
-    return /^\[if\s[^\]]+\]|\[endif\]$/.test(text);
+  return lineBreakBefore + str + lineBreakAfter;
+}
+
+var createMapFromString = utils.createMapFromString;
+// non-empty tags that will maintain whitespace around them
+var inlineTags = createMapFromString('a,abbr,acronym,b,bdi,bdo,big,button,cite,code,del,dfn,em,font,i,ins,kbd,mark,math,q,rt,rp,s,samp,small,span,strike,strong,sub,sup,svg,time,tt,u,var');
+// non-empty tags that will maintain whitespace within them
+var inlineTextTags = createMapFromString('a,abbr,acronym,b,big,del,em,font,i,ins,kbd,mark,s,samp,small,span,strike,strong,sub,sup,time,tt,u,var');
+// self-closing tags that will maintain whitespace around them
+var selfClosingInlineTags = createMapFromString('comment,img,input');
+
+function collapseWhitespaceSmart(str, prevTag, nextTag, options) {
+  var trimLeft = prevTag && !selfClosingInlineTags(prevTag);
+  if (trimLeft && !options.collapseInlineTagWhitespace) {
+    trimLeft = prevTag.charAt(0) === '/' ? !inlineTags(prevTag.slice(1)) : !inlineTextTags(prevTag);
   }
-
-  function isIgnoredComment(text, options) {
-    if (/^!/.test(text)) {
-      return true;
-    }
-
-    if (options.ignoreCustomComments) {
-      for (var i = 0, len = options.ignoreCustomComments.length; i < len; i++) {
-        if (options.ignoreCustomComments[i].test(text)) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+  var trimRight = nextTag && !selfClosingInlineTags(nextTag);
+  if (trimRight && !options.collapseInlineTagWhitespace) {
+    trimRight = nextTag.charAt(0) === '/' ? !inlineTextTags(nextTag.slice(1)) : !inlineTags(nextTag);
   }
+  return collapseWhitespace(str, options, trimLeft, trimRight, prevTag && nextTag);
+}
 
-  function isEventAttribute(attrName, options) {
-    var patterns = options.customEventAttributes;
-    if (patterns) {
-      for (var i = patterns.length; i--;) {
-        if (patterns[i].test(attrName)) {
-          return true;
-        }
-      }
-      return false;
-    }
-    else {
-      return (/^on[a-z]{3,}$/).test(attrName);
-    }
-  }
+function isConditionalComment(text) {
+  return /^\[if\s[^\]]+\]|\[endif\]$/.test(text);
+}
 
-  function canRemoveAttributeQuotes(value) {
-    // http://mathiasbynens.be/notes/unquoted-attribute-values
-    return (/^[^\x20\t\n\f\r"'`=<>]+$/).test(value);
-  }
-
-  function attributesInclude(attributes, attribute) {
-    for (var i = attributes.length; i--;) {
-      if (attributes[i].name.toLowerCase() === attribute) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function isAttributeRedundant(tag, attrName, attrValue, attrs) {
-    attrValue = attrValue ? trimWhitespace(attrValue.toLowerCase()) : '';
-
-    return (
-        (tag === 'script' &&
-        attrName === 'language' &&
-        attrValue === 'javascript') ||
-
-        (tag === 'form' &&
-        attrName === 'method' &&
-        attrValue === 'get') ||
-
-        (tag === 'input' &&
-        attrName === 'type' &&
-        attrValue === 'text') ||
-
-        (tag === 'script' &&
-        attrName === 'charset' &&
-        !attributesInclude(attrs, 'src')) ||
-
-        (tag === 'a' &&
-        attrName === 'name' &&
-        attributesInclude(attrs, 'id')) ||
-
-        (tag === 'area' &&
-        attrName === 'shape' &&
-        attrValue === 'rect')
-    );
-  }
-
-  // https://mathiasbynens.be/demo/javascript-mime-type
-  // https://developer.mozilla.org/en/docs/Web/HTML/Element/script#attr-type
-  var executableScriptsMimetypes = createMap([
-    'text/javascript',
-    'text/ecmascript',
-    'text/jscript',
-    'application/javascript',
-    'application/x-javascript',
-    'application/ecmascript'
-  ]);
-
-  function isScriptTypeAttribute(tag, attrName, attrValue) {
-    return (
-      tag === 'script' &&
-      attrName === 'type' &&
-      executableScriptsMimetypes(trimWhitespace(attrValue.toLowerCase()))
-    );
-  }
-
-  function isExecutableScript(tag, attrs) {
-    if (tag !== 'script') {
-      return false;
-    }
-    for (var i = 0, len = attrs.length; i < len; i++) {
-      var attrName = attrs[i].name.toLowerCase();
-      if (attrName === 'type') {
-        var attrValue = trimWhitespace(attrs[i].value.split(/;/, 2)[0]).toLowerCase();
-        return attrValue === '' || executableScriptsMimetypes(attrValue);
-      }
-    }
+function isIgnoredComment(text, options) {
+  if (/^!/.test(text)) {
     return true;
   }
 
-  function isStyleLinkTypeAttribute(tag, attrName, attrValue) {
-    return (
-      (tag === 'style' || tag === 'link') &&
-      attrName === 'type' &&
-      trimWhitespace(attrValue.toLowerCase()) === 'text/css'
-    );
-  }
-
-  var isSimpleBoolean = createMapFromString('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,defaultchecked,defaultmuted,defaultselected,defer,disabled,enabled,formnovalidate,hidden,indeterminate,inert,ismap,itemscope,loop,multiple,muted,nohref,noresize,noshade,novalidate,nowrap,open,pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,truespeed,typemustmatch,visible');
-  var isBooleanValue = createMapFromString('true,false');
-
-  function isBooleanAttribute(attrName, attrValue) {
-    return isSimpleBoolean(attrName) || attrName === 'draggable' && !isBooleanValue(attrValue);
-  }
-
-  function isUriTypeAttribute(attrName, tag) {
-    return (
-      ((/^(?:a|area|link|base)$/).test(tag) && attrName === 'href') ||
-      (tag === 'img' && (/^(?:src|longdesc|usemap)$/).test(attrName)) ||
-      (tag === 'object' && (/^(?:classid|codebase|data|usemap)$/).test(attrName)) ||
-      (tag === 'q' && attrName === 'cite') ||
-      (tag === 'blockquote' && attrName === 'cite') ||
-      ((tag === 'ins' || tag === 'del') && attrName === 'cite') ||
-      (tag === 'form' && attrName === 'action') ||
-      (tag === 'input' && (attrName === 'src' || attrName === 'usemap')) ||
-      (tag === 'head' && attrName === 'profile') ||
-      (tag === 'script' && (attrName === 'src' || attrName === 'for'))
-    );
-  }
-
-  function isNumberTypeAttribute(attrName, tag) {
-    return (
-      ((/^(?:a|area|object|button)$/).test(tag) && attrName === 'tabindex') ||
-      (tag === 'input' && (attrName === 'maxlength' || attrName === 'tabindex')) ||
-      (tag === 'select' && (attrName === 'size' || attrName === 'tabindex')) ||
-      (tag === 'textarea' && (/^(?:rows|cols|tabindex)$/).test(attrName)) ||
-      (tag === 'colgroup' && attrName === 'span') ||
-      (tag === 'col' && attrName === 'span') ||
-      ((tag === 'th' || tag === 'td') && (attrName === 'rowspan' || attrName === 'colspan'))
-    );
-  }
-
-  function isCanonicalURL(tag, attrs) {
-    if (tag !== 'link') {
-      return false;
-    }
-    for (var i = 0, len = attrs.length; i < len; i++) {
-      if (attrs[i].name === 'rel' && attrs[i].value === 'canonical') {
+  if (options.ignoreCustomComments) {
+    for (var i = 0, len = options.ignoreCustomComments.length; i < len; i++) {
+      if (options.ignoreCustomComments[i].test(text)) {
         return true;
       }
     }
   }
 
-  var fnPrefix = '!function(){';
-  var fnSuffix = '}();';
+  return false;
+}
 
-  function cleanAttributeValue(tag, attrName, attrValue, options, attrs) {
-    if (attrValue && isEventAttribute(attrName, options)) {
-      attrValue = trimWhitespace(attrValue).replace(/^javascript:\s*/i, '').replace(/\s*;$/, '');
-      if (options.minifyJS) {
-        var minified = minifyJS(fnPrefix + attrValue + fnSuffix, options.minifyJS);
-        return minified.slice(fnPrefix.length, -fnSuffix.length);
+function isEventAttribute(attrName, options) {
+  var patterns = options.customEventAttributes;
+  if (patterns) {
+    for (var i = patterns.length; i--;) {
+      if (patterns[i].test(attrName)) {
+        return true;
       }
-      return attrValue;
     }
-    else if (attrName === 'class') {
-      return collapseWhitespaceAll(trimWhitespace(attrValue));
+    return false;
+  }
+  else {
+    return (/^on[a-z]{3,}$/).test(attrName);
+  }
+}
+
+function canRemoveAttributeQuotes(value) {
+  // http://mathiasbynens.be/notes/unquoted-attribute-values
+  return (/^[^\x20\t\n\f\r"'`=<>]+$/).test(value);
+}
+
+function attributesInclude(attributes, attribute) {
+  for (var i = attributes.length; i--;) {
+    if (attributes[i].name.toLowerCase() === attribute) {
+      return true;
     }
-    else if (isUriTypeAttribute(attrName, tag)) {
-      attrValue = trimWhitespace(attrValue);
-      if (options.minifyURLs && !isCanonicalURL(tag, attrs)) {
-        return minifyURLs(attrValue, options.minifyURLs);
-      }
-      return attrValue;
+  }
+  return false;
+}
+
+function isAttributeRedundant(tag, attrName, attrValue, attrs) {
+  attrValue = attrValue ? trimWhitespace(attrValue.toLowerCase()) : '';
+
+  return (
+      (tag === 'script' &&
+      attrName === 'language' &&
+      attrValue === 'javascript') ||
+
+      (tag === 'form' &&
+      attrName === 'method' &&
+      attrValue === 'get') ||
+
+      (tag === 'input' &&
+      attrName === 'type' &&
+      attrValue === 'text') ||
+
+      (tag === 'script' &&
+      attrName === 'charset' &&
+      !attributesInclude(attrs, 'src')) ||
+
+      (tag === 'a' &&
+      attrName === 'name' &&
+      attributesInclude(attrs, 'id')) ||
+
+      (tag === 'area' &&
+      attrName === 'shape' &&
+      attrValue === 'rect')
+  );
+}
+
+// https://mathiasbynens.be/demo/javascript-mime-type
+// https://developer.mozilla.org/en/docs/Web/HTML/Element/script#attr-type
+var executableScriptsMimetypes = utils.createMap([
+  'text/javascript',
+  'text/ecmascript',
+  'text/jscript',
+  'application/javascript',
+  'application/x-javascript',
+  'application/ecmascript'
+]);
+
+function isScriptTypeAttribute(tag, attrName, attrValue) {
+  return (
+    tag === 'script' &&
+    attrName === 'type' &&
+    executableScriptsMimetypes(trimWhitespace(attrValue.toLowerCase()))
+  );
+}
+
+function isExecutableScript(tag, attrs) {
+  if (tag !== 'script') {
+    return false;
+  }
+  for (var i = 0, len = attrs.length; i < len; i++) {
+    var attrName = attrs[i].name.toLowerCase();
+    if (attrName === 'type') {
+      var attrValue = trimWhitespace(attrs[i].value.split(/;/, 2)[0]).toLowerCase();
+      return attrValue === '' || executableScriptsMimetypes(attrValue);
     }
-    else if (isNumberTypeAttribute(attrName, tag)) {
-      return trimWhitespace(attrValue);
+  }
+  return true;
+}
+
+function isStyleSheet(tag, attrs) {
+  if (tag !== 'style') {
+    return false;
+  }
+  for (var i = 0, len = attrs.length; i < len; i++) {
+    var attrName = attrs[i].name.toLowerCase();
+    if (attrName === 'type') {
+      var attrValue = trimWhitespace(attrs[i].value).toLowerCase();
+      return attrValue === '' || attrValue === 'text/css';
     }
-    else if (attrName === 'style') {
-      attrValue = trimWhitespace(attrValue);
-      if (attrValue) {
-        attrValue = attrValue.replace(/\s*;\s*$/, '');
-      }
-      if (options.minifyCSS) {
-        return minifyCSS(attrValue, options.minifyCSS, true);
-      }
-      return attrValue;
+  }
+  return true;
+}
+
+function isStyleLinkTypeAttribute(tag, attrName, attrValue) {
+  return (
+    (tag === 'style' || tag === 'link') &&
+    attrName === 'type' &&
+    trimWhitespace(attrValue.toLowerCase()) === 'text/css'
+  );
+}
+
+var isSimpleBoolean = createMapFromString('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,defaultchecked,defaultmuted,defaultselected,defer,disabled,enabled,formnovalidate,hidden,indeterminate,inert,ismap,itemscope,loop,multiple,muted,nohref,noresize,noshade,novalidate,nowrap,open,pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,truespeed,typemustmatch,visible');
+var isBooleanValue = createMapFromString('true,false');
+
+function isBooleanAttribute(attrName, attrValue) {
+  return isSimpleBoolean(attrName) || attrName === 'draggable' && !isBooleanValue(attrValue);
+}
+
+function isUriTypeAttribute(attrName, tag) {
+  return (
+    ((/^(?:a|area|link|base)$/).test(tag) && attrName === 'href') ||
+    (tag === 'img' && (/^(?:src|longdesc|usemap)$/).test(attrName)) ||
+    (tag === 'object' && (/^(?:classid|codebase|data|usemap)$/).test(attrName)) ||
+    (tag === 'q' && attrName === 'cite') ||
+    (tag === 'blockquote' && attrName === 'cite') ||
+    ((tag === 'ins' || tag === 'del') && attrName === 'cite') ||
+    (tag === 'form' && attrName === 'action') ||
+    (tag === 'input' && (attrName === 'src' || attrName === 'usemap')) ||
+    (tag === 'head' && attrName === 'profile') ||
+    (tag === 'script' && (attrName === 'src' || attrName === 'for'))
+  );
+}
+
+function isNumberTypeAttribute(attrName, tag) {
+  return (
+    ((/^(?:a|area|object|button)$/).test(tag) && attrName === 'tabindex') ||
+    (tag === 'input' && (attrName === 'maxlength' || attrName === 'tabindex')) ||
+    (tag === 'select' && (attrName === 'size' || attrName === 'tabindex')) ||
+    (tag === 'textarea' && (/^(?:rows|cols|tabindex)$/).test(attrName)) ||
+    (tag === 'colgroup' && attrName === 'span') ||
+    (tag === 'col' && attrName === 'span') ||
+    ((tag === 'th' || tag === 'td') && (attrName === 'rowspan' || attrName === 'colspan'))
+  );
+}
+
+function isCanonicalURL(tag, attrs) {
+  if (tag !== 'link') {
+    return false;
+  }
+  for (var i = 0, len = attrs.length; i < len; i++) {
+    if (attrs[i].name === 'rel' && attrs[i].value === 'canonical') {
+      return true;
     }
-    else if (isMetaViewport(tag, attrs) && attrName === 'content') {
-      attrValue = attrValue.replace(/\s+/g, '').replace(/[0-9]+\.[0-9]+/g, function(numString) {
-        // "0.90000" -> "0.9"
-        // "1.0" -> "1"
-        // "1.0001" -> "1.0001" (unchanged)
-        return (+numString).toString();
-      });
-    }
-    else if (attrValue && options.customAttrCollapse && options.customAttrCollapse.test(attrName)) {
-      attrValue = attrValue.replace(/\n+|\r+|\s{2,}/g, '');
-    }
-    else if (tag === 'script' && attrName === 'type') {
-      attrValue = trimWhitespace(attrValue.replace(/\s*;\s*/g, ';'));
+  }
+}
+
+var fnPrefix = '!function(){';
+var fnSuffix = '}();';
+
+function cleanAttributeValue(tag, attrName, attrValue, options, attrs) {
+  if (attrValue && isEventAttribute(attrName, options)) {
+    attrValue = trimWhitespace(attrValue).replace(/^javascript:\s*/i, '').replace(/\s*;$/, '');
+    if (options.minifyJS) {
+      var minified = minifyJS(fnPrefix + attrValue + fnSuffix, options.minifyJS);
+      return minified.slice(fnPrefix.length, -fnSuffix.length);
     }
     return attrValue;
   }
-
-  function isMetaViewport(tag, attrs) {
-    if (tag !== 'meta') {
-      return false;
-    }
-    for (var i = 0, len = attrs.length; i < len; i++) {
-      if (attrs[i].name === 'name' && attrs[i].value === 'viewport') {
-        return true;
-      }
-    }
+  else if (attrName === 'class') {
+    return collapseWhitespaceAll(trimWhitespace(attrValue));
   }
-
-  // Wrap CSS declarations for CleanCSS > 3.x
-  // See https://github.com/jakubpawlowicz/clean-css/issues/418
-  function wrapCSS(text) {
-    return '*{' + text + '}';
+  else if (isUriTypeAttribute(attrName, tag)) {
+    attrValue = trimWhitespace(attrValue);
+    if (options.minifyURLs && !isCanonicalURL(tag, attrs)) {
+      return minifyURLs(attrValue, options.minifyURLs);
+    }
+    return attrValue;
   }
-
-  function unwrapCSS(text) {
-    var matches = text.match(/^\*\{([\s\S]*)\}$/m);
-    if (matches && matches[1]) {
-      return matches[1];
-    }
-    else {
-      return text;
-    }
+  else if (isNumberTypeAttribute(attrName, tag)) {
+    return trimWhitespace(attrValue);
   }
-
-  function cleanConditionalComment(comment, options) {
-    return comment.replace(/^(\[if\s[^\]]+\]>)([\s\S]*?)(<!\[endif\])$/, function(match, prefix, text, suffix) {
-      return prefix + minify(text, options, true) + suffix;
-    });
-  }
-
-  function removeCDATASections(text) {
-    return text
-      // "/* <![CDATA[ */" or "// <![CDATA["
-      .replace(/^(?:\s*\/\*\s*<!\[CDATA\[\s*\*\/|\s*\/\/\s*<!\[CDATA\[.*)/, '')
-      // "/* ]]> */" or "// ]]>"
-      .replace(/(?:\/\*\s*\]\]>\s*\*\/|\/\/\s*\]\]>)\s*$/, '');
-  }
-
-  function processScript(text, options, currentAttrs) {
-    for (var i = 0, len = currentAttrs.length; i < len; i++) {
-      if (currentAttrs[i].name.toLowerCase() === 'type' &&
-          options.processScripts.indexOf(currentAttrs[i].value) > -1) {
-        return minify(text, options);
-      }
+  else if (attrName === 'style') {
+    attrValue = trimWhitespace(attrValue);
+    if (attrValue) {
+      attrValue = attrValue.replace(/\s*;\s*$/, '');
     }
-    return text;
-  }
-
-  var reStartDelimiter = {
-    // account for js + html comments (e.g.: //<!--)
-    script: /^\s*(?:\/\/)?\s*<!--.*\n?/,
-    style: /^\s*<!--\s*/
-  };
-  var reEndDelimiter = {
-    script: /\s*(?:\/\/)?\s*-->\s*$/,
-    style: /\s*-->\s*$/
-  };
-  function removeComments(text, tag) {
-    return text.replace(reStartDelimiter[tag], '').replace(reEndDelimiter[tag], '');
-  }
-
-  // Tag omission rules from https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
-  // with the following deviations:
-  // - retain <body> if followed by <noscript>
-  // - </rb>, </rt>, </rtc>, </rp> & </tfoot> follow http://www.w3.org/TR/html5/syntax.html#optional-tags
-  // - retain all tags which are adjacent to non-standard HTML tags
-  var optionalStartTags = createMapFromString('html,head,body,colgroup,tbody');
-  var optionalEndTags = createMapFromString('html,head,body,li,dt,dd,p,rb,rt,rtc,rp,optgroup,option,colgroup,caption,thead,tbody,tfoot,tr,td,th');
-  var headerTags = createMapFromString('meta,link,script,style,template,noscript');
-  var descriptionTags = createMapFromString('dt,dd');
-  var pBlockTags = createMapFromString('address,article,aside,blockquote,details,div,dl,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,main,menu,nav,ol,p,pre,section,table,ul');
-  var pInlineTags = createMapFromString('a,audio,del,ins,map,noscript,video');
-  var rubyTags = createMapFromString('rb,rt,rtc,rp');
-  var rtcTag = createMapFromString('rb,rtc,rp');
-  var optionTag = createMapFromString('option,optgroup');
-  var tableContentTags = createMapFromString('tbody,tfoot');
-  var tableSectionTags = createMapFromString('thead,tbody,tfoot');
-  var cellTags = createMapFromString('td,th');
-  var topLevelTags = createMapFromString('html,head,body');
-  var compactTags = createMapFromString('html,body');
-  var looseTags = createMapFromString('head,colgroup,caption');
-  var trailingTags = createMapFromString('dt,thead');
-  var htmlTags = createMapFromString('a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bdi,bdo,bgsound,big,blink,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,content,data,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,element,em,embed,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,image,img,input,ins,isindex,kbd,keygen,label,legend,li,link,listing,main,map,mark,marquee,menu,menuitem,meta,meter,multicol,nav,nobr,noembed,noframes,noscript,object,ol,optgroup,option,output,p,param,picture,plaintext,pre,progress,q,rp,rt,rtc,ruby,s,samp,script,section,select,shadow,small,source,spacer,span,strike,strong,style,sub,summary,sup,table,tbody,td,template,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr,xmp');
-
-  function canRemoveParentTag(optionalStartTag, tag) {
-    switch (optionalStartTag) {
-      case 'html':
-      case 'head':
-        return true;
-      case 'body':
-        return !headerTags(tag);
-      case 'colgroup':
-        return tag === 'col';
-      case 'tbody':
-        return tag === 'tr';
-    }
-    return false;
-  }
-
-  function isStartTagMandatory(optionalEndTag, tag) {
-    switch (tag) {
-      case 'colgroup':
-        return optionalEndTag === 'colgroup';
-      case 'tbody':
-        return tableSectionTags(optionalEndTag);
-    }
-    return false;
-  }
-
-  function canRemovePrecedingTag(optionalEndTag, tag) {
-    switch (optionalEndTag) {
-      case 'html':
-      case 'head':
-      case 'body':
-      case 'colgroup':
-      case 'caption':
-        return true;
-      case 'li':
-      case 'optgroup':
-      case 'tr':
-        return tag === optionalEndTag;
-      case 'dt':
-      case 'dd':
-        return descriptionTags(tag);
-      case 'p':
-        return pBlockTags(tag);
-      case 'rb':
-      case 'rt':
-      case 'rp':
-        return rubyTags(tag);
-      case 'rtc':
-        return rtcTag(tag);
-      case 'option':
-        return optionTag(tag);
-      case 'thead':
-      case 'tbody':
-        return tableContentTags(tag);
-      case 'tfoot':
-        return tag === 'tbody';
-      case 'td':
-      case 'th':
-        return cellTags(tag);
-    }
-    return false;
-  }
-
-  var reEmptyAttribute = new RegExp(
-    '^(?:class|id|style|title|lang|dir|on(?:focus|blur|change|click|dblclick|mouse(' +
-      '?:down|up|over|move|out)|key(?:press|down|up)))$');
-
-  function canDeleteEmptyAttribute(tag, attrName, attrValue) {
-    var isValueEmpty = !attrValue || (/^\s*$/).test(attrValue);
-    if (isValueEmpty) {
-      return (
-        (tag === 'input' && attrName === 'value') ||
-        reEmptyAttribute.test(attrName));
-    }
-    return false;
-  }
-
-  function hasAttrName(name, attrs) {
-    for (var i = attrs.length - 1; i >= 0; i--) {
-      if (attrs[i].name === name) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function canRemoveElement(tag, attrs) {
-    switch (tag) {
-      case 'textarea':
-        return false;
-      case 'audio':
-      case 'script':
-      case 'video':
-        if (hasAttrName('src', attrs)) {
-          return false;
-        }
-        break;
-      case 'iframe':
-        if (hasAttrName('src', attrs) || hasAttrName('srcdoc', attrs)) {
-          return false;
-        }
-        break;
-      case 'object':
-        if (hasAttrName('data', attrs)) {
-          return false;
-        }
-        break;
-      case 'applet':
-        if (hasAttrName('code', attrs)) {
-          return false;
-        }
-        break;
-    }
-    return true;
-  }
-
-  function canCollapseWhitespace(tag) {
-    return !(/^(?:script|style|pre|textarea)$/.test(tag));
-  }
-
-  function canTrimWhitespace(tag) {
-    return !(/^(?:pre|textarea)$/.test(tag));
-  }
-
-  function normalizeAttribute(attr, attrs, tag, hasUnarySlash, index, options, isLast) {
-
-    var attrName = options.caseSensitive ? attr.name : attr.name.toLowerCase(),
-        attrValue = attr.value,
-        attrQuote = attr.quote,
-        attrFragment,
-        emittedAttrValue;
-
-    if ((options.removeRedundantAttributes &&
-      isAttributeRedundant(tag, attrName, attrValue, attrs))
-      ||
-      (options.removeScriptTypeAttributes &&
-      isScriptTypeAttribute(tag, attrName, attrValue))
-      ||
-      (options.removeStyleLinkTypeAttributes &&
-      isStyleLinkTypeAttribute(tag, attrName, attrValue))) {
-      return '';
-    }
-
-    attrValue = cleanAttributeValue(tag, attrName, attrValue, options, attrs);
-
-    if (options.removeEmptyAttributes &&
-        canDeleteEmptyAttribute(tag, attrName, attrValue)) {
-      return '';
-    }
-
-    if (attrValue !== undefined && !options.removeAttributeQuotes ||
-        !canRemoveAttributeQuotes(attrValue)) {
-      if (!options.preventAttributesEscaping) {
-        if (options.quoteCharacter !== undefined) {
-          attrQuote = options.quoteCharacter === '\'' ? '\'' : '"';
-        }
-        else {
-          var apos = (attrValue.match(/'/g) || []).length;
-          var quot = (attrValue.match(/"/g) || []).length;
-          attrQuote = apos < quot ? '\'' : '"';
-        }
-        if (attrQuote === '"') {
-          attrValue = attrValue.replace(/"/g, '&#34;');
-        }
-        else {
-          attrValue = attrValue.replace(/'/g, '&#39;');
-        }
-      }
-      emittedAttrValue = attrQuote + attrValue + attrQuote;
-      if (!isLast && !options.removeTagWhitespace) {
-        emittedAttrValue += ' ';
-      }
-    }
-    // make sure trailing slash is not interpreted as HTML self-closing tag
-    else if (isLast && !hasUnarySlash && !/\/$/.test(attrValue)) {
-      emittedAttrValue = attrValue;
-    }
-    else {
-      emittedAttrValue = attrValue + ' ';
-    }
-
-    if (attrValue === undefined || (options.collapseBooleanAttributes &&
-        isBooleanAttribute(attrName.toLowerCase(), attrValue.toLowerCase()))) {
-      attrFragment = attrName;
-      if (!isLast) {
-        attrFragment += ' ';
-      }
-    }
-    else {
-      attrFragment = attrName + attr.customAssign + emittedAttrValue;
-    }
-
-    return attr.customOpen + attrFragment + attr.customClose;
-  }
-
-  function processOptions(options) {
-    if (!('includeAutoGeneratedTags' in options)) {
-      options.includeAutoGeneratedTags = true;
-    }
-
-    var defaultTesters = ['canCollapseWhitespace', 'canTrimWhitespace'];
-    for (var i = 0, len = defaultTesters.length; i < len; i++) {
-      if (!options[defaultTesters[i]]) {
-        options[defaultTesters[i]] = function() {
-          return false;
-        };
-      }
-    }
-
-    if (options.minifyURLs && typeof options.minifyURLs !== 'object') {
-      options.minifyURLs = { };
-    }
-
-    if (options.minifyJS) {
-      if (typeof options.minifyJS !== 'object') {
-        options.minifyJS = { };
-      }
-      options.minifyJS.fromString = true;
-      (options.minifyJS.output || (options.minifyJS.output = { })).inline_script = true;
-    }
-
     if (options.minifyCSS) {
-      if (typeof options.minifyCSS !== 'object') {
-        options.minifyCSS = { };
-      }
-      if (typeof options.minifyCSS.advanced === 'undefined') {
-        options.minifyCSS.advanced = false;
-      }
+      return minifyCSS(attrValue, options.minifyCSS, true);
+    }
+    return attrValue;
+  }
+  else if (isMetaViewport(tag, attrs) && attrName === 'content') {
+    attrValue = attrValue.replace(/\s+/g, '').replace(/[0-9]+\.[0-9]+/g, function(numString) {
+      // "0.90000" -> "0.9"
+      // "1.0" -> "1"
+      // "1.0001" -> "1.0001" (unchanged)
+      return (+numString).toString();
+    });
+  }
+  else if (attrValue && options.customAttrCollapse && options.customAttrCollapse.test(attrName)) {
+    attrValue = attrValue.replace(/\n+|\r+|\s{2,}/g, '');
+  }
+  else if (tag === 'script' && attrName === 'type') {
+    attrValue = trimWhitespace(attrValue.replace(/\s*;\s*/g, ';'));
+  }
+  return attrValue;
+}
+
+function isMetaViewport(tag, attrs) {
+  if (tag !== 'meta') {
+    return false;
+  }
+  for (var i = 0, len = attrs.length; i < len; i++) {
+    if (attrs[i].name === 'name' && attrs[i].value === 'viewport') {
+      return true;
     }
   }
+}
 
-  function noop(text) {
+// Wrap CSS declarations for CleanCSS > 3.x
+// See https://github.com/jakubpawlowicz/clean-css/issues/418
+function wrapCSS(text) {
+  return '*{' + text + '}';
+}
+
+function unwrapCSS(text) {
+  var matches = text.match(/^\*\{([\s\S]*)\}$/m);
+  if (matches && matches[1]) {
+    return matches[1];
+  }
+  else {
     return text;
   }
+}
 
-  function getModule(name, path) {
-    // try to get global reference first
-    var result = global[name];
-    if (typeof result === 'undefined' && typeof require === 'function') {
-      result = require(path);
+function cleanConditionalComment(comment, options) {
+  return options.processConditionalComments ? comment.replace(/^(\[if\s[^\]]+\]>)([\s\S]*?)(<!\[endif\])$/, function(match, prefix, text, suffix) {
+    return prefix + minify(text, options, true) + suffix;
+  }) : comment;
+}
+
+function processScript(text, options, currentAttrs) {
+  for (var i = 0, len = currentAttrs.length; i < len; i++) {
+    if (currentAttrs[i].name.toLowerCase() === 'type' &&
+        options.processScripts.indexOf(currentAttrs[i].value) > -1) {
+      return minify(text, options);
     }
-    return result;
   }
+  return text;
+}
 
-  var minifyURLs = (function() {
-    var RelateUrl = getModule('RelateUrl', 'relateurl');
-    if (RelateUrl && RelateUrl.relate) {
-      return function(text, options) {
-        try {
-          return RelateUrl.relate(text, options);
-        }
-        catch (err) {
-          log(err);
-          return text;
-        }
-      };
-    }
-    else {
-      return noop;
-    }
-  })();
+// Tag omission rules from https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
+// with the following deviations:
+// - retain <body> if followed by <noscript>
+// - </rb>, </rt>, </rtc>, </rp> & </tfoot> follow http://www.w3.org/TR/html5/syntax.html#optional-tags
+// - retain all tags which are adjacent to non-standard HTML tags
+var optionalStartTags = createMapFromString('html,head,body,colgroup,tbody');
+var optionalEndTags = createMapFromString('html,head,body,li,dt,dd,p,rb,rt,rtc,rp,optgroup,option,colgroup,caption,thead,tbody,tfoot,tr,td,th');
+var headerTags = createMapFromString('meta,link,script,style,template,noscript');
+var descriptionTags = createMapFromString('dt,dd');
+var pBlockTags = createMapFromString('address,article,aside,blockquote,details,div,dl,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,main,menu,nav,ol,p,pre,section,table,ul');
+var pInlineTags = createMapFromString('a,audio,del,ins,map,noscript,video');
+var rubyTags = createMapFromString('rb,rt,rtc,rp');
+var rtcTag = createMapFromString('rb,rtc,rp');
+var optionTag = createMapFromString('option,optgroup');
+var tableContentTags = createMapFromString('tbody,tfoot');
+var tableSectionTags = createMapFromString('thead,tbody,tfoot');
+var cellTags = createMapFromString('td,th');
+var topLevelTags = createMapFromString('html,head,body');
+var compactTags = createMapFromString('html,body');
+var looseTags = createMapFromString('head,colgroup,caption');
+var trailingTags = createMapFromString('dt,thead');
+var htmlTags = createMapFromString('a,abbr,acronym,address,applet,area,article,aside,audio,b,base,basefont,bdi,bdo,bgsound,big,blink,blockquote,body,br,button,canvas,caption,center,cite,code,col,colgroup,command,content,data,datalist,dd,del,details,dfn,dialog,dir,div,dl,dt,element,em,embed,fieldset,figcaption,figure,font,footer,form,frame,frameset,h1,h2,h3,h4,h5,h6,head,header,hgroup,hr,html,i,iframe,image,img,input,ins,isindex,kbd,keygen,label,legend,li,link,listing,main,map,mark,marquee,menu,menuitem,meta,meter,multicol,nav,nobr,noembed,noframes,noscript,object,ol,optgroup,option,output,p,param,picture,plaintext,pre,progress,q,rp,rt,rtc,ruby,s,samp,script,section,select,shadow,small,source,spacer,span,strike,strong,style,sub,summary,sup,table,tbody,td,template,textarea,tfoot,th,thead,time,title,tr,track,tt,u,ul,var,video,wbr,xmp');
 
-  var minifyJS = (function() {
-    var UglifyJS = getModule('UglifyJS', 'uglify-js');
-    if (UglifyJS && UglifyJS.minify) {
-      return function(text, options) {
-        try {
-          return UglifyJS.minify(text, options).code;
-        }
-        catch (err) {
-          log(err);
-          return text;
-        }
-      };
-    }
-    else {
-      return noop;
-    }
-  })();
-
-  var minifyCSS = (function() {
-    var CleanCSS = getModule('CleanCSS', 'clean-css');
-    if (CleanCSS) {
-      return function(text, options, inline) {
-        try {
-          var cleanCSS = new CleanCSS(options);
-          if (inline) {
-            return unwrapCSS(cleanCSS.minify(wrapCSS(text)).styles);
-          }
-          else {
-            return cleanCSS.minify(text).styles;
-          }
-        }
-        catch (err) {
-          log(err);
-          return text;
-        }
-      };
-    }
-    else {
-      return noop;
-    }
-  })();
-
-  function uniqueId(value) {
-    var id;
-    do {
-      id = Math.random().toString(36).slice(2);
-    } while (~value.indexOf(id));
-    return id;
+function canRemoveParentTag(optionalStartTag, tag) {
+  switch (optionalStartTag) {
+    case 'html':
+    case 'head':
+      return true;
+    case 'body':
+      return !headerTags(tag);
+    case 'colgroup':
+      return tag === 'col';
+    case 'tbody':
+      return tag === 'tr';
   }
+  return false;
+}
 
-  function minify(value, options, partialMarkup) {
-    options = options || {};
-    var optionsStack = [];
-    processOptions(options);
-    value = options.collapseWhitespace ? trimWhitespace(value) : value;
+function isStartTagMandatory(optionalEndTag, tag) {
+  switch (tag) {
+    case 'colgroup':
+      return optionalEndTag === 'colgroup';
+    case 'tbody':
+      return tableSectionTags(optionalEndTag);
+  }
+  return false;
+}
 
-    var buffer = [ ],
-        charsPrevTag,
-        currentChars = '',
-        hasChars,
-        currentTag = '',
-        currentAttrs = [],
-        stackNoTrimWhitespace = [],
-        stackNoCollapseWhitespace = [],
-        optionalStartTag = '',
-        optionalEndTag = '',
-        lint = options.lint,
-        t = Date.now(),
-        ignoredMarkupChunks = [ ],
-        ignoredCustomMarkupChunks = [ ],
-        uidIgnore,
-        uidAttr;
+function canRemovePrecedingTag(optionalEndTag, tag) {
+  switch (optionalEndTag) {
+    case 'html':
+    case 'head':
+    case 'body':
+    case 'colgroup':
+    case 'caption':
+      return true;
+    case 'li':
+    case 'optgroup':
+    case 'tr':
+      return tag === optionalEndTag;
+    case 'dt':
+    case 'dd':
+      return descriptionTags(tag);
+    case 'p':
+      return pBlockTags(tag);
+    case 'rb':
+    case 'rt':
+    case 'rp':
+      return rubyTags(tag);
+    case 'rtc':
+      return rtcTag(tag);
+    case 'option':
+      return optionTag(tag);
+    case 'thead':
+    case 'tbody':
+      return tableContentTags(tag);
+    case 'tfoot':
+      return tag === 'tbody';
+    case 'td':
+    case 'th':
+      return cellTags(tag);
+  }
+  return false;
+}
 
-    // temporarily replace ignored chunks with comments,
-    // so that we don't have to worry what's there.
-    // for all we care there might be
-    // completely-horribly-broken-alien-non-html-emoj-cthulhu-filled content
-    value = value.replace(/<!-- htmlmin:ignore -->([\s\S]*?)<!-- htmlmin:ignore -->/g, function(match, group1) {
-      if (!uidIgnore) {
-        uidIgnore = '<!--!' + uniqueId(value) + '-->';
+var reEmptyAttribute = new RegExp(
+  '^(?:class|id|style|title|lang|dir|on(?:focus|blur|change|click|dblclick|mouse(' +
+    '?:down|up|over|move|out)|key(?:press|down|up)))$');
+
+function canDeleteEmptyAttribute(tag, attrName, attrValue) {
+  var isValueEmpty = !attrValue || (/^\s*$/).test(attrValue);
+  if (isValueEmpty) {
+    return (
+      (tag === 'input' && attrName === 'value') ||
+      reEmptyAttribute.test(attrName));
+  }
+  return false;
+}
+
+function hasAttrName(name, attrs) {
+  for (var i = attrs.length - 1; i >= 0; i--) {
+    if (attrs[i].name === name) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function canRemoveElement(tag, attrs) {
+  switch (tag) {
+    case 'textarea':
+      return false;
+    case 'audio':
+    case 'script':
+    case 'video':
+      if (hasAttrName('src', attrs)) {
+        return false;
       }
-      var token = uidIgnore + ignoredMarkupChunks.length;
-      ignoredMarkupChunks.push(group1);
-      return token;
-    });
+      break;
+    case 'iframe':
+      if (hasAttrName('src', attrs) || hasAttrName('srcdoc', attrs)) {
+        return false;
+      }
+      break;
+    case 'object':
+      if (hasAttrName('data', attrs)) {
+        return false;
+      }
+      break;
+    case 'applet':
+      if (hasAttrName('code', attrs)) {
+        return false;
+      }
+      break;
+  }
+  return true;
+}
 
-    var customFragments = (options.ignoreCustomFragments || [
-      /<%[\s\S]*?%>/,
-      /<\?[\s\S]*?\?>/
-    ]).map(function(re) {
-      return re.source;
+function canCollapseWhitespace(tag) {
+  return !(/^(?:script|style|pre|textarea)$/.test(tag));
+}
+
+function canTrimWhitespace(tag) {
+  return !(/^(?:pre|textarea)$/.test(tag));
+}
+
+function normalizeAttribute(attr, attrs, tag, hasUnarySlash, index, options, isLast) {
+
+  var attrName = options.caseSensitive ? attr.name : attr.name.toLowerCase(),
+      attrValue = attr.value,
+      attrQuote = attr.quote,
+      attrFragment,
+      emittedAttrValue;
+
+  if ((options.removeRedundantAttributes &&
+    isAttributeRedundant(tag, attrName, attrValue, attrs))
+    ||
+    (options.removeScriptTypeAttributes &&
+    isScriptTypeAttribute(tag, attrName, attrValue))
+    ||
+    (options.removeStyleLinkTypeAttributes &&
+    isStyleLinkTypeAttribute(tag, attrName, attrValue))) {
+    return '';
+  }
+
+  attrValue = cleanAttributeValue(tag, attrName, attrValue, options, attrs);
+
+  if (options.removeEmptyAttributes &&
+      canDeleteEmptyAttribute(tag, attrName, attrValue)) {
+    return '';
+  }
+
+  if (attrValue !== undefined && !options.removeAttributeQuotes ||
+      !canRemoveAttributeQuotes(attrValue)) {
+    if (!options.preventAttributesEscaping) {
+      if (options.quoteCharacter !== undefined) {
+        attrQuote = options.quoteCharacter === '\'' ? '\'' : '"';
+      }
+      else {
+        var apos = (attrValue.match(/'/g) || []).length;
+        var quot = (attrValue.match(/"/g) || []).length;
+        attrQuote = apos < quot ? '\'' : '"';
+      }
+      if (attrQuote === '"') {
+        attrValue = attrValue.replace(/"/g, '&#34;');
+      }
+      else {
+        attrValue = attrValue.replace(/'/g, '&#39;');
+      }
+    }
+    emittedAttrValue = attrQuote + attrValue + attrQuote;
+    if (!isLast && !options.removeTagWhitespace) {
+      emittedAttrValue += ' ';
+    }
+  }
+  // make sure trailing slash is not interpreted as HTML self-closing tag
+  else if (isLast && !hasUnarySlash && !/\/$/.test(attrValue)) {
+    emittedAttrValue = attrValue;
+  }
+  else {
+    emittedAttrValue = attrValue + ' ';
+  }
+
+  if (attrValue === undefined || (options.collapseBooleanAttributes &&
+      isBooleanAttribute(attrName.toLowerCase(), attrValue.toLowerCase()))) {
+    attrFragment = attrName;
+    if (!isLast) {
+      attrFragment += ' ';
+    }
+  }
+  else {
+    attrFragment = attrName + attr.customAssign + emittedAttrValue;
+  }
+
+  return attr.customOpen + attrFragment + attr.customClose;
+}
+
+function processOptions(options) {
+  if (!('includeAutoGeneratedTags' in options)) {
+    options.includeAutoGeneratedTags = true;
+  }
+
+  var defaultTesters = ['canCollapseWhitespace', 'canTrimWhitespace'];
+  for (var i = 0, len = defaultTesters.length; i < len; i++) {
+    if (!options[defaultTesters[i]]) {
+      options[defaultTesters[i]] = function() {
+        return false;
+      };
+    }
+  }
+
+  if (options.minifyURLs && typeof options.minifyURLs !== 'object') {
+    options.minifyURLs = { };
+  }
+
+  if (options.minifyJS) {
+    if (typeof options.minifyJS !== 'object') {
+      options.minifyJS = { };
+    }
+    options.minifyJS.fromString = true;
+    (options.minifyJS.output || (options.minifyJS.output = { })).inline_script = true;
+  }
+
+  if (options.minifyCSS) {
+    if (typeof options.minifyCSS !== 'object') {
+      options.minifyCSS = { };
+    }
+    if (typeof options.minifyCSS.advanced === 'undefined') {
+      options.minifyCSS.advanced = false;
+    }
+  }
+}
+
+function minifyURLs(text, options) {
+  try {
+    return RelateUrl.relate(text, options);
+  }
+  catch (err) {
+    log(err);
+    return text;
+  }
+}
+
+function minifyJS(text, options) {
+  var start = text.match(/^\s*<!--.*/);
+  var code = start ? text.slice(start[0].length).replace(/\n\s*-->\s*$/, '') : text;
+  try {
+    return UglifyJS.minify(code, options).code;
+  }
+  catch (err) {
+    log(err);
+    return text;
+  }
+}
+
+function minifyCSS(text, options, inline) {
+  var start = text.match(/^\s*<!--/);
+  var style = start ? text.slice(start[0].length).replace(/-->\s*$/, '') : text;
+  try {
+    var cleanCSS = new CleanCSS(options);
+    if (inline) {
+      return unwrapCSS(cleanCSS.minify(wrapCSS(style)).styles);
+    }
+    else {
+      return cleanCSS.minify(style).styles;
+    }
+  }
+  catch (err) {
+    log(err);
+    return text;
+  }
+}
+
+function uniqueId(value) {
+  var id;
+  do {
+    id = Math.random().toString(36).slice(2);
+  } while (~value.indexOf(id));
+  return id;
+}
+
+function minify(value, options, partialMarkup) {
+  options = options || {};
+  var optionsStack = [];
+  processOptions(options);
+  value = options.collapseWhitespace ? trimWhitespace(value) : value;
+
+  var buffer = [ ],
+      charsPrevTag,
+      currentChars = '',
+      hasChars,
+      currentTag = '',
+      currentAttrs = [],
+      stackNoTrimWhitespace = [],
+      stackNoCollapseWhitespace = [],
+      optionalStartTag = '',
+      optionalEndTag = '',
+      lint = options.lint,
+      t = Date.now(),
+      ignoredMarkupChunks = [ ],
+      ignoredCustomMarkupChunks = [ ],
+      uidIgnore,
+      uidAttr;
+
+  // temporarily replace ignored chunks with comments,
+  // so that we don't have to worry what's there.
+  // for all we care there might be
+  // completely-horribly-broken-alien-non-html-emoj-cthulhu-filled content
+  value = value.replace(/<!-- htmlmin:ignore -->([\s\S]*?)<!-- htmlmin:ignore -->/g, function(match, group1) {
+    if (!uidIgnore) {
+      uidIgnore = uniqueId(value);
+    }
+    var token = '<!--!' + uidIgnore + ignoredMarkupChunks.length + '-->';
+    ignoredMarkupChunks.push(group1);
+    return token;
+  });
+
+  var customFragments = (options.ignoreCustomFragments || [
+    /<%[\s\S]*?%>/,
+    /<\?[\s\S]*?\?>/
+  ]).map(function(re) {
+    return re.source;
+  });
+  if (customFragments.length) {
+    var reCustomIgnore = new RegExp('\\s*(?:' + customFragments.join('|') + ')+\\s*', 'g');
+    // temporarily replace custom ignored fragments with unique attributes
+    value = value.replace(reCustomIgnore, function(match) {
+      if (!uidAttr) {
+        uidAttr = uniqueId(value);
+      }
+      var token = uidAttr + ignoredCustomMarkupChunks.length;
+      ignoredCustomMarkupChunks.push(match);
+      return '\t' + token + '\t';
     });
-    if (customFragments.length) {
-      var reCustomIgnore = new RegExp('\\s*(?:' + customFragments.join('|') + ')+\\s*', 'g');
-      // temporarily replace custom ignored fragments with unique attributes
-      value = value.replace(reCustomIgnore, function(match) {
-        if (!uidAttr) {
-          uidAttr = uniqueId(value);
-        }
-        var token = uidAttr + ignoredCustomMarkupChunks.length;
-        ignoredCustomMarkupChunks.push(match);
-        return '\t' + token + '\t';
+  }
+
+  function _canCollapseWhitespace(tag, attrs) {
+    return canCollapseWhitespace(tag) || options.canCollapseWhitespace(tag, attrs);
+  }
+
+  function _canTrimWhitespace(tag, attrs) {
+    return canTrimWhitespace(tag) || options.canTrimWhitespace(tag, attrs);
+  }
+
+  function removeStartTag() {
+    var index = buffer.length - 1;
+    while (index > 0 && !/^<[^/!]/.test(buffer[index])) {
+      index--;
+    }
+    buffer.length = Math.max(0, index);
+  }
+
+  function removeEndTag() {
+    var index = buffer.length - 1;
+    while (index > 0 && !/^<\//.test(buffer[index])) {
+      index--;
+    }
+    buffer.length = Math.max(0, index);
+  }
+
+  // look for trailing whitespaces from previously processed text
+  // which may not be trimmed due to a following comment or an empty
+  // element which has now been removed
+  function squashTrailingWhitespace(nextTag) {
+    var charsIndex;
+    if (buffer.length > 1 && /^(?:<!|$)/.test(buffer[buffer.length - 1]) &&
+        /\s$/.test(buffer[buffer.length - 2])) {
+      charsIndex = buffer.length - 2;
+    }
+    else if (buffer.length > 0 && /\s$/.test(buffer[buffer.length - 1])) {
+      charsIndex = buffer.length - 1;
+    }
+    if (charsIndex > 0) {
+      buffer[charsIndex] = buffer[charsIndex].replace(/\s+$/, function(text) {
+        return collapseWhitespaceSmart(text, 'comment', nextTag, options);
       });
     }
+  }
 
-    function _canCollapseWhitespace(tag, attrs) {
-      return canCollapseWhitespace(tag) || options.canCollapseWhitespace(tag, attrs);
-    }
+  new HTMLParser(value, {
+    partialMarkup: partialMarkup,
+    html5: typeof options.html5 !== 'undefined' ? options.html5 : true,
 
-    function _canTrimWhitespace(tag, attrs) {
-      return canTrimWhitespace(tag) || options.canTrimWhitespace(tag, attrs);
-    }
+    start: function(tag, attrs, unary, unarySlash, autoGenerated) {
+      var lowerTag = tag.toLowerCase();
 
-    function removeStartTag() {
-      var index = buffer.length - 1;
-      while (index > 0 && !/^<[^/!]/.test(buffer[index])) {
-        index--;
+      if (lowerTag === 'svg') {
+        optionsStack.push(options);
+        var nextOptions = {};
+        for (var key in options) {
+          nextOptions[key] = options[key];
+        }
+        nextOptions.keepClosingSlash = true;
+        nextOptions.caseSensitive = true;
+        options = nextOptions;
       }
-      buffer.length = Math.max(0, index);
-    }
 
-    function removeEndTag() {
-      var index = buffer.length - 1;
-      while (index > 0 && !/^<\//.test(buffer[index])) {
-        index--;
+      tag = options.caseSensitive ? tag : lowerTag;
+
+      currentTag = tag;
+      charsPrevTag = tag;
+      if (!inlineTextTags(tag)) {
+        currentChars = '';
       }
-      buffer.length = Math.max(0, index);
-    }
+      hasChars = false;
+      currentAttrs = attrs;
 
-    // look for trailing whitespaces from previously processed text
-    // which may not be trimmed due to a following comment or an empty
-    // element which has now been removed
-    function squashTrailingWhitespace(nextTag) {
-      var charsIndex;
-      if (buffer.length > 1 && /^(?:<!|$)/.test(buffer[buffer.length - 1]) &&
-          /\s$/.test(buffer[buffer.length - 2])) {
-        charsIndex = buffer.length - 2;
-      }
-      else if (buffer.length > 0 && /\s$/.test(buffer[buffer.length - 1])) {
-        charsIndex = buffer.length - 1;
-      }
-      if (charsIndex > 0) {
-        buffer[charsIndex] = buffer[charsIndex].replace(/\s+$/, function(text) {
-          return collapseWhitespaceSmart(text, 'comment', nextTag, options);
-        });
-      }
-    }
-
-    new HTMLParser(value, {
-      partialMarkup: partialMarkup,
-      html5: typeof options.html5 !== 'undefined' ? options.html5 : true,
-
-      start: function(tag, attrs, unary, unarySlash) {
-        var lowerTag = tag.toLowerCase();
-
-        if (lowerTag === 'svg') {
-          optionsStack.push(options);
-          var nextOptions = {};
-          for (var key in options) {
-            nextOptions[key] = options[key];
-          }
-          nextOptions.keepClosingSlash = true;
-          nextOptions.caseSensitive = true;
-          options = nextOptions;
-        }
-
-        tag = options.caseSensitive ? tag : lowerTag;
-
-        currentTag = tag;
-        charsPrevTag = tag;
-        if (!inlineTextTags(tag)) {
-          currentChars = '';
-        }
-        hasChars = false;
-        currentAttrs = attrs;
-
-        var optional = options.removeOptionalTags;
-        if (optional) {
-          var htmlTag = htmlTags(tag);
-          // <html> may be omitted if first thing inside is not comment
-          // <head> may be omitted if first thing inside is an element
-          // <body> may be omitted if first thing inside is not space, comment, <meta>, <link>, <script>, <style> or <template>
-          // <colgroup> may be omitted if first thing inside is <col>
-          // <tbody> may be omitted if first thing inside is <tr>
-          if (htmlTag && canRemoveParentTag(optionalStartTag, tag)) {
-            removeStartTag();
-          }
-          optionalStartTag = '';
-          // end-tag-followed-by-start-tag omission rules
-          if (htmlTag && canRemovePrecedingTag(optionalEndTag, tag)) {
-            removeEndTag();
-            // <colgroup> cannot be omitted if preceding </colgroup> is omitted
-            // <tbody> cannot be omitted if preceding </tbody>, </thead> or </tfoot> is omitted
-            optional = !isStartTagMandatory(optionalEndTag, tag);
-          }
-          optionalEndTag = '';
-        }
-
-        // set whitespace flags for nested tags (eg. <code> within a <pre>)
-        if (options.collapseWhitespace) {
-          if (!stackNoTrimWhitespace.length) {
-            squashTrailingWhitespace(tag);
-          }
-          if (!_canTrimWhitespace(tag, attrs)) {
-            stackNoTrimWhitespace.push(tag);
-          }
-          if (!_canCollapseWhitespace(tag, attrs)) {
-            stackNoCollapseWhitespace.push(tag);
-          }
-        }
-
-        var openTag = '<' + tag;
-        var hasUnarySlash = unarySlash && options.keepClosingSlash;
-
-        buffer.push(openTag);
-
-        if (lint) {
-          lint.testElement(tag);
-        }
-
-        var parts = [ ];
-        var token, isLast = true;
-        for (var i = attrs.length; --i >= 0; ) {
-          if (lint) {
-            lint.testAttribute(tag, attrs[i].name.toLowerCase(), attrs[i].value);
-          }
-          token = normalizeAttribute(attrs[i], attrs, tag, hasUnarySlash, i, options, isLast);
-          if (token) {
-            isLast = false;
-            parts.unshift(token);
-          }
-        }
-        if (parts.length > 0) {
-          buffer.push(' ');
-          buffer.push.apply(buffer, parts);
-        }
-        // start tag must never be omitted if it has any attributes
-        else if (optional && optionalStartTags(tag)) {
-          optionalStartTag = tag;
-        }
-
-        buffer.push(buffer.pop() + (hasUnarySlash ? '/' : '') + '>');
-      },
-      end: function(tag, attrs, autoGenerated) {
-        var lowerTag = tag.toLowerCase();
-        if (lowerTag === 'svg') {
-          options = optionsStack.pop();
-        }
-        tag = options.caseSensitive ? tag : lowerTag;
-
-        // check if current tag is in a whitespace stack
-        if (options.collapseWhitespace) {
-          if (stackNoTrimWhitespace.length) {
-            if (tag === stackNoTrimWhitespace[stackNoTrimWhitespace.length - 1]) {
-              stackNoTrimWhitespace.pop();
-            }
-          }
-          else {
-            squashTrailingWhitespace('/' + tag);
-          }
-          if (stackNoCollapseWhitespace.length &&
-            tag === stackNoCollapseWhitespace[stackNoCollapseWhitespace.length - 1]) {
-            stackNoCollapseWhitespace.pop();
-          }
-        }
-
-        var isElementEmpty = false;
-        if (tag === currentTag) {
-          currentTag = '';
-          isElementEmpty = !hasChars;
-        }
-
-        if (options.removeOptionalTags) {
-          // <html>, <head> or <body> may be omitted if the element is empty
-          if (isElementEmpty && topLevelTags(optionalStartTag)) {
-            removeStartTag();
-          }
-          optionalStartTag = '';
-          // </html> or </body> may be omitted if not followed by comment
-          // </head> may be omitted if not followed by space or comment
-          // </p> may be omitted if no more content in non-</a> parent
-          // except for </dt> or </thead>, end tags may be omitted if no more content in parent element
-          if (htmlTags(tag) && optionalEndTag && !trailingTags(optionalEndTag) && (optionalEndTag !== 'p' || !pInlineTags(tag))) {
-            removeEndTag();
-          }
-          optionalEndTag = optionalEndTags(tag) ? tag : '';
-        }
-
-        if (options.removeEmptyElements && isElementEmpty && canRemoveElement(tag, attrs)) {
-          // remove last "element" from buffer
+      var optional = options.removeOptionalTags;
+      if (optional) {
+        var htmlTag = htmlTags(tag);
+        // <html> may be omitted if first thing inside is not comment
+        // <head> may be omitted if first thing inside is an element
+        // <body> may be omitted if first thing inside is not space, comment, <meta>, <link>, <script>, <style> or <template>
+        // <colgroup> may be omitted if first thing inside is <col>
+        // <tbody> may be omitted if first thing inside is <tr>
+        if (htmlTag && canRemoveParentTag(optionalStartTag, tag)) {
           removeStartTag();
-          optionalStartTag = '';
-          optionalEndTag = '';
         }
-        else {
-          // push out everything but the end tag
-          if (options.includeAutoGeneratedTags || !autoGenerated) {
-            buffer.push('</' + tag + '>');
-          }
-          charsPrevTag = '/' + tag;
-          if (!inlineTextTags(tag)) {
-            currentChars = '';
-          }
+        optionalStartTag = '';
+        // end-tag-followed-by-start-tag omission rules
+        if (htmlTag && canRemovePrecedingTag(optionalEndTag, tag)) {
+          removeEndTag();
+          // <colgroup> cannot be omitted if preceding </colgroup> is omitted
+          // <tbody> cannot be omitted if preceding </tbody>, </thead> or </tfoot> is omitted
+          optional = !isStartTagMandatory(optionalEndTag, tag);
         }
-      },
-      chars: function(text, prevTag, nextTag) {
-        prevTag = prevTag === '' ? 'comment' : prevTag;
-        nextTag = nextTag === '' ? 'comment' : nextTag;
-        if (options.collapseWhitespace) {
-          if (!stackNoTrimWhitespace.length) {
-            if (prevTag === 'comment') {
-              var removed = buffer[buffer.length - 1] === '';
-              if (removed) {
-                prevTag = charsPrevTag;
-              }
-              if (buffer.length > 1 && (removed || / $/.test(currentChars))) {
-                var charsIndex = buffer.length - 2;
-                buffer[charsIndex] = buffer[charsIndex].replace(/\s+$/, function(trailingSpaces) {
-                  text = trailingSpaces + text;
-                  return '';
-                });
-              }
-            }
-            if (prevTag && inlineTextTags(prevTag.charAt(0) === '/' ? prevTag.slice(1) : prevTag)) {
-              text = collapseWhitespace(text, options, /(?:^|\s)$/.test(currentChars));
-            }
-            text = prevTag || nextTag ? collapseWhitespaceSmart(text, prevTag, nextTag, options) : trimWhitespace(text);
-            if (!text && /\s$/.test(currentChars) && prevTag && prevTag.charAt(0) === '/') {
-              for (var index = buffer.length - 2, endTag = prevTag.slice(1); index >= 0 && _canTrimWhitespace(endTag); index--) {
-                var str = buffer[index];
-                var match = str.match(/^<\/([\w:-]+)>$/);
-                if (match) {
-                  endTag = match[1];
-                }
-                else if (/>$/.test(str) || (buffer[index] = collapseWhitespaceSmart(str, null, nextTag, options))) {
-                  break;
-                }
-              }
-            }
-          }
-          if (!stackNoCollapseWhitespace.length) {
-            text = prevTag && nextTag || nextTag === 'html' ? text : collapseWhitespaceAll(text);
-          }
-        }
-        if (currentTag === 'script' || currentTag === 'style') {
-          if (options.removeCommentsFromCDATA) {
-            text = removeComments(text, currentTag);
-          }
-          if (options.removeCDATASectionsFromCDATA) {
-            text = removeCDATASections(text);
-          }
-          if (options.processScripts) {
-            text = processScript(text, options, currentAttrs);
-          }
-        }
-        if (options.minifyJS && isExecutableScript(currentTag, currentAttrs)) {
-          text = minifyJS(text, options.minifyJS);
-          if (text.charAt(text.length - 1) === ';') {
-            text = text.slice(0, -1);
-          }
-        }
-        if (currentTag === 'style' && options.minifyCSS) {
-          text = minifyCSS(text, options.minifyCSS);
-        }
-        if (options.removeOptionalTags && text) {
-          // <html> may be omitted if first thing inside is not comment
-          // <body> may be omitted if first thing inside is not space, comment, <meta>, <link>, <script>, <style> or <template>
-          if (optionalStartTag === 'html' || optionalStartTag === 'body' && !/^\s/.test(text)) {
-            removeStartTag();
-          }
-          optionalStartTag = '';
-          // </html> or </body> may be omitted if not followed by comment
-          // </head>, </colgroup> or </caption> may be omitted if not followed by space or comment
-          if (compactTags(optionalEndTag) || looseTags(optionalEndTag) && !/^\s/.test(text)) {
-            removeEndTag();
-          }
-          optionalEndTag = '';
-        }
-        charsPrevTag = /^\s*$/.test(text) ? prevTag : 'comment';
-        currentChars += text;
-        if (text) {
-          hasChars = true;
-        }
-        if (lint) {
-          lint.testChars(text);
-        }
-        buffer.push(text);
-      },
-      comment: function(text, nonStandard) {
-        var prefix = nonStandard ? '<!' : '<!--';
-        var suffix = nonStandard ? '>' : '-->';
-        if (isConditionalComment(text)) {
-          text = prefix + cleanConditionalComment(text, options) + suffix;
-        }
-        else if (options.removeComments) {
-          if (isIgnoredComment(text, options)) {
-            text = '<!--' + text + '-->';
-          }
-          else {
-            text = '';
-          }
-        }
-        else {
-          text = prefix + text + suffix;
-        }
-        if (options.removeOptionalTags && text) {
-          // preceding comments suppress tag omissions
-          optionalStartTag = '';
-          optionalEndTag = '';
-        }
-        buffer.push(text);
-      },
-      doctype: function(doctype) {
-        buffer.push(options.useShortDoctype ? '<!DOCTYPE html>' : collapseWhitespaceAll(doctype));
-      },
-      customAttrAssign: options.customAttrAssign,
-      customAttrSurround: options.customAttrSurround
-    });
+        optionalEndTag = '';
+      }
 
-    if (options.removeOptionalTags) {
-      // <html> may be omitted if first thing inside is not comment
-      // <head> or <body> may be omitted if empty
-      if (topLevelTags(optionalStartTag)) {
+      // set whitespace flags for nested tags (eg. <code> within a <pre>)
+      if (options.collapseWhitespace) {
+        if (!stackNoTrimWhitespace.length) {
+          squashTrailingWhitespace(tag);
+        }
+        if (!_canTrimWhitespace(tag, attrs)) {
+          stackNoTrimWhitespace.push(tag);
+        }
+        if (!_canCollapseWhitespace(tag, attrs)) {
+          stackNoCollapseWhitespace.push(tag);
+        }
+      }
+
+      var openTag = '<' + tag;
+      var hasUnarySlash = unarySlash && options.keepClosingSlash;
+
+      buffer.push(openTag);
+
+      if (lint) {
+        lint.testElement(tag);
+      }
+
+      var parts = [ ];
+      var token, isLast = true;
+      for (var i = attrs.length; --i >= 0; ) {
+        if (lint) {
+          lint.testAttribute(tag, attrs[i].name.toLowerCase(), attrs[i].value);
+        }
+        token = normalizeAttribute(attrs[i], attrs, tag, hasUnarySlash, i, options, isLast);
+        if (token) {
+          isLast = false;
+          parts.unshift(token);
+        }
+      }
+      if (parts.length > 0) {
+        buffer.push(' ');
+        buffer.push.apply(buffer, parts);
+      }
+      // start tag must never be omitted if it has any attributes
+      else if (optional && optionalStartTags(tag)) {
+        optionalStartTag = tag;
+      }
+
+      buffer.push(buffer.pop() + (hasUnarySlash ? '/' : '') + '>');
+
+      if (autoGenerated && !options.includeAutoGeneratedTags) {
         removeStartTag();
       }
-      // except for </dt> or </thead>, end tags may be omitted if no more content in parent element
-      if (optionalEndTag && !trailingTags(optionalEndTag)) {
-        removeEndTag();
+    },
+    end: function(tag, attrs, autoGenerated) {
+      var lowerTag = tag.toLowerCase();
+      if (lowerTag === 'svg') {
+        options = optionsStack.pop();
       }
-    }
+      tag = options.caseSensitive ? tag : lowerTag;
 
-    var str = joinResultSegments(buffer, options);
-
-    if (uidAttr) {
-      str = str.replace(new RegExp('(\\s*)' + uidAttr + '([0-9]+)(\\s*)', 'g'), function(match, prefix, index, suffix) {
-        var chunk = ignoredCustomMarkupChunks[+index];
-        if (options.collapseWhitespace) {
-          if (prefix !== '\t') {
-            chunk = prefix + chunk;
+      // check if current tag is in a whitespace stack
+      if (options.collapseWhitespace) {
+        if (stackNoTrimWhitespace.length) {
+          if (tag === stackNoTrimWhitespace[stackNoTrimWhitespace.length - 1]) {
+            stackNoTrimWhitespace.pop();
           }
-          if (suffix !== '\t') {
-            chunk += suffix;
-          }
-          return collapseWhitespace(chunk, {
-            preserveLineBreaks: options.preserveLineBreaks,
-            conservativeCollapse: true
-          }, /^\s/.test(chunk), /\s$/.test(chunk));
         }
         else {
-          return chunk;
+          squashTrailingWhitespace('/' + tag);
         }
-      });
-    }
-    if (uidIgnore) {
-      str = str.replace(new RegExp(uidIgnore + '([0-9]+)', 'g'), function(match, index) {
-        return ignoredMarkupChunks[+index];
-      });
-    }
-
-    log('minified in: ' + (Date.now() - t) + 'ms');
-    return str;
-  }
-
-  function joinResultSegments(results, options) {
-    var str;
-    var maxLineLength = options.maxLineLength;
-    if (maxLineLength) {
-      var token;
-      var lines = [];
-      var line = '';
-      for (var i = 0, len = results.length; i < len; i++) {
-        token = results[i];
-        if (line.length + token.length < maxLineLength) {
-          line += token;
-        }
-        else {
-          lines.push(line.replace(/^\n/, ''));
-          line = token;
+        if (stackNoCollapseWhitespace.length &&
+          tag === stackNoCollapseWhitespace[stackNoCollapseWhitespace.length - 1]) {
+          stackNoCollapseWhitespace.pop();
         }
       }
-      lines.push(line);
 
-      str = lines.join('\n');
-    }
-    else {
-      str = results.join('');
-    }
+      var isElementEmpty = false;
+      if (tag === currentTag) {
+        currentTag = '';
+        isElementEmpty = !hasChars;
+      }
 
-    return options.collapseWhitespace ? trimWhitespace(str) : str;
+      if (options.removeOptionalTags) {
+        // <html>, <head> or <body> may be omitted if the element is empty
+        if (isElementEmpty && topLevelTags(optionalStartTag)) {
+          removeStartTag();
+        }
+        optionalStartTag = '';
+        // </html> or </body> may be omitted if not followed by comment
+        // </head> may be omitted if not followed by space or comment
+        // </p> may be omitted if no more content in non-</a> parent
+        // except for </dt> or </thead>, end tags may be omitted if no more content in parent element
+        if (htmlTags(tag) && optionalEndTag && !trailingTags(optionalEndTag) && (optionalEndTag !== 'p' || !pInlineTags(tag))) {
+          removeEndTag();
+        }
+        optionalEndTag = optionalEndTags(tag) ? tag : '';
+      }
+
+      if (options.removeEmptyElements && isElementEmpty && canRemoveElement(tag, attrs)) {
+        // remove last "element" from buffer
+        removeStartTag();
+        optionalStartTag = '';
+        optionalEndTag = '';
+      }
+      else {
+        if (options.includeAutoGeneratedTags || !autoGenerated) {
+          buffer.push('</' + tag + '>');
+        }
+        charsPrevTag = '/' + tag;
+        if (!inlineTags(tag)) {
+          currentChars = '';
+        }
+        else if (isElementEmpty) {
+          currentChars += '|';
+        }
+      }
+    },
+    chars: function(text, prevTag, nextTag) {
+      prevTag = prevTag === '' ? 'comment' : prevTag;
+      nextTag = nextTag === '' ? 'comment' : nextTag;
+      if (options.collapseWhitespace) {
+        if (!stackNoTrimWhitespace.length) {
+          if (prevTag === 'comment') {
+            var removed = buffer[buffer.length - 1] === '';
+            if (removed) {
+              prevTag = charsPrevTag;
+            }
+            if (buffer.length > 1 && (removed || / $/.test(currentChars))) {
+              var charsIndex = buffer.length - 2;
+              buffer[charsIndex] = buffer[charsIndex].replace(/\s+$/, function(trailingSpaces) {
+                text = trailingSpaces + text;
+                return '';
+              });
+            }
+          }
+          if (prevTag && inlineTextTags(prevTag.charAt(0) === '/' ? prevTag.slice(1) : prevTag)) {
+            text = collapseWhitespace(text, options, /(?:^|\s)$/.test(currentChars));
+          }
+          text = prevTag || nextTag ? collapseWhitespaceSmart(text, prevTag, nextTag, options) : trimWhitespace(text);
+          if (!text && /\s$/.test(currentChars) && prevTag && prevTag.charAt(0) === '/') {
+            for (var index = buffer.length - 2, endTag = prevTag.slice(1); index >= 0 && _canTrimWhitespace(endTag); index--) {
+              var str = buffer[index];
+              var match = str.match(/^<\/([\w:-]+)>$/);
+              if (match) {
+                endTag = match[1];
+              }
+              else if (/>$/.test(str) || (buffer[index] = collapseWhitespaceSmart(str, null, nextTag, options))) {
+                break;
+              }
+            }
+          }
+        }
+        if (!stackNoCollapseWhitespace.length) {
+          text = prevTag && nextTag || nextTag === 'html' ? text : collapseWhitespaceAll(text);
+        }
+      }
+      if (options.processScripts && (currentTag === 'script' || currentTag === 'style')) {
+        text = processScript(text, options, currentAttrs);
+      }
+      if (options.minifyJS && isExecutableScript(currentTag, currentAttrs)) {
+        text = minifyJS(text, options.minifyJS);
+        if (text.charAt(text.length - 1) === ';') {
+          text = text.slice(0, -1);
+        }
+      }
+      if (options.minifyCSS && isStyleSheet(currentTag, currentAttrs)) {
+        text = minifyCSS(text, options.minifyCSS);
+      }
+      if (options.removeOptionalTags && text) {
+        // <html> may be omitted if first thing inside is not comment
+        // <body> may be omitted if first thing inside is not space, comment, <meta>, <link>, <script>, <style> or <template>
+        if (optionalStartTag === 'html' || optionalStartTag === 'body' && !/^\s/.test(text)) {
+          removeStartTag();
+        }
+        optionalStartTag = '';
+        // </html> or </body> may be omitted if not followed by comment
+        // </head>, </colgroup> or </caption> may be omitted if not followed by space or comment
+        if (compactTags(optionalEndTag) || looseTags(optionalEndTag) && !/^\s/.test(text)) {
+          removeEndTag();
+        }
+        optionalEndTag = '';
+      }
+      charsPrevTag = /^\s*$/.test(text) ? prevTag : 'comment';
+      currentChars += text;
+      if (text) {
+        hasChars = true;
+      }
+      if (lint) {
+        lint.testChars(text);
+      }
+      buffer.push(text);
+    },
+    comment: function(text, nonStandard) {
+      var prefix = nonStandard ? '<!' : '<!--';
+      var suffix = nonStandard ? '>' : '-->';
+      if (isConditionalComment(text)) {
+        text = prefix + cleanConditionalComment(text, options) + suffix;
+      }
+      else if (options.removeComments) {
+        if (isIgnoredComment(text, options)) {
+          text = '<!--' + text + '-->';
+        }
+        else {
+          text = '';
+        }
+      }
+      else {
+        text = prefix + text + suffix;
+      }
+      if (options.removeOptionalTags && text) {
+        // preceding comments suppress tag omissions
+        optionalStartTag = '';
+        optionalEndTag = '';
+      }
+      buffer.push(text);
+    },
+    doctype: function(doctype) {
+      buffer.push(options.useShortDoctype ? '<!DOCTYPE html>' : collapseWhitespaceAll(doctype));
+    },
+    customAttrAssign: options.customAttrAssign,
+    customAttrSurround: options.customAttrSurround
+  });
+
+  if (options.removeOptionalTags) {
+    // <html> may be omitted if first thing inside is not comment
+    // <head> or <body> may be omitted if empty
+    if (topLevelTags(optionalStartTag)) {
+      removeStartTag();
+    }
+    // except for </dt> or </thead>, end tags may be omitted if no more content in parent element
+    if (optionalEndTag && !trailingTags(optionalEndTag)) {
+      removeEndTag();
+    }
   }
 
-  global.minify = function(value, options) {
-    return minify(value, options);
-  };
+  var str = joinResultSegments(buffer, options);
 
-}(typeof exports === 'undefined' ? this : exports));
+  if (uidAttr) {
+    str = str.replace(new RegExp('(\\s*)' + uidAttr + '([0-9]+)(\\s*)', 'g'), function(match, prefix, index, suffix) {
+      var chunk = ignoredCustomMarkupChunks[+index];
+      if (options.collapseWhitespace) {
+        if (prefix !== '\t') {
+          chunk = prefix + chunk;
+        }
+        if (suffix !== '\t') {
+          chunk += suffix;
+        }
+        return collapseWhitespace(chunk, {
+          preserveLineBreaks: options.preserveLineBreaks,
+          conservativeCollapse: true
+        }, /^\s/.test(chunk), /\s$/.test(chunk));
+      }
+      else {
+        return chunk;
+      }
+    });
+  }
+  if (uidIgnore) {
+    str = str.replace(new RegExp('<!--!' + uidIgnore + '([0-9]+)-->', 'g'), function(match, index) {
+      return ignoredMarkupChunks[+index];
+    });
+  }
 
-},{"./htmlparser":68}],"relateurl":[function(require,module,exports){
+  log('minified in: ' + (Date.now() - t) + 'ms');
+  return str;
+}
+
+function joinResultSegments(results, options) {
+  var str;
+  var maxLineLength = options.maxLineLength;
+  if (maxLineLength) {
+    var token;
+    var lines = [];
+    var line = '';
+    for (var i = 0, len = results.length; i < len; i++) {
+      token = results[i];
+      if (line.length + token.length < maxLineLength) {
+        line += token;
+      }
+      else {
+        lines.push(line.replace(/^\n/, ''));
+        line = token;
+      }
+    }
+    lines.push(line);
+
+    str = lines.join('\n');
+  }
+  else {
+    str = results.join('');
+  }
+
+  return options.collapseWhitespace ? trimWhitespace(str) : str;
+}
+
+exports.minify = function(value, options) {
+  return minify(value, options);
+};
+
+},{"./htmlparser":68,"./utils":69,"clean-css":"clean-css","relateurl":"relateurl","uglify-js":"uglify-js"}],"relateurl":[function(require,module,exports){
 "use strict";
 
 var constants  = require("./constants");
@@ -41552,7 +41754,7 @@ objUtils.shallowMerge(RelateUrl, constants);
 
 module.exports = RelateUrl;
 
-},{"./constants":93,"./format":94,"./options":95,"./parse":98,"./relate":105,"./util/object":107}],"uglify-js":[function(require,module,exports){
+},{"./constants":94,"./format":95,"./options":96,"./parse":99,"./relate":106,"./util/object":108}],"uglify-js":[function(require,module,exports){
 var sys = require("util");
 var MOZ_SourceMap = require("source-map");
 var UglifyJS = exports;
@@ -50556,7 +50758,7 @@ exports.describe_ast = function () {
     doitem(UglifyJS.AST_Node);
     return out + "";
 };
-},{"source-map":137,"util":142}]},{},[]);
+},{"source-map":138,"util":143}]},{},[]);
 
 var Argument = Argument || {};
 
@@ -51503,6 +51705,25 @@ var MagTool = MagTool || {};
             });
         };
         
+        var selectableSelector;
+        var selectableCancelSelector = '[class*="creditsHolder"], [data-medium-focused="true"], .ui-resizable-handle';
+        
+        var getSelectableSelector = function() {
+            if (typeof selectableSelector === 'undefined') {
+                selectableSelector = [];
+                
+                selectableSelector.push('.draggable');
+                selectableSelector.push('.editable:not(.draggable .editable)');
+                selectableSelector.push('.editable:not(.resizable .editable)');
+                selectableSelector.push('.resizable');
+                selectableSelector.push('[class*="creditsWhole"]');
+                
+                selectableSelector = selectableSelector.join(', ');
+            }
+            
+            return selectableSelector;
+        };
+        
         var triggerSelectable = function() {
             var selectable = callWidgetFunction($selectable, 'selectable', 'instance');
             
@@ -51512,6 +51733,8 @@ var MagTool = MagTool || {};
         };
         
         this.select = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.addClass('ui-selecting');
             triggerSelectable();
         };
@@ -51559,6 +51782,8 @@ var MagTool = MagTool || {};
         };
         
         this.deselect = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.removeClass('ui-selected');
             triggerSelectable();
         };
@@ -51603,13 +51828,11 @@ var MagTool = MagTool || {};
         };
         
         this.makeSelectable = function() {
-            var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
-            
             $selectable = app.Page.getContent();
             
             $selectable.selectable({
-                filter: selectableSelector,
-                cancel: '[class*="creditsHolder"]',
+                filter: getSelectableSelector(),
+                cancel: selectableCancelSelector,
                 start: function() {
                     app.UI.getAllControls().blur();
                 },
@@ -51624,7 +51847,25 @@ var MagTool = MagTool || {};
                 }
             });
             
-            this.applySelectable($selectable.find(selectableSelector), false);
+            this.applySelectable($selectable.find(getSelectableSelector()), false);
+        };
+        
+        this.enableSelectable = function($el) {
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', selectableCancelSelector]);
+            callWidgetFunction($selectable, 'selectable', 'enable');
+            
+            if (typeof $el !== 'undefined') {
+                this.applySelectable($el);
+            }
+        };
+        
+        this.disableSelectable = function($el) {
+            if (typeof $el !== 'undefined') {
+                $el.off('click');
+            }
+            
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', '*']);
+            callWidgetFunction($selectable, 'selectable', 'disable');
         };
         
         this.removeSelectable = function() {
@@ -51769,7 +52010,7 @@ var MagTool = MagTool || {};
         
         this.enableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('enable');
+                return callWidgetFunction($el, 'draggable', 'enable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'enable');
@@ -51777,7 +52018,7 @@ var MagTool = MagTool || {};
         
         this.disableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('disable');
+                return callWidgetFunction($el, 'draggable', 'disable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'disable');
@@ -51933,7 +52174,7 @@ var MagTool = MagTool || {};
         
         this.enableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('enable');
+                return this.applyResizable($el);
             }
             
             callWidgetFunction($resizables, 'resizable', 'enable');
@@ -51941,7 +52182,7 @@ var MagTool = MagTool || {};
         
         this.disableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('disable');
+                return callWidgetFunction($el, 'resizable', 'destroy');
             }
             
             callWidgetFunction($resizables, 'resizable', 'disable');
@@ -51951,7 +52192,7 @@ var MagTool = MagTool || {};
             callWidgetFunction($resizables, 'resizable', 'destroy');
         };
         
-        var editor, $editing;
+        var editor, $editing, $disableInteractions;
         
         var getSelectedElement = function() {
             var Selection = window.getSelection();
@@ -51971,6 +52212,7 @@ var MagTool = MagTool || {};
                     buttons: [
                         'b',
                         'i',
+                        'u',
                         'anchor',
                         'h2',
                         'h3',
@@ -51979,6 +52221,65 @@ var MagTool = MagTool || {};
                         'span',
                         'dropcap',
                         'case'
+                    ]
+                },
+                keyboardCommands: {
+                    commands: [
+                        {
+                            key: 'B',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('b').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'I',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('i').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'U',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('u').button.onclick();
+                            },
+                        },
+                        {
+                            key: '2',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h2'
+                        },
+                        {
+                            key: '3',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h3'
+                        },
+                        {
+                            key: '4',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h4'
+                        },
+                        {
+                            key: '5',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h5'
+                        }
                     ]
                 },
                 extensions: {
@@ -51991,6 +52292,28 @@ var MagTool = MagTool || {};
                         label: '<i class="fa fa-italic"></i>',
                         start: '<em>',
                         end: '</em>'
+                    }),
+                    'u': new Medium.button({
+                        label: '<i class="fa fa-underline"></i>',
+                        action: function(html, mark) {
+                            var el = getSelectedElement();
+                            var $el = $(el);
+                            
+                            if (! $el.is(':header')) {
+                                if (! $el.is('u')) {
+                                    return '<u>' + html + '</u>';
+                                }
+                                
+                                editor.selectElement(el);
+                                html = $el.html();
+                                
+                                $el.remove();
+                            } else {
+                                $el.toggleClass('underline');
+                            }
+                            
+                            return html;
+                        }
                     }),
                     'span': new Medium.button({
                         label: '<b>span</b>',
@@ -52031,29 +52354,29 @@ var MagTool = MagTool || {};
                     action: function(html, mark) {
                         var el = getSelectedElement();
                         var $el = $(el);
-
+                        
                         $el.removeClass('dropcap3');
-
+                        
                         editor.selectElement(el);
-
+                        
                         if ($el.is('.continue')) {
                             var $firstLetter = $el.find('.firstletter');
-
+                            
                             $el.removeClass('continue');
                             $firstLetter.replaceWith($firstLetter.text());
-
+                            
                             html = $el.html();
                         } else {
                             html = window.getCurrentSelection();
                             html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
                             html = '<p class="continue">' + html + '</p>';
                         }
-
+                        
                         return html;
                     }
                 });
             }
-
+            
             return new Medium.editor(selector, options);
         };
         
@@ -52064,14 +52387,20 @@ var MagTool = MagTool || {};
             
             $el = $el.first();
             
-            app.ContentEditor.deselectAll($selectables);
-            app.ContentEditor.select($el);
+            this.deselectAll($selectables);
             
-            app.ContentEditor.disableDraggable($el);
-            app.ContentEditor.disableResizable($el);
-            app.ContentEditor.removeSelectable();
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            }
             
-            editor = window.editor = makeEditor($el);
+            $disableInteractions = $el.add($el.parentsUntil('.magazineContent'));
+            
+            this.disableDraggable($disableInteractions);
+            this.disableResizable($disableInteractions);
+            this.disableSelectable($disableInteractions);
+            this.disableEditable($el);
+            
+            editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
             
@@ -52099,15 +52428,17 @@ var MagTool = MagTool || {};
                 var $medium = $('[id*=medium-]');
                 var stop = true;
                 
-                if ($target.is($el) || $.contains($el.get(0), e.target)) {
+                if ($target.is($disableInteractions) || $.contains($el.get(0), e.target)) {
                     stop = false;
                 }
                 
-                for (var i = 0; i < $medium.length; i++) {
-                    if ($.contains($medium.get(i), e.target)) {
-                        stop = false;
-                        
-                        break;
+                if (stop) {
+                    for (var i = 0; i < $medium.length; i++) {
+                        if ($.contains($medium.get(i), e.target)) {
+                            stop = false;
+                            
+                            break;
+                        }
                     }
                 }
                 
@@ -52115,6 +52446,7 @@ var MagTool = MagTool || {};
                     app.ContentEditor.stopEditing();
                 }
             });
+            
             $(document).click($(document).data('click'));
             
             $editing = $el;
@@ -52133,7 +52465,7 @@ var MagTool = MagTool || {};
             }
             
             editor.destroy();
-            $editing = null;
+            editor = $editing = null;
             
             $(document).off('click', $(document).data('click'));
             
@@ -52150,12 +52482,20 @@ var MagTool = MagTool || {};
             // Ensure newline before .dropcap3, .continue
             $el.find('.dropcap3, .continue').prev(':not(br)').after('<br>');
             
-            app.ContentEditor.enableDraggable($el);
-            app.ContentEditor.enableResizable($el);
-            app.ContentEditor.makeSelectable();
-            app.ContentEditor.makeEditable();
+            this.enableSelectable($disableInteractions);
+            this.enableDraggable($disableInteractions);
+            this.enableResizable($disableInteractions);
+            this.enableEditable($el);
             
-            app.ContentEditor.select($el);
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            } else {
+                var $parent = $el.parentsUntil(getSelectableSelector());
+                
+                if ($parent.length) {
+                    this.select($parent);
+                }
+            }
         };
         
         this.applyEditable = function($el) {
@@ -52167,7 +52507,7 @@ var MagTool = MagTool || {};
             
             $editables = $editables.add($el);
             
-            $el.dblclick(function(e) {
+            $el.data('startEdit', function(e) {
                 var $this = $(this);
                 
                 // If we are currently editing a different element,
@@ -52176,13 +52516,30 @@ var MagTool = MagTool || {};
                     app.ContentEditor.stopEditing();
                 }
                 
-                $this.off('dblclick');
                 app.ContentEditor.startEditing($this);
             });
+            
+            $el.dblclick($el.data('startEdit'));
         };
         
         this.makeEditable = function() {
             this.applyEditable(app.Page.getContent().find('.editable'));
+        };
+        
+        this.enableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick').dblclick($el.data('startEdit'));
+            }
+            
+            $editables.off('dblclick').dblclick($editables.data('startEdit'));
+        };
+        
+        this.disableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick');
+            }
+            
+            $editables.off('dblclick');
         };
         
         this.removeEditable = function() {
@@ -52192,7 +52549,7 @@ var MagTool = MagTool || {};
                 selection.collapseToStart();
             }
             
-            if (typeof editor !== 'undefined') {
+            if (typeof editor !== 'undefined' && editor !== null) {
                 editor.destroy();
             }
             
@@ -52314,7 +52671,7 @@ var MagTool = MagTool || {};
             }
         };
         
-        this.change = function(id) {
+        this.changeId = function(id) {
             app.ContentEditor.getSelection().find('a').attr('data-magtool', id);
         };
         
@@ -52337,7 +52694,7 @@ var MagTool = MagTool || {};
             }
         };
     }
-
+    
     app.registerModule('CtaEditor', CtaEditor);
 })(window, jQuery, MagTool);
 
@@ -52645,7 +53002,7 @@ var MagTool = MagTool || {};
         };
         
         var trimBreakTags = function() {
-            getCloneContainer().find('br:first-child, br:last-child').remove();
+            getCloneContainer().find('br:last-child').remove();
         };
         
         var removeStyleAttributes = function() {
@@ -52770,7 +53127,11 @@ var MagTool = MagTool || {};
             
             $a.hide().appendTo($('#magtoolComponents'));
             
-            if ($.inArray('infoBlocks', files) > -1) {
+            if (typeof files === 'string') {
+                files = files.split(/[,\s]+/);
+            }
+            
+            if ($.inArray('infoBlocks', files) > -1 || $.inArray('infoblocks', files) > -1) {
                 zip.file(page + '/' + lang + '/infoBlocks.html', getContentHtml());
             }
             
@@ -52844,6 +53205,7 @@ var MagTool = MagTool || {};
         ).done(function() {
             window.MagTool = {
                 BASE_URI: app.BASE_URI,
+                env: app.env,
                 getVersion: app.getVersion,
                 reloading: true,
                 VERSION: app.VERSION

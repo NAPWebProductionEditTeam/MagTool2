@@ -146,6 +146,25 @@
             });
         };
         
+        var selectableSelector;
+        var selectableCancelSelector = '[class*="creditsHolder"], [data-medium-focused="true"], .ui-resizable-handle';
+        
+        var getSelectableSelector = function() {
+            if (typeof selectableSelector === 'undefined') {
+                selectableSelector = [];
+                
+                selectableSelector.push('.draggable');
+                selectableSelector.push('.editable:not(.draggable .editable)');
+                selectableSelector.push('.editable:not(.resizable .editable)');
+                selectableSelector.push('.resizable');
+                selectableSelector.push('[class*="creditsWhole"]');
+                
+                selectableSelector = selectableSelector.join(', ');
+            }
+            
+            return selectableSelector;
+        };
+        
         var triggerSelectable = function() {
             var selectable = callWidgetFunction($selectable, 'selectable', 'instance');
             
@@ -155,6 +174,8 @@
         };
         
         this.select = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.addClass('ui-selecting');
             triggerSelectable();
         };
@@ -202,6 +223,8 @@
         };
         
         this.deselect = function($el) {
+            $el = $el.filter(getSelectableSelector());
+            
             $el.removeClass('ui-selected');
             triggerSelectable();
         };
@@ -246,13 +269,11 @@
         };
         
         this.makeSelectable = function() {
-            var selectableSelector = '.draggable, .editable, .resizable, [class*="creditsWhole"]';
-            
             $selectable = app.Page.getContent();
             
             $selectable.selectable({
-                filter: selectableSelector,
-                cancel: '[class*="creditsHolder"]',
+                filter: getSelectableSelector(),
+                cancel: selectableCancelSelector,
                 start: function() {
                     app.UI.getAllControls().blur();
                 },
@@ -267,7 +288,25 @@
                 }
             });
             
-            this.applySelectable($selectable.find(selectableSelector), false);
+            this.applySelectable($selectable.find(getSelectableSelector()), false);
+        };
+        
+        this.enableSelectable = function($el) {
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', selectableCancelSelector]);
+            callWidgetFunction($selectable, 'selectable', 'enable');
+            
+            if (typeof $el !== 'undefined') {
+                this.applySelectable($el);
+            }
+        };
+        
+        this.disableSelectable = function($el) {
+            if (typeof $el !== 'undefined') {
+                $el.off('click');
+            }
+            
+            callWidgetFunction($selectable, 'selectable', 'option', ['cancel', '*']);
+            callWidgetFunction($selectable, 'selectable', 'disable');
         };
         
         this.removeSelectable = function() {
@@ -412,7 +451,7 @@
         
         this.enableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('enable');
+                return callWidgetFunction($el, 'draggable', 'enable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'enable');
@@ -420,7 +459,7 @@
         
         this.disableDraggable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.draggable('disable');
+                return callWidgetFunction($el, 'draggable', 'disable');
             }
             
             callWidgetFunction($draggables, 'draggable', 'disable');
@@ -576,7 +615,7 @@
         
         this.enableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('enable');
+                return this.applyResizable($el);
             }
             
             callWidgetFunction($resizables, 'resizable', 'enable');
@@ -584,7 +623,7 @@
         
         this.disableResizable = function($el) {
             if (typeof $el !== 'undefined') {
-                return $el.resizable('disable');
+                return callWidgetFunction($el, 'resizable', 'destroy');
             }
             
             callWidgetFunction($resizables, 'resizable', 'disable');
@@ -594,7 +633,7 @@
             callWidgetFunction($resizables, 'resizable', 'destroy');
         };
         
-        var editor, $editing;
+        var editor, $editing, $disableInteractions;
         
         var getSelectedElement = function() {
             var Selection = window.getSelection();
@@ -614,6 +653,7 @@
                     buttons: [
                         'b',
                         'i',
+                        'u',
                         'anchor',
                         'h2',
                         'h3',
@@ -622,6 +662,65 @@
                         'span',
                         'dropcap',
                         'case'
+                    ]
+                },
+                keyboardCommands: {
+                    commands: [
+                        {
+                            key: 'B',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('b').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'I',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('i').button.onclick();
+                            },
+                        },
+                        {
+                            key: 'U',
+                            meta: true,
+                            shift: false,
+                            alt: false,
+                            command: function() {
+                                editor.getExtensionByName('u').button.onclick();
+                            },
+                        },
+                        {
+                            key: '2',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h2'
+                        },
+                        {
+                            key: '3',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h3'
+                        },
+                        {
+                            key: '4',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h4'
+                        },
+                        {
+                            key: '5',
+                            meta: false,
+                            shift: false,
+                            alt: true,
+                            command: 'h5'
+                        }
                     ]
                 },
                 extensions: {
@@ -634,6 +733,28 @@
                         label: '<i class="fa fa-italic"></i>',
                         start: '<em>',
                         end: '</em>'
+                    }),
+                    'u': new Medium.button({
+                        label: '<i class="fa fa-underline"></i>',
+                        action: function(html, mark) {
+                            var el = getSelectedElement();
+                            var $el = $(el);
+                            
+                            if (! $el.is(':header')) {
+                                if (! $el.is('u')) {
+                                    return '<u>' + html + '</u>';
+                                }
+                                
+                                editor.selectElement(el);
+                                html = $el.html();
+                                
+                                $el.remove();
+                            } else {
+                                $el.toggleClass('underline');
+                            }
+                            
+                            return html;
+                        }
                     }),
                     'span': new Medium.button({
                         label: '<b>span</b>',
@@ -674,29 +795,29 @@
                     action: function(html, mark) {
                         var el = getSelectedElement();
                         var $el = $(el);
-
+                        
                         $el.removeClass('dropcap3');
-
+                        
                         editor.selectElement(el);
-
+                        
                         if ($el.is('.continue')) {
                             var $firstLetter = $el.find('.firstletter');
-
+                            
                             $el.removeClass('continue');
                             $firstLetter.replaceWith($firstLetter.text());
-
+                            
                             html = $el.html();
                         } else {
                             html = window.getCurrentSelection();
                             html = '<span class="firstletter">' + html.slice(0, 1) + '</span>' + html.slice(1, html.length);
                             html = '<p class="continue">' + html + '</p>';
                         }
-
+                        
                         return html;
                     }
                 });
             }
-
+            
             return new Medium.editor(selector, options);
         };
         
@@ -707,14 +828,20 @@
             
             $el = $el.first();
             
-            app.ContentEditor.deselectAll($selectables);
-            app.ContentEditor.select($el);
+            this.deselectAll($selectables);
             
-            app.ContentEditor.disableDraggable($el);
-            app.ContentEditor.disableResizable($el);
-            app.ContentEditor.removeSelectable();
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            }
             
-            editor = window.editor = makeEditor($el);
+            $disableInteractions = $el.add($el.parentsUntil('.magazineContent'));
+            
+            this.disableDraggable($disableInteractions);
+            this.disableResizable($disableInteractions);
+            this.disableSelectable($disableInteractions);
+            this.disableEditable($el);
+            
+            editor = makeEditor($el);
             $el.click(); // trigger a click to make sure it has focus.
             editor.selectElement(editor.getFocusedElement()); // Now select the element that has focus et voilá!
             
@@ -742,15 +869,17 @@
                 var $medium = $('[id*=medium-]');
                 var stop = true;
                 
-                if ($target.is($el) || $.contains($el.get(0), e.target)) {
+                if ($target.is($disableInteractions) || $.contains($el.get(0), e.target)) {
                     stop = false;
                 }
                 
-                for (var i = 0; i < $medium.length; i++) {
-                    if ($.contains($medium.get(i), e.target)) {
-                        stop = false;
-                        
-                        break;
+                if (stop) {
+                    for (var i = 0; i < $medium.length; i++) {
+                        if ($.contains($medium.get(i), e.target)) {
+                            stop = false;
+                            
+                            break;
+                        }
                     }
                 }
                 
@@ -758,6 +887,7 @@
                     app.ContentEditor.stopEditing();
                 }
             });
+            
             $(document).click($(document).data('click'));
             
             $editing = $el;
@@ -776,7 +906,7 @@
             }
             
             editor.destroy();
-            $editing = null;
+            editor = $editing = null;
             
             $(document).off('click', $(document).data('click'));
             
@@ -793,12 +923,20 @@
             // Ensure newline before .dropcap3, .continue
             $el.find('.dropcap3, .continue').prev(':not(br)').after('<br>');
             
-            app.ContentEditor.enableDraggable($el);
-            app.ContentEditor.enableResizable($el);
-            app.ContentEditor.makeSelectable();
-            app.ContentEditor.makeEditable();
+            this.enableSelectable($disableInteractions);
+            this.enableDraggable($disableInteractions);
+            this.enableResizable($disableInteractions);
+            this.enableEditable($el);
             
-            app.ContentEditor.select($el);
+            if ($el.is(getSelectableSelector())) {
+                this.select($el);
+            } else {
+                var $parent = $el.parentsUntil(getSelectableSelector());
+                
+                if ($parent.length) {
+                    this.select($parent);
+                }
+            }
         };
         
         this.applyEditable = function($el) {
@@ -810,7 +948,7 @@
             
             $editables = $editables.add($el);
             
-            $el.dblclick(function(e) {
+            $el.data('startEdit', function(e) {
                 var $this = $(this);
                 
                 // If we are currently editing a different element,
@@ -819,13 +957,30 @@
                     app.ContentEditor.stopEditing();
                 }
                 
-                $this.off('dblclick');
                 app.ContentEditor.startEditing($this);
             });
+            
+            $el.dblclick($el.data('startEdit'));
         };
         
         this.makeEditable = function() {
             this.applyEditable(app.Page.getContent().find('.editable'));
+        };
+        
+        this.enableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick').dblclick($el.data('startEdit'));
+            }
+            
+            $editables.off('dblclick').dblclick($editables.data('startEdit'));
+        };
+        
+        this.disableEditable = function($el) {
+            if (typeof $el !== 'undefined') {
+                return $el.off('dblclick');
+            }
+            
+            $editables.off('dblclick');
         };
         
         this.removeEditable = function() {
@@ -835,7 +990,7 @@
                 selection.collapseToStart();
             }
             
-            if (typeof editor !== 'undefined') {
+            if (typeof editor !== 'undefined' && editor !== null) {
                 editor.destroy();
             }
             

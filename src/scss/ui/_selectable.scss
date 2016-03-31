@@ -5,32 +5,21 @@
 }
 
 .ui-selectee {
-    &:after {
-        content: '';
-        @include absolute((top: -$uiPadding, right: -$uiPadding, bottom: -$uiPadding, left: -$uiPadding));
-        border: 1px solid rgba($uiColor, 0);
-        pointer-events: none;
-        transition: box-shadow .3s, background .3s, border-color .3s;
-    }
-    
-    &:hover {
-        &:after {
-            border-color: rgba($uiColor, .5);
-            box-shadow: inset 0 0 8px rgba($uiColor, .3), 0 0 8px rgba($uiColor, .3);
+    @extend %ui-interactable;
+}
+
+.ui-selectable:not(.ui-selectable-disabled) {
+    .ui-selectee {
+        &.ui-selecting, &:hover {
+            @extend %ui-interacting;
         }
-    }
-}
-
-.ui-selecting {
-    &:after {
-        border-color: rgba($uiColor, .5);
-        box-shadow: inset 0 0 8px rgba($uiColor, .3), 0 0 8px rgba($uiColor, .3);
-    }
-}
-
-.ui-selected {
-    &:after, &:hover:after {
-        border-color: $uiColor;
-        box-shadow: inset 0 0 8px rgba($uiColor, .6), 0 0 8px rgba($uiColor, .6);
+        
+        &.ui-selected {
+            @extend %ui-interacted;
+            
+            &:hover{
+                @extend %ui-interacted;
+            }
+        }
     }
 }

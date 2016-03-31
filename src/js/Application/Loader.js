@@ -49,6 +49,7 @@
         ).done(function() {
             window.MagTool = {
                 BASE_URI: app.BASE_URI,
+                env: app.env,
                 getVersion: app.getVersion,
                 reloading: true,
                 VERSION: app.VERSION

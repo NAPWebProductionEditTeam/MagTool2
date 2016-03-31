@@ -1,7 +1,15 @@
-.ui-draggable-dragging {
-    @extends .ui-selected;
+.ui-draggable:not(.ui-draggable-disabled) {
+    @extend %ui-interactable;
     
-    &:after {
-        background: rgba($uiColor, .3);
+    &:hover {
+        @extend %ui-interacting;
+    }
+    
+    &.ui-draggable-dragging {
+        @extend %ui-interacted;
+        
+        &:after {
+            background: rgba($uiColor, .3);
+        }
     }
 }
