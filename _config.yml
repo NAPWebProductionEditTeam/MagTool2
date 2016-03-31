@@ -6,6 +6,7 @@ project:
     tagline: Net-A-Porter Magazine Tool
     author: "NAPWebProductionEditTeam"
     github: "https://github.com/NAPWebProductionEditTeam/MagTool2"
+    package: "NAPWebProductionEditTeam/MagTool2"
 navigation:
   - name: Documentation
     url : "docs"
