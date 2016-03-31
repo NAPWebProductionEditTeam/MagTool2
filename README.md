@@ -1,5 +1,7 @@
 <!-- header start -->
 [![Latest Stable Version](https://img.shields.io/github/release/NAPWebProductionEditTeam/MagTool2.svg)]()
+[![License](https://img.shields.io/github/license/NAPWebProductionEditTeam/MagTool2.svg)]()
+[![Issues](https://img.shields.io/github/issues-raw/NAPWebProductionEditTeam/MagTool2.svg)]()
 
 # MagTool2
 ### Net-A-Porter Magazine Tool
