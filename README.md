@@ -1,7 +1,7 @@
 <!-- header start -->
-[![Latest Stable Version](https://img.shields.io/github/release/NAPWebProductionEditTeam/MagTool2.svg)]()
-[![License](https://img.shields.io/github/license/NAPWebProductionEditTeam/MagTool2.svg)]()
-[![Issues](https://img.shields.io/github/issues-raw/NAPWebProductionEditTeam/MagTool2.svg)]()
+[![Latest Stable Version](https://img.shields.io/github/release/NAPWebProductionEditTeam/MagTool2.svg)](https://github.com/NAPWebProductionEditTeam/MagTool2/releases)
+[![License](https://img.shields.io/github/license/NAPWebProductionEditTeam/MagTool2.svg)](https://raw.githubusercontent.com/NAPWebProductionEditTeam/MagTool2/master/LICENSE)
+[![Issues](https://img.shields.io/github/issues-raw/NAPWebProductionEditTeam/MagTool2.svg)](https://github.com/NAPWebProductionEditTeam/MagTool2/issues)
 
 # MagTool2
 ### Net-A-Porter Magazine Tool
