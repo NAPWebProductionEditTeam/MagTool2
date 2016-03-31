@@ -1,0 +1,57 @@
+@include component(docs-chooser) {
+    position: relative;
+    margin: 2.5% 0;
+    padding-bottom: 47.5%;
+    
+    @include part(wrapper) {
+        @extend %flexRow;
+        @extend %flexBetween;
+        flex-wrap: wrap;
+        align-items: stretch;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        
+        a {
+            @extend %flexCol;
+            @extend %flexAround;
+            position: relative;
+            width: 47.5%;
+            margin: 0 2.5%;
+            font-size: 1.5rem;
+            color: #FFF;
+            text-align: center;
+            box-sizing: border-box;
+            background-color: rgba(mix(lighten($lightAccentColor, 5%), lighten($darkAccentColor, 5%)), .8);
+            background-image: linear-gradient(90deg, rgba(lighten($lightAccentColor, 5%), .8), rgba(lighten($darkAccentColor, 5%), .8));
+            background-attachment: fixed;
+            
+            &:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: rgba(#FFF, 0);
+                transition: background .2s;
+            }
+            
+            &:hover {
+                &:after {
+                    background: rgba(#FFF, .1);
+                }
+            }
+            
+            &:first-child {
+                margin-left: 0;
+            }
+            
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+}

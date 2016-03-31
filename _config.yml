@@ -7,23 +7,25 @@ project:
     author: "NAPWebProductionEditTeam"
     github: "https://github.com/NAPWebProductionEditTeam/MagTool2"
 navigation:
-  - name: User Documentation
-    url: "docs/user"
+  - name: Documentation
+    url : "docs"
     navigation:
-      - name: Getting Started
-        type: category
-      - name: Installation
-        type: page
-        url: "installation"
-navigation:
-  - name: Developer Documentation
-    url: "docs/dev"
-    navigation:
-      - name: Getting Started
-        type: category
-      - name: Installation
-        type: page
-        url: "installation"
+      - name: User
+        url: "user"
+        navigation:
+          - name: Getting Started
+            type: category
+          - name: Installation
+            type: page
+            url: "installation"
+      - name: Developer
+        url: "dev"
+        navigation:
+          - name: Getting Started
+            type: category
+          - name: Installation
+            type: page
+            url: "installation"
 url: "https://napwebproductioneditteam.github.com/MagTool2"
 github_username: NAPWebProductionEditTeam
 
@@ -37,6 +39,8 @@ gems:
   - jekyll-assets
   - nokogiri
   - octopress-minify-html
+  - redcarpet
+  - pygments.rb
 assets:
   dirname: assets
   base_url: assets/

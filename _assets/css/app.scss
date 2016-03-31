@@ -1,13 +1,15 @@
 @charset "utf-8";
 
-$spacing-unit:     30px;
+@import "fonts", "icons/font-awesome";
+
+$spacing-unit: 30px;
 
 $pastelColor: #FAF2FD;
-$lightAccentColor: #AA076B;
-$darkAccentColor: #61045F;
+$lightAccentColor: #4b6cb7;
+$darkAccentColor: #182848;
 
 $csstyle-part-symbol: '\\/';
-$csstyle-root-id: 'twostream';
+$csstyle-root-id: 'magtool';
 
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import

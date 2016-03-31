@@ -20,9 +20,6 @@
     git add *
     git commit -a -m "Site updated on `date +'%Y-%m-%d %H:%M:%S'`"
     git push origin gh-pages
-
-	# Finally, switch back to the master branch and exit block
-	git checkout master
     
-    # purge sass cache folder in case it exists within the master branch.
-    rm -rf .sass-cache
+    # Finally, switch back to the build_site branch and exit block
+    git checkout build_site

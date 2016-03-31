@@ -1,0 +1,8 @@
+/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
+   readers do not read off random characters that represent icons */
+
+@each $icn in $fa-icons-all {
+    .#{$fa-css-prefix}-#{nth($icn, 1)}:before {
+        content: nth($icn, 2);
+    }
+}
