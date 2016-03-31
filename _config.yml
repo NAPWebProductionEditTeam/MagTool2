@@ -30,6 +30,7 @@ url: "https://napwebproductioneditteam.github.com/MagTool2"
 github_username: NAPWebProductionEditTeam
 
 # Build settings
+exclude: ['build.sh']
 markdown: redcarpet
 redcarpet:
   extensions: ['no_intra_emphasis', 'with_toc_data', 'html_toc', 'strikethrough', 'autolink', 'tables', 'footnotes', 'underline']
