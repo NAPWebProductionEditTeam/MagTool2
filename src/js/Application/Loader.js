@@ -7,17 +7,23 @@
     
     var load = function(callback) {
         // Load all required assets && js plugins.
-        var html;
+        var html, dCss, $css, dFa, $fa;
+        
+        dCss = $.Deferred();
+        $css = $('<link>').attr({rel: 'stylesheet', href: app.BASE_URI + css + suffix, id: 'mtCss'})
+            .appendTo($('head')).load(function() {
+                dCss.resolve();
+            });
+        
+        dFa = $.Deferred();
+        $fa = $('<link>').attr({rel: 'stylesheet', href: fa, id: 'fontAwesome'})
+            .appendTo($('head')).load(function() {
+                dFa.resolve();
+            });
         
         $.when(
-            $.get(fa).done(function() {
-                $('<link>').attr({rel: 'stylesheet', href: fa, id: 'fontAwesome'})
-                    .appendTo($('head'));
-            }),
-            $.get(app.BASE_URI + css + suffix).done(function() {
-                $('<link>').attr({rel: 'stylesheet', href: app.BASE_URI + css + suffix, id: 'mtCss'})
-                    .appendTo($('head'));
-            }),
+            dCss,
+            dFa,
             $.get(app.BASE_URI + tpl + suffix).done(function(data) {
                 html = data;
             }),

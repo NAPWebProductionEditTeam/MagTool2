@@ -1,4 +1,5 @@
 (function(window, $, app, Argument, CssEvents) {
+    var getComputedStyle = window.getComputedStyle;
     var setTimeout = window.setTimeout;
     var clearTimeout = window.clearTimeout;
     
@@ -6,21 +7,21 @@
         var $mt, $notify, $controls, $mainControlsSection, $mainControls, $pageControlsSection, $pageControls, $selectionSection, $selectionControls, $bottomSection;
         
         this.show = function() {
-            // dirty but that's the only way I could get it to work 100% of the time.
-            setTimeout(function() {
-                var repaint = app.UI.getUI().get(0).offset;
-                
-                $('#magtoolComponents').removeClass('+hide');
-                app.UI.getUI().removeClass('--hide');
-                
-                // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
-                if (! app.reloading) {
-                    var mtHeight = app.UI.getUI().outerHeight();
+            var repaint;
+            
+            repaint = getComputedStyle(app.UI.getUI().get(0)).opacity;
+            repaint = getComputedStyle(app.UI.getNotification().get(0)).transform;
+            
+            $('#magtoolComponents').removeClass('+hide');
+            app.UI.getUI().removeClass('--hide');
+            
+            // Add padding to body the size of the MagTool, and ensure there's no page 'jump' by recalculating the scrollTop.
+            if (! app.reloading) {
+                var mtHeight = app.UI.getUI().outerHeight();
                     
-                    app.$body.css({'padding-top': mtHeight});
-                    $(window).scrollTop($(window).scrollTop() + mtHeight);
-                }
-            }, 0);
+                app.$body.css({'padding-top': mtHeight});
+                $(window).scrollTop($(window).scrollTop() + mtHeight);
+            }
         };
         
         this.getUI = function() {
