@@ -1,4 +1,7 @@
 (function(window, $, app) {
+    var Math = window.Math;
+    var parseInt = window.parseInt;
+    
     function Credits() {
         var getCreditsHolder = function() {
             return app.Page.get().find('[class*="creditsHolder"]');
@@ -81,12 +84,25 @@
             getCreditsWhole().find('p').html(text);
         };
         
-        //        this.resizeCreditSpan = function(option) {
-        //            var $creditsWhole = getCreditsWhole();
-        //
-        //            if (option == 'addSpan') {
-        //            }
-        //        };
+        this.resize = function(operator) {
+            var $creditsWhole = getCreditsWhole();
+            var creditsClass = $creditsWhole.attr('class').replace(/\bspan-(\d+)\b/, function(match, $1) {
+                var size;
+                
+                if (operator === '+') {
+                    size = parseInt($1) + 1;
+                } else {
+                    size = parseInt($1) - 1;
+                }
+                
+                size = Math.max(1, size);
+                size = Math.min(25, size);
+                
+                return 'span-' + size;
+            });
+            
+            $creditsWhole.attr('class', creditsClass);
+        };
     }
     
     app.registerModule('Credits', Credits);
