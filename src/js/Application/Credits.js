@@ -81,13 +81,12 @@
             getCreditsWhole().find('p').html(text);
         };
         
-        this.resizeCreditSpan = function (option){
-             var $creditsWhole = getCreditsWhole();
-            if (option = 'addSpan'){
-                
-            }
-            
-        }
+        //        this.resizeCreditSpan = function(option) {
+        //            var $creditsWhole = getCreditsWhole();
+        //
+        //            if (option == 'addSpan') {
+        //            }
+        //        };
     }
     
     app.registerModule('Credits', Credits);
