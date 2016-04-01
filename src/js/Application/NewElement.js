@@ -72,7 +72,7 @@
          * Create New CTA Element.
          */
         this.newCTA = function() {
-            var $container = createContainer('btnShopThe textAlignCenter editable resizable draggable', 12);
+            var $container = createContainer('btnShopThe textAlignCenter resizable draggable', 12);
             var $a = $('<a/>');
             
             $a.attr('href', '')
