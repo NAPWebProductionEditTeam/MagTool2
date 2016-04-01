@@ -146,6 +146,12 @@ module.exports = function(grunt) {
                         }
                     },
                     {
+                        pattern: '{{ PORT }}',
+                        replacement: function() {
+                            return grunt.option('port');
+                        }
+                    },
+                    {
                         pattern: /^/,
                         replacement: 'javascript:'
                     }
@@ -171,6 +177,10 @@ module.exports = function(grunt) {
             }
         },
         watch: {
+            atBegin: {
+                files: [],
+                tasks: ['option-defaults', 'connect:watch']
+            },
             bower: {
                 files: ['bower.json'],
                 tasks: ['exec:bower_update']
@@ -192,7 +202,8 @@ module.exports = function(grunt) {
                 tasks: ['sass:build', 'notify:sass']
             },
             options: {
-                spawn: false,
+                atBegin: true,
+                spawn: false
             },
         },
         notify: {
@@ -238,6 +249,34 @@ module.exports = function(grunt) {
                     message: 'The dev and dist bookmarks were generated successfully'
                 }
             }
+        },
+        connect: {
+            options: {
+                port: grunt.option('port') || 1337,
+                base: 'build',
+                directory: 'build',
+                hostname: 'magtool.local',
+                middleware: function(connect, options, middlewares) {
+                    middlewares.unshift(function(req, res, next) {
+                        res.setHeader('Access-Control-Allow-Origin', '*');
+                        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+                        res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+                        next();
+                    });
+                    
+                    return middlewares;
+                }
+            },
+            server: {
+                options: {
+                    keepalive: true,
+                }
+            },
+            watch: {
+                options: {
+                    keepalive: false,
+                }
+            }
         }
     });
     
@@ -245,6 +284,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-contrib-connect');
     
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -260,16 +300,22 @@ module.exports = function(grunt) {
     grunt.registerTask('env:dev', function() {
         grunt.option('env', 'dev');
     });
-    grunt.registerTask('env-default:dev', function() {
+    
+    grunt.registerTask('option-defaults', function() {
         if (! grunt.option('env')) {
             grunt.option('env', 'dev');
         }
+        
+        if (! grunt.option('port')) {
+            grunt.option('port', 1337);
+        }
     });
     
-    grunt.registerTask('default', ['env-default:dev', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
+    grunt.registerTask('default', ['option-defaults', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
     grunt.registerTask('dist', ['exec', 'jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
     grunt.registerTask('bookmarks', ['uglify:bookmark', 'string-replace:dist', 'env:dev', 'uglify:build', 'string-replace:build', 'notify:bookmarks']);
     
+    grunt.registerTask('serve', ['option-defaults', 'uglify:build', 'string-replace:build', 'connect:server']);
     grunt.registerTask('update', ['exec']);
     
     var changedFiles = Object.create(null);
