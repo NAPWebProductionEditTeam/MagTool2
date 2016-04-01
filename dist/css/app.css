@@ -6626,6 +6626,16 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
   content: "\f070";
 }
 
+#magtoolComponents .btn-group {
+  float: left;
+  display: block;
+  color: rebeccapurple;
+}
+
+#magtoolComponents .btn-group + .btn-group {
+  margin-left: 15px;
+}
+
 #magtoolComponents .btn-group .radioBtn:first-child + .btn, #magtoolComponents .btn-group .uRadioBtn:first-child + .btn, #magtoolComponents .btn-group .checkbox:first-child + .btn {
   border-bottom-left-radius: 4px !important;
   border-top-left-radius: 4px !important;
@@ -7185,6 +7195,7 @@ p[contenteditable] {
   height: 162px;
   color: #FFF;
   background: #333;
+  opacity: 1;
   transition: opacity .3s;
   z-index: 9999990;
 }

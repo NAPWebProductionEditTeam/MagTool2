@@ -60,7 +60,9 @@ var MagTool = MagTool || {};
     app.registerBindings = function() {
         // Click bindings
         app.UI.getUI().on('click', '[data-action]', function() {
-            resolveAction($(this).data('action'));
+            var $this = $(this);
+            
+            resolveAction($this.data('action'), [$this.val()]);
         });
         
         // Change bindings
@@ -588,6 +590,11 @@ var MagTool = MagTool || {};
         app.Credits.update(text);
     }, false, true);
     
+    registerAction('resizeCredits', function(operator) {
+        console.log('res', operator);
+        app.Credits.resize(operator);
+    }, false, true);
+    
     // Slugs
     registerAction('moveSlug', function(position) {
         app.Slug.move(position);
@@ -641,4 +648,5 @@ var MagTool = MagTool || {};
     registerAction('changeHorizontalAnchor', function(anchor) {
         app.Anchor.changeHorizontalAnchor(anchor);
     }, false, true);
+    
 })(window, $, MagTool, Argument, Mousetrap);
