@@ -244,7 +244,7 @@
                             <label class="col-sm-2 control-label">
                                 Colour
                             </label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-4">
                                 <div class="btn-group">
                                     <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaBlack" value="black" data-change="changeCtaColor">
                                     <label class="btn btn-default" for="ctaBlack">
@@ -256,17 +256,24 @@
                                     </label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="ctaId" class="col-sm-2 control-label">
+                            <label for="ctaId" class="col-sm-1 control-label">
                                 Id
                             </label>
                             <div class="col-sm-3">
-                                <input type="cta" class="form-control" id="ctaId" placeholder="" data-change="changeCtaId">
+                                <input type="text" class="form-control" id="ctaId" placeholder="" data-change="changeCtaId">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="ctaContent" class="col-sm-2 control-label">
+                                Text
+                            </label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="ctaContent" placeholder="" data-change="changeCtaContent">
+                            </div>
+                            
+                        </div>
                     </div>
-
+                    
                     <!-- mixedSelection -->
                     <div class="selection" data-selection="mixed">
                         <p class="lead">
@@ -280,28 +287,28 @@
                             <label class="col-sm-2 control-label">
                                 Anchor
                             </label>
-                            <div class="col-sm-4">
-                                <div class="btn-group">
-                                    <input type="radio" class="radioBtn" name="verticalAnchor" id="anchorTop" value="top" data-change="changeVerticalAnchor">
-                                    <label class="btn btn-default" for="anchorTop">
-                                        Top
-                                    </label>
-                                    <input type="radio" class="radioBtn" name="verticalAnchor" id="anchorBottom" value="bottom" data-change="changeVerticalAnchor">
-                                    <label class="btn btn-default" for="anchorBottom">
-                                        Bottom
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="btn-group">
-                                    <input type="radio" class="radioBtn" name="horizontalAnchor" id="anchorLeft" value="left" data-change="changeHorizontalAnchor">
-                                    <label class="btn btn-default" for="anchorLeft">
-                                        Left
-                                    </label>
-                                    <input type="radio" class="radioBtn" name="horizontalAnchor" id="anchorRight" value="right" data-change="changeHorizontalAnchor">
-                                    <label class="btn btn-default" for="anchorRight">
-                                        Right
-                                    </label>
+                            <div class="col-sm-8">
+                                <div>
+                                    <div class="btn-group">
+                                        <input type="radio" class="radioBtn" name="verticalAnchor" id="anchorTop" value="top" data-change="changeVerticalAnchor">
+                                        <label class="btn btn-default" for="anchorTop">
+                                            Top
+                                        </label>
+                                        <input type="radio" class="radioBtn" name="verticalAnchor" id="anchorBottom" value="bottom" data-change="changeVerticalAnchor">
+                                        <label class="btn btn-default" for="anchorBottom">
+                                            Bottom
+                                        </label>
+                                    </div>
+                                    <div class="btn-group">
+                                        <input type="radio" class="radioBtn" name="horizontalAnchor" id="anchorLeft" value="left" data-change="changeHorizontalAnchor">
+                                        <label class="btn btn-default" for="anchorLeft">
+                                            Left
+                                        </label>
+                                        <input type="radio" class="radioBtn" name="horizontalAnchor" id="anchorRight" value="right" data-change="changeHorizontalAnchor">
+                                        <label class="btn btn-default" for="anchorRight">
+                                            Right
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
