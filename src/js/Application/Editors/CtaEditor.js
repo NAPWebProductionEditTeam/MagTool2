@@ -8,12 +8,18 @@
     var ctaTwo = '.btnShopTheTwoLine, .btnShopTheTwoLineWhite';
     
     function CtaEditor() {
+        var getLink = function() {
+            return app.ContentEditor.getSelection().find('a');
+        };
+        
         this.detectSelectedCta = function() {
             var $selected = app.ContentEditor.getSelection();
+            var $a = getLink();
             
-            $('#ctaId').val($selected.find('a').data('magtool'));
+            $('#ctaId').val($a.data('magtool'));
+            $('#ctaContent').val($a.text());
             
-            if ($selected.is('.btnShopThe') || $selected.is('.btnShopTheTwoLine')) {
+            if ($selected.is(ctaBlack)) {
                 $('#ctaBlack').prop('checked', true);
             } else {
                 $('#ctaWhite').prop('checked', true);
@@ -21,7 +27,11 @@
         };
         
         this.changeId = function(id) {
-            app.ContentEditor.getSelection().find('a').attr('data-magtool', id);
+            getLink().attr('data-magtool', id);
+        };
+        
+        this.changeContent = function(txt) {
+            getLink().text(txt);
         };
         
         this.changeColor = function(color) {

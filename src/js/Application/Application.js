@@ -611,6 +611,10 @@ var MagTool = MagTool || {};
         app.CtaEditor.changeId(id);
     }, false, true);
     
+    registerAction('changeCtaContent', function(txt) {
+        app.CtaEditor.changeContent(txt);
+    }, false, true);
+    
     registerAction('changeCtaColor', function(ctaColor) {
         app.CtaEditor.changeColor(ctaColor);
     }, false, true);
