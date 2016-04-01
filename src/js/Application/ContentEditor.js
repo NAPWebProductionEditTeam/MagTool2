@@ -646,7 +646,7 @@
             return node;
         };
         
-        var makeEditor = function(selector) {
+        var makeEditor = function($el) {
             var options = {
                 disableExtraSpaces: true,
                 toolbar: {
@@ -818,7 +818,7 @@
                 });
             }
             
-            return new Medium.editor(selector, options);
+            return new Medium.editor($el, options);
         };
         
         this.startEditing = function($el) {
