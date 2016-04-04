@@ -649,6 +649,9 @@
         var makeEditor = function($el) {
             var options = {
                 disableExtraSpaces: true,
+                paste: {
+                    cleanPastedHTML: true
+                },
                 toolbar: {
                     buttons: [
                         'b',
@@ -663,6 +666,9 @@
                         'dropcap',
                         'case'
                     ]
+                },
+                anchor: {
+                    targetCheckbox: true
                 },
                 keyboardCommands: {
                     commands: [
