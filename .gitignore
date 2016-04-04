@@ -1,6 +1,7 @@
 *.codekit
 .codekit-cache
 .sass-cache
+.asset-cache
 bower_components
 node_modules
 build
