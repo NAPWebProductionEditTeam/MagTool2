@@ -137,7 +137,9 @@ var MagTool = MagTool || {};
             resolveAction('edit');
         });
         
-        Mousetrap.bind('mod+s', function() {
+        Mousetrap.bind('mod+s', function(e) {
+            e.preventDefault();
+            
             resolveAction('save');
         });
         
