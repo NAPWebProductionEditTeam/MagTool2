@@ -260,7 +260,7 @@ var MagTool = MagTool || {};
             app.ContentEditor.startEditing(app.ContentEditor.getSelection().filter('.editable'));
         });
         
-        Mousetrap.bindGlobal('mod+enter', function() {
+        Mousetrap.bindGlobal(['mod+enter', 'esc'], function() {
             if (! app.ContentEditor.isEditing()) {
                 return;
             }
