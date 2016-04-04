@@ -25,7 +25,7 @@ Please note that you must specify `magtool.local` in your hosts file. On OS X, r
 
 ### Watching For File Changes
 
-You can also make grunt watch for file changes. To do so, run `grunt watch`. The watch task will start the server as well, so there is no need to open another cli window and run `grunt serve`.
+You can also make grunt watch for file changes. To do so, run `grunt watch`. This will automatically run the server as well, so there is no need to open another cli window and run `grunt serve`.
 
 ## Specifying Environment
 
