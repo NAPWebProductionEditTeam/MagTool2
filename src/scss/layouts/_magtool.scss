@@ -15,6 +15,10 @@
     display: none;
 }
 
+.nav-level-2 {
+    display: none;
+}
+
 @include component(magtool) {
     position: fixed;
     top: 0;

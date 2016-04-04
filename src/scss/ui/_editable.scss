@@ -1,8 +1,15 @@
 [contenteditable] {
     @extend %ui-interactable;
+    z-index: 99 !important;
     
     &:hover {
         @extend %ui-interacting;
+    }
+    
+    &:before {
+        content: '';
+        @include absolute((top: -$uiEditingPadding, right: -$uiEditingPadding, bottom: -$uiEditingPadding, left: -$uiEditingPadding));
+        z-index: -1;
     }
     
     &:after, &:hover:after {
