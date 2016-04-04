@@ -855,17 +855,11 @@
                 $node = $(getSelectedElement());
                 $parent = $node.parents('p, :header');
                 
-                if ($node.is('span, em, strong')) {
-                    // Remove <span style=""> elements created by contenteditable
-                    if ($node.is('span[style]')) {
-                        editor.saveSelection();
-                        $node.contents().unwrap();
-                        editor.restoreSelection();
-                    }
-                    
-                    if ($parent.length) {
-                        $node = $parent;
-                    }
+                // Remove <span style=""> elements created by contenteditable
+                if ($node.is('span[style]')) {
+                    editor.saveSelection();
+                    $node.contents().unwrap();
+                    editor.restoreSelection();
                 }
                 
                 // If contenteditable created <p> inside of a header, remove the <p> tag.
@@ -876,14 +870,18 @@
                 }
                 
                 // If contenteditable created a <div> tag, change it to a <p> tag.
-                if ($node.is('div')) {
+                if ($node.is('div:not(.editable)')) {
                     editor.saveSelection();
                     $node.wrap('<p>').contents().unwrap();
                     editor.restoreSelection();
                 }
                 
                 if (e.keyCode === 13 && ! e.shiftKey) {
-                    $node.removeAttr('class');
+                    if ($node.is('span, em, strong')) {
+                        $parent.removeAttr('class');
+                    } else {
+                        $node.removeAttr('class');
+                    }
                 }
             });
             
