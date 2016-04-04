@@ -181,17 +181,9 @@ module.exports = function(grunt) {
                 files: [],
                 tasks: ['option-defaults', 'connect:watch']
             },
-            bower: {
-                files: ['bower.json'],
-                tasks: ['exec:bower_update']
-            },
-            npm: {
-                files: ['package.json'],
-                tasks: ['exec:npm_update']
-            },
             js: {
-                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js', '!src/js/vendor.js'],
-                tasks: ['jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'string-replace:build', 'notify:concat']
+                files: ['Gruntfile.js', 'jscs.json', 'src/**/*.js'],
+                tasks: ['jshint', 'jscs', 'concat:build', 'uglify:build', 'string-replace:build', 'notify:concat']
             },
             tpl: {
                 files: ['src/tpl/**'],
