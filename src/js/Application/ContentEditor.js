@@ -649,9 +649,6 @@
         var makeEditor = function($el) {
             var options = {
                 disableExtraSpaces: true,
-                paste: {
-                    cleanPastedHTML: true
-                },
                 toolbar: {
                     buttons: [
                         'b',
@@ -853,15 +850,39 @@
             
             // Remove id from new nodes.
             $el.keyup(function(e) {
-                if (e.keyCode === 13 && ! e.shiftKey) {
-                    var $node, $parent;
-                    
-                    $node = $(getSelectedElement());
-                    
-                    if ($node.is('span, em, strong') && ($parent = $node.parents('p, :header')).length) {
-                        $node = $parent;
+                var $node, $parent;
+                
+                $node = $(getSelectedElement());
+                $parent = $node.parents('p, :header');
+                
+                if ($node.is('span, em, strong')) {
+                    // Remove <span style=""> elements created by contenteditable
+                    if ($node.is('span[style]')) {
+                        editor.saveSelection();
+                        $node.contents().unwrap();
+                        editor.restoreSelection();
                     }
                     
+                    if ($parent.length) {
+                        $node = $parent;
+                    }
+                }
+                
+                // If contenteditable created <p> inside of a header, remove the <p> tag.
+                if ($node.is('p') && $parent.is(':header')) {
+                    editor.saveSelection();
+                    $node.contents().unwrap();
+                    editor.restoreSelection();
+                }
+                
+                // If contenteditable created a <div> tag, change it to a <p> tag.
+                if ($node.is('div')) {
+                    editor.saveSelection();
+                    $node.wrap('<p>').contents().unwrap();
+                    editor.restoreSelection();
+                }
+                
+                if (e.keyCode === 13 && ! e.shiftKey) {
                     $node.removeAttr('class');
                 }
             });
@@ -923,7 +944,6 @@
                 return ! $(this).text();
             }).remove();
             
-            $el.find('span[style]').contents().unwrap();
             $el.find('[id]').removeAttr('id');
             
             // Ensure newline before .dropcap3, .continue
