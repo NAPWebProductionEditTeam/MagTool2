@@ -14,7 +14,7 @@
                                         <li class="sidebar/nav/item --active">{{ item.name }}</li>
                                     {% else %}
                                         <li class="sidebar/nav/item">
-                                            <a href="/{{ parent.url }}/{{ sub_parent.url }}/{{ item.url }}">{{ item.name }}</a>
+                                            <a href="{{ parent.url }}/{{ sub_parent.url }}/{{ item.url }}">{{ item.name }}</a>
                                         </li>
                                     {% endif %}
                                 {% endif %}

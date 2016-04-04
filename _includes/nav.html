@@ -2,14 +2,14 @@
     <section class="nav/left">
         <div class="nav/item">
             {{ site.project.name }}
-            <a href="/" class="+clickable"></a>
+            <a href="" class="+clickable"></a>
         </div>
     </section>
     <section class="nav/right">
         {% for item in site.navigation %}
             <div class="nav/item{% if item.navigation %} --has_children{% endif %}" id="nav-item_{{ item.url | slugify }}">
                 {{ item.name }}
-                <a href="/{{ item.url }}" class="+clickable"></a>
+                <a href="{{ item.url }}" class="+clickable"></a>
                 
                 {% if item.navigation %}
                     <nav class="nav/sub_menu">
@@ -17,7 +17,7 @@
                             {% capture url %}{{ item.url }}/{{ sub_item.url }}{% endcapture %}
                             <div class="nav/item --is_child" id="nav-item_{{ url | slugify }}">
                                 {{ sub_item.name }}
-                                <a href="/{{ url }}" class="+clickable"></a>
+                                <a href="{{ url }}" class="+clickable"></a>
                             </div>
                         {% endfor %}
                     </nav>
