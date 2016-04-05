@@ -17,9 +17,18 @@
                 
                 {% if parent.navigation %}
                     {% for item in parent.navigation %}
-                    {% capture full_link %}{{ parent.url }}/{{ item.url }}{% endcapture %}
+                        {% capture full_link %}{{ parent.url }}/{{ item.url }}{% endcapture %}
                         {% if ancestor_url == full_link %}
                             {% assign ancestor_obj = item %}
+                        {% endif %}
+                        
+                        {% if item.navigation %}
+                            {% for child in item.navigation %}
+                                {% capture full_link %}{{ parent.url }}/{{ item.url }}/{{ child.url }}{% endcapture %}
+                                {% if ancestor_url == full_link %}
+                                    {% assign ancestor_obj = child %}
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
                     {% endfor %}
                 {% endif %}
