@@ -1,5 +1,6 @@
 (function(window, $, app, Argument) {
     var Date = window.Date;
+    var console = window.console;
     
     function Modal() {
         var $modal, $dialog, $header, $title, $content, $modal_blocks;
@@ -101,7 +102,7 @@
             }
         };
         
-        this.confirm = function(e, title, content, ok, cancel) {
+        var confirm = function(title, content, ok, cancel) {
             init('confirm');
             
             title = Argument.default(title, false);
@@ -110,10 +111,6 @@
             cancel = Argument.default(cancel, 'Cancel');
             
             var $confirm = getBlocks();
-            var fire = ! e.isDefaultPrevented();
-            
-            // Cancel event
-            e.preventDefault();
             
             // Show appropriate blocks
             $modal_blocks.addClass('+hide');
@@ -123,6 +120,36 @@
             setContent(title, content);
             $confirm.find('[data-confirm]').text(ok);
             $confirm.find('[data-dismiss]').text(cancel);
+            
+            // Show modal
+            $modal.modal('show');
+            
+            return $confirm;
+        };
+        
+        this.confirm = function(title, content, ok, cancel) {
+            var Deferred = $.Deferred();
+            var $confirm = confirm(title, content, ok, cancel);
+            
+            $confirm.find('[data-confirm]').click(function() {
+                Deferred.resolve();
+                
+                $modal.modal('hide');
+            });
+            
+            $modal.on('hide.bs.modal', function(e) {
+                Deferred.reject(e);
+            });
+            
+            return Deferred;
+        };
+        
+        this.confirmEvent = function(e, title, content, ok, cancel) {
+            var $confirm = confirm(title, content, ok, cancel);
+            var fire = ! e.isDefaultPrevented();
+            
+            // Cancel event
+            e.preventDefault();
             
             // Re-fire event on confirm
             $confirm.find('[data-confirm]').click(function() {
@@ -147,9 +174,6 @@
                     }
                 }
             });
-            
-            // Show modal
-            $modal.modal('show');
         };
         
         this.alert = function(title, content, ok) {

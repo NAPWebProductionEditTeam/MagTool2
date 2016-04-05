@@ -336,7 +336,7 @@ var MagTool = MagTool || {};
                     });
                 };
                 
-                app.Modal.confirm(e, 'Unsaved Changes!', confirm);
+                app.Modal.confirmEvent(e, 'Unsaved Changes!', confirm);
                 
                 return false;
             }
@@ -432,6 +432,8 @@ var MagTool = MagTool || {};
                 app.unbindOriginalKeyEvents();
                 app.unbindOriginalNavigationEvents();
                 
+                app.Exporter.beforeEdit();
+                
                 app.ContentEditor.startEdit();
                 app.UI.showEditTools();
                 
@@ -479,6 +481,12 @@ var MagTool = MagTool || {};
         app.Server.save(pageId, files.credits, files.infoBlocks).done(function() {
             app.bindOriginalKeyEvents();
             app.bindOriginalNavigationEvents();
+            
+            if (app.Exporter.scriptHasChanged()) {
+                app.Modal.confirm('Script Changed', 'The script.html file has changed, would you like to download it?', 'Download', 'No').done(function() {
+                    app.Exporter.toFile('script');
+                });
+            }
             
             app.UI.showBtn('editSave', 'edit');
             

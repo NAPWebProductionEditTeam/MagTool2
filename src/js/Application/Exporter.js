@@ -231,6 +231,24 @@
             return getHtml($elements);
         };
         
+        var script;
+        
+        /**
+         * Grab the script before editing so we can detect changes to the script.html.
+         */
+        this.beforeEdit = function() {
+            script = getScriptHtml();
+        };
+        
+        /**
+         * Check if the script html has changed.
+         *
+         * @returns {boolean}
+         */
+        this.scriptHasChanged = function() {
+            return script === getScriptHtml();
+        };
+        
         /**
          * Get the current page as an Object.
          *
