@@ -13,6 +13,7 @@
             {% for parent in site.navigation %}
                 {% if ancestor_url == parent.url %}
                     {% assign ancestor_obj = parent %}
+                    {% assign ancestor_obj.url = full_link %}
                 {% endif %}
                 
                 {% if parent.navigation %}
@@ -20,6 +21,7 @@
                         {% capture full_link %}{{ parent.url }}/{{ item.url }}{% endcapture %}
                         {% if ancestor_url == full_link %}
                             {% assign ancestor_obj = item %}
+                            {% assign ancestor_obj.url = full_link %}
                         {% endif %}
                         
                         {% if item.navigation %}
@@ -27,6 +29,7 @@
                                 {% capture full_link %}{{ parent.url }}/{{ item.url }}/{{ child.url }}{% endcapture %}
                                 {% if ancestor_url == full_link %}
                                     {% assign ancestor_obj = child %}
+                                    {% assign ancestor_obj.url = full_link %}
                                 {% endif %}
                             {% endfor %}
                         {% endif %}
