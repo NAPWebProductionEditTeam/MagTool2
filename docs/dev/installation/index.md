@@ -27,6 +27,10 @@ Please note that you must specify `magtool.local` in your hosts file. On OS X, r
 
 You can also make grunt watch for file changes. To do so, run `grunt watch`. This will automatically run the server as well, so there is no need to open another cli window and run `grunt serve`.
 
+## Bookmark
+
+Once you rana local build, you can copy the contents of the `build/js/bookmark.min.js` file and save them into a bookmark in your browser. If you have a local server running, this bookmark will load your local version of the Magazine Tool.
+
 ## Specifying Environment
 
 You can specify the build environment by passing the `--env` option. The available environments are `dev` (`['dev', 'local', 'development']`), `test` (`['test', 'staging', 'testing']`) and `dist` (`['dist', 'live', 'production', 'distribution']`).
