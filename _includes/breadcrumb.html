@@ -13,7 +13,7 @@
             {% for parent in site.navigation %}
                 {% if ancestor_url == parent.url %}
                     {% assign ancestor_obj = parent %}
-                    {% assign ancestor_obj.url = full_link %}
+                    {% assign ancestor_obj_url = parent.url %}
                 {% endif %}
                 
                 {% if parent.navigation %}
@@ -21,7 +21,7 @@
                         {% capture full_link %}{{ parent.url }}/{{ item.url }}{% endcapture %}
                         {% if ancestor_url == full_link %}
                             {% assign ancestor_obj = item %}
-                            {% assign ancestor_obj.url = full_link %}
+                            {% assign ancestor_obj_url = full_link %}
                         {% endif %}
                         
                         {% if item.navigation %}
@@ -29,7 +29,7 @@
                                 {% capture full_link %}{{ parent.url }}/{{ item.url }}/{{ child.url }}{% endcapture %}
                                 {% if ancestor_url == full_link %}
                                     {% assign ancestor_obj = child %}
-                                    {% assign ancestor_obj.url = full_link %}
+                                    {% assign ancestor_obj_url = full_link %}
                                 {% endif %}
                             {% endfor %}
                         {% endif %}
@@ -39,7 +39,7 @@
             
             {% unless forloop.last %}
                 <li class="breadcrumb/item">
-                    <a href="{{ ancestor_obj.url }}">{{ ancestor_obj.name }}</a>
+                    <a href="{{ ancestor_obj_url }}">{{ ancestor_obj.name }}</a>
                 </li>
             {% else %}
                 <li class="breadcrumb/item --active">{{ ancestor_obj.name }}</li>
