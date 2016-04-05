@@ -54,4 +54,16 @@ assets:
   css_compressor: sass
   gzip: [ text/css, application/javascript ]
   sources:
-    - _assets
+    - _assetsgems: [jekyll-assets, nokogiri, octopress-minify-html, redcarpet, pygments.rb]
+#assets:
+#  compress:
+#    css: true
+#    js: true
+#  prefix: 'assets'
+#  assets:
+#    - "app.css"
+#    - "app.js"
+#  digest: true
+#  sources:
+#    - "_assets/css"
+#    - "_assets/js"
