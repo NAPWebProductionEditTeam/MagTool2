@@ -246,7 +246,7 @@
          * @returns {boolean}
          */
         this.scriptHasChanged = function() {
-            return script === getScriptHtml();
+            return script !== getScriptHtml();
         };
         
         /**
