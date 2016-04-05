@@ -27,4 +27,4 @@ this.app = this.app || {};
         
         app.scrollTo(location);
     });
-})(window, $, this.app)
+})(window, $, this.app);
