@@ -2,6 +2,10 @@
 layout: default
 ---
 
+---
+layout: default
+---
+
 # Application Lifecycle
 <!-- [[TOC]] -->
 
