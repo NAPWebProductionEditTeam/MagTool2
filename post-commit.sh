@@ -29,6 +29,10 @@ if [ `git rev-parse --abbrev-ref HEAD` == "master" ]; then
 	###################################################################
 	git checkout build_site
     
+    # Sync _config.yml
+	###################################################################
+	git checkout master -- _config.yml
+    
 	# Sync the README.md in master to index.md adding jekyll header
 	###################################################################
 	git checkout master -- README.md
