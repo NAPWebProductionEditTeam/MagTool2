@@ -1,7 +1,3 @@
----
-layout: default
----
-
 <!-- header start -->
 [![Latest Stable Version](https://img.shields.io/github/release/NAPWebProductionEditTeam/MagTool2.svg)](https://github.com/NAPWebProductionEditTeam/MagTool2/releases)
 [![License](https://img.shields.io/github/license/NAPWebProductionEditTeam/MagTool2.svg)](https://raw.githubusercontent.com/NAPWebProductionEditTeam/MagTool2/master/LICENSE)
@@ -13,8 +9,8 @@ layout: default
 
 The Net-A-Porter Magazine Tool is a front-end UI tool to build and edit *The EDIT* magazine right from your browser.
 
- - [User Documentation]()
- - [Developer Documentation]()
+ - [User Documentation](http://napwebproductioneditteam.github.io/MagTool2/docs/user/)
+ - [Developer Documentation](http://napwebproductioneditteam.github.io/MagTool2/docs/dev/)
 
 ## Quickstart
 
