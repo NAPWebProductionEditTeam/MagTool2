@@ -1,7 +1,3 @@
----
-layout: default
----
-
 # Local Builds
 <!-- [[TOC]] -->
 
