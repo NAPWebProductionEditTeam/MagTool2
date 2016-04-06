@@ -2,10 +2,6 @@
 layout: default
 ---
 
----
-layout: default
----
-
 # Documentation
 
 Welcome to the Magazine Tool documentation. The documentation is split into two parts: the [User Documentation](docs/user) and the [Developer Documentation](docs/dev). You can select a section below.
