@@ -1,5 +1,3 @@
-var MagTool = MagTool || {};
-
 (function(window, $, app, Argument, Mousetrap) {
     var Object = window.Object;
     var magazineBuilder = window.magazineBuilder;
