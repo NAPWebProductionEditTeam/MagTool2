@@ -11,7 +11,8 @@
                 <i class="fa fa-wifi fa-stack-1x"></i>
                 <i class="fa fa-ban fa-stack-2x text-danger"></i>
                 </span></section>-->
-            <!-- Edit/Save etc.  -->
+            
+            <!-- Global Tools  -->
             <section class="col-md-2 text-right section main-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -49,7 +50,7 @@
                 </div>
             </section>
 
-            <!-- Edit Page specific elements -->
+            <!-- Page Specific Tools -->
             <section class="col-md-3 section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -104,7 +105,7 @@
                 </div>
             </section>
 
-            <!-- Create new Element Tools -->
+            <!-- Create Element Tools -->
             <section class="col-md-1 text-right section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -175,69 +176,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- imageSelection -->
-                    <div class="form-horizontal selection" data-selection="image">
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <label for="imageURL" class="col-sm-2 control-label">
-                                    URL
-                                </label>
-                                <div class="col-sm-6">
-                                    <input type="url" class="form-control" id="imageURL" data-change="changeImageUrl">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="imageWidth" class="col-sm-2 control-label">
-                                    Size
-                                </label>
-                                <div class="col-sm-2">
-                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" value="auto" placeholder="auto" data-change="changeImageSize">
-                                </div>
-                                <div class="col-sm-2">
-                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeImageSize">
-                                </div>
-                                <div class="col-sm-3">
-                                    <p class="help-block" id="naturalSize"></p>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- videoSelection -->
-                    <div class="form-horizontal selection" data-selection="video">
-                        <form class="form-horizontal">
-                            <div class="form-group">
-                                <label for="videoId" class="col-sm-2 control-label">
-                                    Id
-                                </label>
-                                <div class="col-sm-6">
-                                    <input type="text" class="form-control" id="videoId" data-change="changeVideoId">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- creditsSelection -->
-                    <div class="form-horizontal selection" data-selection="credits">
-                        <div class="form-group">
-                            <label for="creditsContents" class="col-sm-2 control-label">
-                                Contents
-                            </label>
-                            <div class="col-sm-8">
-                                <textarea class="form-control" rows="5" data-change="updateCredits" id="creditsEditor"></textarea>
-                            </div>
-                            <div class="btnGroup col-sm-2">
-                                <button type="button" class="btn btn-default btn-block" value="+" data-action="resizeCredits">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-default btn-block" value="-" data-action="resizeCredits">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>                   
-                    </div>
-
+                    
                     <!-- CtaSelection -->
                     <div class="form-horizontal selection" data-selection="cta">
                         <div class="form-group">
@@ -274,6 +213,68 @@
                         </div>
                     </div>
                     
+                    <!-- imageSelection -->
+                    <div class="form-horizontal selection" data-selection="image">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="imageURL" class="col-sm-2 control-label">
+                                    URL
+                                </label>
+                                <div class="col-sm-6">
+                                    <input type="url" class="form-control" id="imageURL" data-change="changeImageUrl">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="imageWidth" class="col-sm-2 control-label">
+                                    Size
+                                </label>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageWidth" value="auto" placeholder="auto" data-change="changeImageSize">
+                                </div>
+                                <div class="col-sm-2">
+                                    <input type="text" class="form-control multi-input" name="imageSize" id="imageHeight" placeholder="auto" value="auto" data-change="changeImageSize">
+                                </div>
+                                <div class="col-sm-3">
+                                    <p class="help-block" id="naturalSize"></p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- videoSelection -->
+                    <div class="form-horizontal selection" data-selection="video">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="videoId" class="col-sm-2 control-label">
+                                    Id
+                                </label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="videoId" data-change="changeVideoId">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- creditsSelection -->
+                    <div class="form-horizontal selection" data-selection="credits">
+                        <div class="form-group">
+                            <label for="creditsContents" class="col-sm-2 control-label">
+                                Contents
+                            </label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" rows="5" data-change="updateCredits" id="creditsEditor"></textarea>
+                            </div>
+                            <div class="btnGroup col-sm-2">
+                                <button type="button" class="btn btn-default btn-block" value="+" data-action="resizeCredits">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-default btn-block" value="-" data-action="resizeCredits">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- mixedSelection -->
                     <div class="selection" data-selection="mixed">
                         <p class="lead">
@@ -281,6 +282,8 @@
                         </p>
                     </div>
                 </div>
+                
+                <!-- Shared Element Tools -->
                 <div class="wrapper">
                     <div class="form-horizontal selection bottom-section" id="bottom-section">
                         <div class="form-group">
@@ -318,6 +321,7 @@
         </div>
     </div>
     
+    <!-- Notifications -->
     <div class="notification hasZ +z-depth-2" id="notify">
         <i class="notification/icon fa fa-lg fa-fw fa-bell pull-left"></i>
         <div class="notification/content">
@@ -327,6 +331,7 @@
         <i class="notification/close fa fa-close"></i>
     </div>
     
+    <!-- Modals -->
     <div class="modal fade" id="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
