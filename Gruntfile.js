@@ -317,7 +317,7 @@ module.exports = function(grunt) {
                             },
                             validate: function(value) {
                                 var valid = semver.valid(value);
-
+                                
                                 return !!valid || 'Must be a valid semver, such as 1.2.3-rc1. See http://semver.org/ for more details.';
                             }
                         }
@@ -327,10 +327,13 @@ module.exports = function(grunt) {
         },
         bump: {
             options: {
+                files: ['package.json', 'README.md', 'docs/user/installation.md'],
                 updateConfigs: ['pkg'],
                 commitMessage: 'Release: v%VERSION%',
                 commitFiles: ['-a'],
-                pushTo: 'origin'
+                pushTo: 'origin',
+                globalReplace: true,
+                regExp: /([\'\"]?version[\'\"]?\s*:\s*[\'\"]?|bookmark\.min\.js\?v=)(\d+\.\d+\.\d+(-rc\.\d+)?(-\d+)?)[\dA-a\.\-]*([\'\"]?)/i
             }
         }
     });
