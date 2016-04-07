@@ -3,7 +3,7 @@
 
 ## Core
 
-The Core of the Application is located in `Application/Application.js`. It contains some Core Application Methods that can be called directly on the `MagTool` object, but also contains all of the Bindings and Keyboard Shortcuts. Finally, it has the definition of all the [Actions][docs_actions] that can be triggered by user interactions.
+The Core of the Application is located in `Application/Application.js`. It contains some Core Application Methods that can be called directly on the `MagTool` object, but also contains all of the Bindings and Keyboard Shortcuts. Finally, it has the definition of all the [Actions][docs.actions] that can be triggered by user interactions.
 
 ## Properties
 
@@ -15,4 +15,4 @@ The Application has a few public properties, most of them are read-only values. 
  - `$body`: Result of `$('body')`. This property MUST be used instead of calling `$('body')`. *(jQuery, read-only)*
  - `cta`: Selector for CTA links. *(String, read-only)*
 
-[docs_actions]: docs/dev/actions
+[docs.actions]: docs/dev/actions
