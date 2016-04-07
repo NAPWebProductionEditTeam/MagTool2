@@ -26,6 +26,6 @@ Once you ran a local build, you can copy the contents of the `build/js/bookmark.
 
 ## Specifying Environment
 
-You can specify the build environment by passing the `--env` option. The available environments are `dev` (`['dev', 'local', 'development']`), `test` (`['test', 'staging', 'testing']`) and `dist` (`['dist', 'live', 'production', 'distribution']`).
+You can specify the build environment by passing the `--env` option. The available environments are `dev` (`['dev', 'local', 'development']`), `test` (`['test', 'staging', 'testing']`) and `dist` (`['dist', 'live', 'production', 'distribution']`). You MUST use one of these environments when setting the environment.
 
 Example: `grunt --env=test`

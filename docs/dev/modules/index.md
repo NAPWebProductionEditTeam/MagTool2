@@ -7,9 +7,9 @@ layout: default
 
 ## Defining Modules
 
-Modules are each defined within a self invoking anonymous function, preventing any naming conflicts. When they are initialised in the `app.js`, their instances will become available as a property on the `MagTool` object. Modules are defined as a function starting with a Capital letter. Private methods and properties are defined using the `var` keyword inside this function. Public methods and properties are defined using the `this` keyword. Lastly, to register the Module in the Magazine Tool Application, use the Application's `registerModule` method. Obviously, each module should be registered with a unique name.
+Modules MUST be defined within a self invoking anonymous function, preventing any naming conflicts. When they are initialised in the `app.js`, their instances will become available as a property on the `MagTool` object. Modules MUST be defined as a function starting with a Capital letter. Private methods and properties MUST be defined using the `var` keyword inside this function. Public methods and properties MUST be defined using the `this` keyword. Lastly, each Module MUST be registered with the Magazine Tool Application using the Application's `registerModule` method. Each module MUST be registered with a unique name.
 
-An example module:
+An example Module:
 
 ```js
 (function(window, app) {
@@ -34,7 +34,9 @@ An example module:
 
 ## Importing Public Objects
 
-To import default javascript functions and classes from `window`, redefine them before your module function by accessing them through the `window` object, rather than passing all of them to the self invoking function. Other javascript libraries can be imported by passing them to the self invocing function.
+To import default javascript functions and classes from `window`, you SHOULD redefine them before your Module Definition by accessing them through the `window` object, rather than passing all of them to the self invoking function. Other javascript libraries MAY be imported by passing them to the self invocing function.
+
+An example Module that imports `window.Math` and `jQuery`:
 
 ```js
 (function(window, $, app) {
