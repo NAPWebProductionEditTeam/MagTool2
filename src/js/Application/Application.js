@@ -619,7 +619,6 @@
     }, false, true);
     
     registerAction('resizeCredits', function(operator) {
-        console.log('res', operator);
         app.Credits.resize(operator);
     }, false, true);
     
