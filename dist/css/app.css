@@ -6806,7 +6806,7 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
 }
 
 .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selecting, .ui-selectable:not(.ui-selectable-disabled) .ui-selectee:hover, .ui-draggable:not(.ui-draggable-disabled):hover, .ui-resizable:not(.ui-resizable-disabled):hover, [contenteditable]:hover {
-  z-index: 5 !important;
+  z-index: 5;
 }
 
 .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selecting:after, .ui-selectable:not(.ui-selectable-disabled) .ui-selectee:hover:after, .ui-draggable:hover:not(.ui-draggable-disabled):after, .ui-resizable:hover:not(.ui-resizable-disabled):after, [contenteditable]:hover:after {
@@ -6815,7 +6815,7 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
 }
 
 .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selected, .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selected:hover, .ui-draggable.ui-draggable-dragging:not(.ui-draggable-disabled), .ui-resizable.ui-resizable-resizing:not(.ui-resizable-disabled) {
-  z-index: 9 !important;
+  z-index: 9;
 }
 
 .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selected:after, .ui-selectable:not(.ui-selectable-disabled) .ui-selectee.ui-selected:hover:after, .ui-draggable.ui-draggable-dragging:not(.ui-draggable-disabled):after, .ui-resizable.ui-resizable-resizing:not(.ui-resizable-disabled):after {
@@ -6975,20 +6975,6 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
 
 .ui-resizable-disabled .ui-resizable-handle {
   display: none;
-}
-
-[contenteditable] {
-  z-index: 99 !important;
-}
-
-[contenteditable]:before {
-  content: '';
-  position: absolute;
-  top: -16px;
-  right: -16px;
-  bottom: -16px;
-  left: -16px;
-  z-index: -1;
 }
 
 [contenteditable]:after, [contenteditable]:hover:after {
@@ -7198,10 +7184,6 @@ p[contenteditable] {
 }
 
 #chat-invite, #chat-window, #LPbutton {
-  display: none;
-}
-
-.nav-level-2 {
   display: none;
 }
 
