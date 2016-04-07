@@ -177,6 +177,9 @@ module.exports = function(grunt) {
             },
             npm_update: {
                 cmd: 'npm update'
+            },
+            publish_docs: {
+                cmd: './publish-docs'
             }
         },
         watch: {
@@ -366,9 +369,10 @@ module.exports = function(grunt) {
     });
     
     grunt.registerTask('bumpVersion', ['prompt:bump', 'bump']);
+    grunt.registerTask('publish', ['exec:publish_docs']);
     grunt.registerTask('update', ['exec:bower_update', 'exec:npm_update']);
     grunt.registerTask('serve', ['option-defaults', 'uglify:build', 'string-replace:build', 'connect:server']);
-
+    
     grunt.registerTask('default', [
         'option-defaults',
         'jshint',
@@ -381,7 +385,7 @@ module.exports = function(grunt) {
         'string-replace:build',
         'notify:build'
     ]);
-
+    
     grunt.registerTask('dist', [
         'update',
         'jshint',
@@ -397,7 +401,7 @@ module.exports = function(grunt) {
         'bumpVersion',
         'notify:dist'
     ]);
-
+    
     grunt.registerTask('bookmarks', [
         'uglify:bookmark',
         'string-replace:dist',
