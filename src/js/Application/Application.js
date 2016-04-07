@@ -355,14 +355,34 @@
             var handlers;
             
             if ($this.is('.control.prev')) {
-                handlers = [magazineBuilder.goToPreviousPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.goToPreviousPage;
+                    }
+                ];
             } else if ($this.is('.control.next')) {
-                handlers = [magazineBuilder.goToNextPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.goToNextPage;
+                    }
+                ];
             } else if ($this.is('#button-content')) {
-                handlers = [magazineBuilder.loadContentsPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.loadContentsPage;
+                    }
+                ];
             } else if ($this.is('#button-archive')) {
                 handlers = [
-                    function() {
+                    function(e) {
+                        e.preventDefault();
+                        
                         magazineBuilder.jumpToPage(magazineBuilder.get_NumberOfPages());
                     }
                 ];
