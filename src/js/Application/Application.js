@@ -19,8 +19,8 @@
         return modules;
     };
     
-    app.$doc = $(window.document);
-    app.$body = $('body');
+    app.define('$doc', $(window.document));
+    app.define('$body', $('body'));
     
     app.getLanguage = function() {
         return app.$body.data('language');
