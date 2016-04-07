@@ -94,6 +94,46 @@
             }
         };
         
+        var joinDuplicateNodes = function(node) {
+            if (node.nodeType !== Node.ELEMENT_NODE || $.inArray(node.tagName, ['DIV', 'P', 'BR', 'AREA']) > -1) {
+                return;
+            }
+
+            var next = node.nextSibling;
+            var removeNodes = [];
+            var appendNode = null;
+
+            while (next !== null) {
+                if (next.nodeType === Node.ELEMENT_NODE && node.tagName === next.tagName && node.className === next.className) {
+                    var children = Array.from(next.childNodes);
+
+                    if (appendNode !== null) {
+                        node.appendChild(appendNode);
+                    }
+
+                    for (var i = 0; i < children.length; i++) {
+                        node.appendChild(children[i]);
+                    }
+
+                    removeNodes.push(next);
+                } else if (next.nodeType === Node.ELEMENT_NODE && next.tagName === 'BR') {
+                    appendNode = next;
+                } else if (next.nodeType === Node.TEXT_NODE && next.textContent.match(/^\s*$/)) {
+                    if (next.textContent.match(/^\s+$/) && appendNode === null) {
+                        appendNode = next;
+                    }
+                } else {
+                    break;
+                }
+
+                next = next.nextSibling;
+            }
+
+            for (var j = 0; j < removeNodes.length; j++) {
+                removeNodes[j].parentNode.removeChild(removeNodes[j]);
+            }
+        };
+
         /**
          * Ensure braces are always outside em tags and colon always inside em tag.
          *
@@ -179,6 +219,8 @@
                 
                 if (node.nodeType == Node.TEXT_NODE) {
                     normalizeCapitalisation(node);
+                } else if (node.nodeType == Node.ELEMENT_NODE) {
+                    joinDuplicateNodes(node);
                 }
             }
             

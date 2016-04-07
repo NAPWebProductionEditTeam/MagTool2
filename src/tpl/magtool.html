@@ -11,7 +11,8 @@
                 <i class="fa fa-wifi fa-stack-1x"></i>
                 <i class="fa fa-ban fa-stack-2x text-danger"></i>
                 </span></section>-->
-            <!-- Edit/Save etc.  -->
+
+            <!-- Global Tools  -->
             <section class="col-md-2 text-right section main-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -49,7 +50,7 @@
                 </div>
             </section>
 
-            <!-- Edit Page specific elements -->
+            <!-- Page Specific Tools -->
             <section class="col-md-3 section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -104,7 +105,7 @@
                 </div>
             </section>
 
-            <!-- Create new Element Tools -->
+            <!-- Create Element Tools -->
             <section class="col-md-1 text-right section page-controls">
                 <div class="form-horizontal">
                     <div class="form-group">
@@ -176,6 +177,42 @@
                         </div>
                     </div>
 
+                    <!-- CtaSelection -->
+                    <div class="form-horizontal selection" data-selection="cta">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">
+                                Colour
+                            </label>
+                            <div class="col-sm-4">
+                                <div class="btn-group">
+                                    <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaBlack" value="black" data-change="changeCtaColor">
+                                    <label class="btn btn-default" for="ctaBlack">
+                                        Black
+                                    </label>
+                                    <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaWhite" value="white" data-change="changeCtaColor">
+                                    <label class="btn btn-default" for="ctaWhite">
+                                        White
+                                    </label>
+                                </div>
+                            </div>
+                            <label for="ctaId" class="col-sm-1 control-label">
+                                Id
+                            </label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="ctaId" placeholder="" data-change="changeCtaId">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ctaContent" class="col-sm-2 control-label">
+                                Text
+                            </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="ctaContent" placeholder="" data-change="changeCtaContent">
+                            </div>
+
+                        </div>
+                    </div>
+
                     <!-- imageSelection -->
                     <div class="form-horizontal selection" data-selection="image">
                         <form class="form-horizontal">
@@ -235,42 +272,6 @@
                                     <i class="fa fa-minus"></i>
                                 </button>
                             </div>
-                        </div>                   
-                    </div>
-
-                    <!-- CtaSelection -->
-                    <div class="form-horizontal selection" data-selection="cta">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">
-                                Colour
-                            </label>
-                            <div class="col-sm-4">
-                                <div class="btn-group">
-                                    <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaBlack" value="black" data-change="changeCtaColor">
-                                    <label class="btn btn-default" for="ctaBlack">
-                                        Black
-                                    </label>
-                                    <input type="checkbox" class="uRadioBtn" name="ctaColor" id="ctaWhite" value="white" data-change="changeCtaColor">
-                                    <label class="btn btn-default" for="ctaWhite">
-                                        White
-                                    </label>
-                                </div>
-                            </div>
-                            <label for="ctaId" class="col-sm-1 control-label">
-                                Id
-                            </label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" id="ctaId" placeholder="" data-change="changeCtaId">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="ctaContent" class="col-sm-2 control-label">
-                                Text
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" id="ctaContent" placeholder="" data-change="changeCtaContent">
-                            </div>
-                            
                         </div>
                     </div>
                     
@@ -281,6 +282,8 @@
                         </p>
                     </div>
                 </div>
+
+                <!-- Shared Element Tools -->
                 <div class="wrapper">
                     <div class="form-horizontal selection bottom-section" id="bottom-section">
                         <div class="form-group">
@@ -318,6 +321,7 @@
         </div>
     </div>
     
+    <!-- Notifications -->
     <div class="notification hasZ +z-depth-2" id="notify">
         <i class="notification/icon fa fa-lg fa-fw fa-bell pull-left"></i>
         <div class="notification/content">
@@ -327,6 +331,7 @@
         <i class="notification/close fa fa-close"></i>
     </div>
     
+    <!-- Modals -->
     <div class="modal fade" id="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

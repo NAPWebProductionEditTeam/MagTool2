@@ -36,13 +36,13 @@
     };
     
     var reload = function() {
-        var faded = $.Deferred();
+        var dFaded = $.Deferred();
         
         app.UI.getUI().addClass('--hide').on(CssEvents.transitionEvent(), function() {
             $(this).off(CssEvents.transitionEvent());
             
             $('#magtoolComponents').remove();
-            faded.resolve();
+            dFaded.resolve();
         });
         
         app.ContentEditor.stopEdit();
@@ -50,7 +50,7 @@
         app.UI.getNotification().removeClass('--open');
         
         $.when(
-            faded,
+            dFaded,
             app.getVersion()
         ).done(function() {
             window.MagTool = {

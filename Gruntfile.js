@@ -1,3 +1,6 @@
+var semver = require('semver');
+var currentVersion = require('./package.json').version;
+
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -269,6 +272,63 @@ module.exports = function(grunt) {
                     keepalive: false,
                 }
             }
+        },
+        prompt: {
+            bump: {
+                options: {
+                    questions: [
+                        {
+                            config: 'bump.increment',
+                            type: 'list',
+                            message: 'Bump version from ' + '<%= pkg.version %>' + ' to:',
+                            default: 'patch',
+                            choices: [
+                                {
+                                    value: 'build',
+                                    name: 'Build:  ' + (currentVersion + '-?') + ' Unstable, betas, and release candidates.'
+                                },
+                                {
+                                    value: 'patch',
+                                    name: 'Patch:  ' + semver.inc(currentVersion, 'patch') + ' Backwards-compatible bug fixes.'
+                                },
+                                {
+                                    value: 'minor',
+                                    name: 'Minor:  ' + semver.inc(currentVersion, 'minor') + ' Add functionality in a backwards-compatible manner.'
+                                },
+                                {
+                                    value: 'major',
+                                    name: 'Major:  ' + semver.inc(currentVersion, 'major') + ' Incompatible API changes.'
+                                },
+                                {
+                                    value: 'custom',
+                                    name: 'Custom: ?.?.? Specify version...'
+                                }
+                            ]
+                        },
+                        {
+                            config: 'bump.version',
+                            type: 'input',
+                            message: 'What specific version would you like',
+                            when: function(answers) {
+                                return answers['bump.increment'] === 'custom';
+                            },
+                            validate: function(value) {
+                                var valid = semver.valid(value);
+
+                                return !!valid || 'Must be a valid semver, such as 1.2.3-rc1. See http://semver.org/ for more details.';
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        bump: {
+            options: {
+                updateConfigs: ['pkg'],
+                commitMessage: 'Release: v%VERSION%',
+                commitFiles: ['-a'],
+                pushTo: 'origin'
+            }
         }
     });
     
@@ -276,6 +336,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-prompt');
+    grunt.loadNpmTasks('grunt-bump');
     grunt.loadNpmTasks('grunt-contrib-connect');
     
     grunt.loadNpmTasks('grunt-browserify');
@@ -303,12 +365,47 @@ module.exports = function(grunt) {
         }
     });
     
-    grunt.registerTask('default', ['option-defaults', 'jshint', 'jscs', 'browserify', 'concat:build', 'uglify:build', 'sass:build', 'htmlmin:build', 'string-replace:build', 'notify:build']);
-    grunt.registerTask('dist', ['exec', 'jshint', 'jscs', 'browserify', 'concat', 'uglify:dist', 'uglify:bookmark', 'sass', 'htmlmin:dist', 'copy', 'string-replace:dist', 'notify:dist']);
-    grunt.registerTask('bookmarks', ['uglify:bookmark', 'string-replace:dist', 'env:dev', 'uglify:build', 'string-replace:build', 'notify:bookmarks']);
-    
+    grunt.registerTask('bumpVersion', ['prompt:bump', 'bump']);
+    grunt.registerTask('update', ['exec:bower_update', 'exec:npm_update']);
     grunt.registerTask('serve', ['option-defaults', 'uglify:build', 'string-replace:build', 'connect:server']);
-    grunt.registerTask('update', ['exec']);
+
+    grunt.registerTask('default', [
+        'option-defaults',
+        'jshint',
+        'jscs',
+        'browserify',
+        'concat:build',
+        'uglify:build',
+        'sass:build',
+        'htmlmin:build',
+        'string-replace:build',
+        'notify:build'
+    ]);
+
+    grunt.registerTask('dist', [
+        'update',
+        'jshint',
+        'jscs',
+        'browserify',
+        'concat',
+        'uglify:dist',
+        'uglify:bookmark',
+        'sass',
+        'htmlmin:dist',
+        'copy',
+        'string-replace:dist',
+        'bumpVersion',
+        'notify:dist'
+    ]);
+
+    grunt.registerTask('bookmarks', [
+        'uglify:bookmark',
+        'string-replace:dist',
+        'env:dev',
+        'uglify:build',
+        'string-replace:build',
+        'notify:bookmarks'
+    ]);
     
     var changedFiles = Object.create(null);
     var onChange = grunt.util._.debounce(function() {

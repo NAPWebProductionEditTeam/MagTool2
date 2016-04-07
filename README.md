@@ -9,8 +9,8 @@
 
 The Net-A-Porter Magazine Tool is a front-end UI tool to build and edit *The EDIT* magazine right from your browser.
 
- - [User Documentation]()
- - [Developer Documentation]()
+ - [User Documentation](http://napwebproductioneditteam.github.io/MagTool2/docs/user/)
+ - [Developer Documentation](http://napwebproductioneditteam.github.io/MagTool2/docs/dev/)
 
 ## Quickstart
 

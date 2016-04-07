@@ -4,7 +4,7 @@
             var $editor = app.UI.getSelectionControls().filter('#videoId');
             var $video = app.ContentEditor.getSelection();
             var $js = app.Page.getContent().find('script');
-            var id = $js.html().match(/.*videoID\s*:\s*"(\d+)".*/)[1];
+            var id = $video.find('.videoLoader').attr('id');
             
             $editor.val(id);
         };

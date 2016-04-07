@@ -850,16 +850,24 @@
             
             // Remove id from new nodes.
             $el.keyup(function(e) {
+                var $this = $(this);
                 var $node, $parent;
                 
                 $node = $(getSelectedElement());
                 $parent = $node.parents('p, :header');
                 
-                // Remove <span style=""> elements created by contenteditable
-                if ($node.is('span[style]')) {
-                    editor.saveSelection();
-                    $node.contents().unwrap();
-                    editor.restoreSelection();
+                editor.saveSelection();
+
+                if ($this.find('span[style], em em').length) {
+                    $this.find('span[style], em em').each(function() {
+                        $(this).contents().unwrap();
+                    });
+                }
+
+                if ($this.find('* p, * div').length) {
+                    $this.find('* p, * div').each(function() {
+                        $(this).contents().unwrap();
+                    });
                 }
                 
                 // If contenteditable created <p> inside of a header, remove the <p> tag.
@@ -883,6 +891,8 @@
                         $node.removeAttr('class');
                     }
                 }
+
+                editor.restoreSelection();
             });
             
             $(document).data('click', function(e) {
