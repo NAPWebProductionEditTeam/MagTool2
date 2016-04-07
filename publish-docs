@@ -48,7 +48,7 @@ echo "build start"
 /usr/local/bin/jekyll build
 echo "build done"
 
-git add *
+git add .
 git commit -a -m "Built site on `date +'%Y-%m-%d %H:%M:%S'`"
 
 # Push build_site
@@ -60,7 +60,7 @@ git checkout gh-pages
 git checkout build_site -- _site
 cp -r _site/ .
 rm -rf _site
-git add *
+git add .
 git commit -a -m "Site updated on `date +'%Y-%m-%d %H:%M:%S'`"
 git push origin gh-pages
 
