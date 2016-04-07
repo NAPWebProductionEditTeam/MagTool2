@@ -13,11 +13,15 @@ layout: default
 
 The Net-A-Porter Magazine Tool is a front-end UI tool to build and edit *The EDIT* magazine right from your browser.
 
- - [User Documentation]()
- - [Developer Documentation]()
+ - [User Documentation][docs/user]
+ - [Developer Documentation][docs/dev]
 
 ## Quickstart
 
-Open the [bookmark.min.js](http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/js/bookmark.min.js?v=0.0.0) file and copy the text displayed (`cmd+a` & `cmd+c`) in your browser. Next, create a new bookmark and paste in the content you just copied as the url.
+Open the [bookmark.min.js][bookmark] file and copy the text displayed (`cmd+a` & `cmd+c`) in your browser. Next, create a new bookmark and paste in the content you just copied as the url.
 
 Now open The EDIT magazine to a page you'd like to edit, and click the bookmark you just created. This will start the Magazine Tool. Once it's loaded, click the Start Edit button, and you're good to go.
+
+[docs/user]: http://napwebproductioneditteam.github.io/MagTool2/docs/user/
+[docs/dev]: http://napwebproductioneditteam.github.io/MagTool2/docs/dev/
+[bookmark]: http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/js/bookmark.min.js?v=1.0.9
