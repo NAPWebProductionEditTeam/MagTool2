@@ -130,7 +130,7 @@
         // Reset Mousetrap in case any Mousetrap shortcuts are already bound.
         Mousetrap.reset();
         
-        // Time to bind our own key events then.
+        // Time to bind our own key events.
         Mousetrap.bind('mod+e', function() {
             resolveAction('edit');
         });
