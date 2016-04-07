@@ -352,8 +352,6 @@ module.exports = function(grunt) {
     
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     
-    grunt.renameTask('bump', 'version-bump');
-    
     grunt.registerTask('env:dev', function() {
         grunt.option('env', 'dev');
     });
@@ -368,7 +366,7 @@ module.exports = function(grunt) {
         }
     });
     
-    grunt.registerTask('bump', ['prompt:bump', 'version-bump']);
+    grunt.registerTask('bumpVersion', ['prompt:bump', 'bump']);
     grunt.registerTask('update', ['exec:bower_update', 'exec:npm_update']);
     grunt.registerTask('serve', ['option-defaults', 'uglify:build', 'string-replace:build', 'connect:server']);
     
@@ -397,7 +395,7 @@ module.exports = function(grunt) {
         'htmlmin:dist',
         'copy',
         'string-replace:dist',
-        'bump',
+        'bumpVersion',
         'notify:dist'
     ]);
     
