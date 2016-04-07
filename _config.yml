@@ -30,11 +30,17 @@ navigation:
           - name: Local Builds
             type: page
             url: "local"
+          - name: Application Structure
+            type: page
+            url: "structure"
           - name: The Basics
             type: category
-          - name: Application Lifecycle
+          - name: Lifecycle
             type: page
             url: "lifecycle"
+          - name: The Application
+            type: page
+            url: "application"
           - name: Modules
             type: page
             url: "modules"
