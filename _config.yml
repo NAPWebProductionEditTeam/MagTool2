@@ -30,9 +30,14 @@ navigation:
           - name: Local Builds
             type: page
             url: "local"
+          - name: The Basics
+            type: category
           - name: Application Lifecycle
             type: page
             url: "lifecycle"
+          - name: Modules
+            type: page
+            url: "modules"
 url: "https://napwebproductioneditteam.github.com/MagTool2"
 github_username: NAPWebProductionEditTeam
 

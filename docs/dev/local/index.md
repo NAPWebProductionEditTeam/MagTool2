@@ -22,7 +22,7 @@ You can also make grunt watch for file changes. To do so, run `grunt watch`. Thi
 
 ## Bookmark
 
-Once you rana local build, you can copy the contents of the `build/js/bookmark.min.js` file and save them into a bookmark in your browser. If you have a local server running, this bookmark will load your local version of the Magazine Tool.
+Once you ran a local build, you can copy the contents of the `build/js/bookmark.min.js` file and save them into a bookmark in your browser. If you have a local server running, this bookmark will load your local version of the Magazine Tool.
 
 ## Specifying Environment
 
