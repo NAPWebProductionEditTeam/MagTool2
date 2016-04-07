@@ -13,7 +13,8 @@
     <title>{% if page.title %}{{ page.title }} // {% endif %}{{ site.project.alt_name }} by {{ site.project.author }}</title>
     
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link type="text/css" rel="stylesheet" href="assets/css/app.css">
+    {% capture css_path %}{% asset_path css/app %}{% endcapture %}
+    <link type="text/css" rel="stylesheet" href="{{ css_path | md5_cache_bust }}">
 </head>
 <body>
     {% include nav.html %}

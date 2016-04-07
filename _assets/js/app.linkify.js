@@ -1,4 +1,5 @@
 this.app = this.app || {};
+
 (function(window, $, app){
     var linkifyAnchors = function(level, container){
         if (!(level instanceof window.Array))
@@ -21,4 +22,4 @@ this.app = this.app || {};
     };
     
     app.linkifyAnchors = linkifyAnchors;
-})(window, $, this.app)
+})(window, $, this.app);

@@ -17,12 +17,12 @@ body {
   color: #525252; }
 
 a {
-  color: $darkAccentColor;
+  color: $linkColor;
   text-decoration: none;
   cursor: pointer;
   transition: color .2s; }
   a:hover {
-    color: $lightAccentColor; }
+    color: $linkHoverColor; }
 
 h1, h2, h3, h4, h5, h6{
     a{
