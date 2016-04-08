@@ -1,4 +1,5 @@
 # Start Editing
+<!-- [[TOC]] -->
 This page describes the tools on the left hand side of the Magazine Tool.
 
 ## Start Edit
