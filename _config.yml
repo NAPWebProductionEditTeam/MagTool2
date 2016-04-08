@@ -47,6 +47,8 @@ navigation:
           - name: Modules
             type: page
             url: "modules"
+          - name: API Reference
+            type: category
 url: "https://napwebproductioneditteam.github.com/MagTool2"
 github_username: NAPWebProductionEditTeam
 
