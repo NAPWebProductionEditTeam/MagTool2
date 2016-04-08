@@ -2,7 +2,7 @@
 
 # Build the site
 echo "build start"
-jekyll b
+#jekyll b
 echo "build done"
 
 git add *
