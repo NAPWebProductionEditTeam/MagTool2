@@ -3,9 +3,6 @@ layout: default
 ---
 
 # Release Process
-<!-- [[TOC]] -->
-
-## Releasing A New Version
 
 To release a new version of the Magazine Tool, run the `grunt dist` command. This will update your dependencies, run a full distribution build and bump the version. Grunt will ask you if this is a patch, minor or major change. The difference between are indicated when you need to choose. If you want to do some further reading on this, read the [Semantic Versioning][semver] spec.
 
