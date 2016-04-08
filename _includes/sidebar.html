@@ -8,7 +8,7 @@
                             {% for item in sub_parent.navigation %}
                                 {% if item.type == 'category' %}
                                     <li class="sidebar/nav/category">{{ item.name }}</li>
-                                {% elseif item.type == 'page' %}
+                                {% elsif item.type == 'page' %}
                                     {% capture full_link %}{{ parent.url }}/{{ item.url }}{% endcapture %}
                                     {% if page_url contains full_link %}
                                         <li class="sidebar/nav/item --active">{{ item.name }}</li>
