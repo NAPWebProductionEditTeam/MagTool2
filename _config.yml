@@ -19,6 +19,25 @@ navigation:
           - name: Installation
             type: page
             url: "installation"
+          - name: Start Editing
+            type: page
+            url: "start-edit"
+          - name: Basic Editing Controls
+            type: category
+          - name: Selecting and Moving Elements
+            type: page
+            url: "general-editing"
+          - name: Slug Controls
+            type: page
+            url: "slug-controls"
+          - name: Credit Controls
+            type: page
+            url: "credits"
+          - name: Advanced Tools
+            type: category
+          - name: Text Boxes
+            type: page
+            url: "text-boxes"
       - name: Developer
         url: "dev"
         navigation:
