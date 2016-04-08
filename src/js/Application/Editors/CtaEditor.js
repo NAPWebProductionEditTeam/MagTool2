@@ -1,5 +1,5 @@
 (function(window, $, app) {
-    app.CTA = '.btnShopThe, .btnShopTheWhite, .btnShopTheTwoLine, .btnShopTheTwoLineWhite';
+    app.define('cta', '.btnShopThe, .btnShopTheWhite, .btnShopTheTwoLine, .btnShopTheTwoLineWhite');
     
     var ctaBlack = '.btnShopThe, .btnShopTheTwoLine';
     var ctaWhite = '.btnShopTheWhite, .btnShopTheTwoLineWhite';
