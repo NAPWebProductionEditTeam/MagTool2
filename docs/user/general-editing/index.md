@@ -3,15 +3,15 @@ layout: default
 ---
 
 # Selecting and Moving Elements
-
+<!-- [[TOC]] -->
 This page introduces the general editing abilities of the Magazine Tool. These actions are common to text-boxes, images, CTA links etc which are referred to below as elements.
 
 ## Selecting Elements
-<!-- [[TOC]] -->
+
 To select an element on the page click that element once. The element will be highlighted and the properties will be displayed in the right-hand-side of the Magazine Tool. You can also select multiple elements at once. To do so, either drag a box around the elements you want to select, or select them individually while holding the shift key.
 
 ## Deleting Elements
-<!-- [[TOC]] -->
+
 When you have selected one or more elements you can remove them from the page completely by pressing the backspace key.
 
 ## Moving Elements
