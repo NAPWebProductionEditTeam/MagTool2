@@ -41,6 +41,9 @@ navigation:
           - name: The Application
             type: page
             url: "application"
+          - name: Actions
+            type: page
+            url: "actions"
           - name: Modules
             type: page
             url: "modules"
