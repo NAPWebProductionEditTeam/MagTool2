@@ -26,7 +26,7 @@
         return app.$body.data('language');
     };
     
-    var resolveAction = app.resolveAction = function(actionName, params) {
+    var resolveAction = function(actionName, params) {
         params = Argument.default(params, []);
         
         var action = actions[actionName];
