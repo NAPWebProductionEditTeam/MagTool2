@@ -50921,7 +50921,7 @@ String.prototype.isUpperCase = function() {
         return app.$body.data('language');
     };
     
-    var resolveAction = function(actionName, params) {
+    var resolveAction = app.resolveAction = function(actionName, params) {
         params = Argument.default(params, []);
         
         var action = actions[actionName];
@@ -51787,6 +51787,7 @@ String.prototype.isUpperCase = function() {
         };
         
         this.selectOnly = function($el) {
+            
             this.deselect($selected.not($el));
             
             if (! this.getSelection().filter($el).length) {
