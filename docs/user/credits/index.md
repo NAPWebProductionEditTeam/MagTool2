@@ -12,10 +12,10 @@ The credits are also able to appear in either black or white. To switch between 
 
 ## Show/Hide
 
-To completely remove the credits from a page or to add credits to a page that does not have them, click the eye icon.
+To completely remove the credits from a page, or to add credits to a page that does not have them, click the eye icon.
 
 ## Edit Credits
 
-To edit the credits, first the credits must be displayed. Either click on the "credits" button at the bottom-left or bottom-right of the page and then click on the content of the credits. Alternatively just press the "c" key to acheive the same result.
+To edit the credits, they must first be displayed. Either click on the "credits" button at the bottom-left or bottom-right of the page and then click on the content of the credits. Alternatively just press the "c" key to acheive the same result.
 
-At the top right of the magazine tool the content of the credits should be displayed
+At the righthand side of the magazine tool the content of the credits should be displayed.
