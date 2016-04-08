@@ -24,9 +24,10 @@ a {
   a:hover {
     color: $linkHoverColor; }
 
-h1, h2, h3, h4, h5, h6{
-    a{
+h1, h2, h3, h4, h5, h6 {
+    a {
         position: relative;
+        display: inline-block;
         color: inherit;
         
         &:hover{
@@ -49,6 +50,12 @@ h1, h2, h3, h4, h5, h6{
                     opacity: .6;
                 }
             }
+        }
+        
+        code {
+            display: inline-block;
+            padding: 4px 4px 0;
+            font-size: inherit;
         }
     }
 }
