@@ -3,11 +3,11 @@ layout: default
 ---
 
 # Slug Controls
-
+<!-- [[TOC]] -->
 This page explains how to edit the slug for a given page of the magazine. The Slug is found on most pages and is in the top-right or top-left of the page. The Slug is a semi-transparant image that either says "The Edit", "Travel" or "Beauty".
 
 ## Positioning
-<!-- [[TOC]] -->
+
 The Slug has three possible positions: left, right or none. To move the Slug to either side of the page, click the left or right arrow keys found next to the word Slug. To remove the slug from the page altogether, "none".  
 
 
