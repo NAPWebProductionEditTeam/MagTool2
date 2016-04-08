@@ -12,12 +12,6 @@ layout: default
 
 ## Available Properties
 
- - $body
- - $doc
- - BASE_URI
- - VERSION
- - CTA
-
 #### `$body`
 
  - Type: Read-only
@@ -50,20 +44,6 @@ Css / jQuery selector for CTA links.
  - Var: String
 
 ## Available Methods
-
- - bindOriginalKeyEvents
- - bindOriginalNavigationEvents
- - define
- - env
- - getLanguage
- - getModules
- - getVersion
- - registerBindings
- - registerKeyBindings
- - registerModule
- - registerNavigationBindings
- - unbindOriginalKeyEvents
- - unbindOriginalNavigationEvents
 
 #### `bindOriginalKeyEvents()`
 
