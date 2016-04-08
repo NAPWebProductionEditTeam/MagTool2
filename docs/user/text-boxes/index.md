@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 This page outlines how to use the new text editor. To find out how to move, delete and anchor text-boxes go to the [general][general editing page].
 
 # Start the text editor

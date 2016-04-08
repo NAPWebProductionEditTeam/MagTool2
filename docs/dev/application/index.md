@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # The Application
 <!-- [[TOC]] -->
 

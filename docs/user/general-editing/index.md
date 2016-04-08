@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 This page introduces the general editing abilities of the Magazine Tool. These actions are common to text-boxes, images, CTA links etc which are referred to below as elements.
 
 # Selecting Elements
