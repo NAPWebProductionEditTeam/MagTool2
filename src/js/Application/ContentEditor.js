@@ -181,6 +181,7 @@
         };
         
         this.selectOnly = function($el) {
+            
             this.deselect($selected.not($el));
             
             if (! this.getSelection().filter($el).length) {
