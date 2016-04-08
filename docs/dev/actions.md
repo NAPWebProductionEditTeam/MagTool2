@@ -36,10 +36,10 @@ resolveAction('myAction', [param1, param2]);
 The Application Core binds actions to user actions by looking for the `data-action` and `data-change` attributes on UI Elements. The value or values are automatically passed to the action as well. The `data-action` attribute binds to the click event, while the `data-change` attribute binds on an `input` Element's change event.
 
 ```html
-<button type="button" value="paramOne" data-action="myAction">
-
-<input type="text" class="multi-input" name="paramOne" data-change="myAction">
-<input type="text" class="multi-input" name="paramTwo" data-change="myAction">
+    <button type="button" value="paramOne" data-action="myAction">
+    
+    <input type="text" class="multi-input" name="paramOne" data-change="myAction">
+    <input type="text" class="multi-input" name="paramTwo" data-change="myAction">
 ```
 
 [docs.application]: docs/dev/application
