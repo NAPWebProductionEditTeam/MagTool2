@@ -4,9 +4,9 @@
     var modules = {};
     var actions = {};
     
-    app.define = function(name, definition) {
+    app.define = function(name, value) {
         Object.defineProperty(app, name, {
-            value: definition,
+            value: value,
             writable: false
         });
     };
