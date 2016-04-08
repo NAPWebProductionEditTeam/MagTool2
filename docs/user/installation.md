@@ -3,7 +3,6 @@
 
 ## Setup
 
-Open [The Bookmark][bookmark] link and copy the text displayed in your browser (`cmd+a` & `cmd+c` on OS X, `ctrl+a` & `ctrl+c`). Next, create a new bookmark and paste in the content you just copied as the url and type a title like `MagTool 2`.
+Open [This Bookmark][bookmark] link and copy the text displayed in your browser (`cmd+a` & `cmd+c` on OS X, `ctrl+a` & `ctrl+c`). Next, create a new bookmark by right-clicking your bookmarks bar and selecting Add Page (Chrome) or New Bookmark (Firefox). Paste in the content you just copied into the url/link field and type a title for the bookmark like `MagTool 2`.
 
 [bookmark]: http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/js/bookmark.min.js?v=1.0.9
-[repo]: https://github.com/NAPWebProductionEditTeam/MagTool2
