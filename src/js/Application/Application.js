@@ -4,9 +4,9 @@
     var modules = {};
     var actions = {};
     
-    app.define = function(name, definition) {
+    app.define = function(name, value) {
         Object.defineProperty(app, name, {
-            value: definition,
+            value: value,
             writable: false
         });
     };
@@ -19,14 +19,14 @@
         return modules;
     };
     
-    app.$doc = $(window.document);
-    app.$body = $('body');
+    app.define('$doc', $(window.document));
+    app.define('$body', $('body'));
     
     app.getLanguage = function() {
         return app.$body.data('language');
     };
     
-    var resolveAction = app.resolveAction = function(actionName, params) {
+    var resolveAction = function(actionName, params) {
         params = Argument.default(params, []);
         
         var action = actions[actionName];
@@ -355,14 +355,34 @@
             var handlers;
             
             if ($this.is('.control.prev')) {
-                handlers = [magazineBuilder.goToPreviousPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.goToPreviousPage();
+                    }
+                ];
             } else if ($this.is('.control.next')) {
-                handlers = [magazineBuilder.goToNextPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.goToNextPage();
+                    }
+                ];
             } else if ($this.is('#button-content')) {
-                handlers = [magazineBuilder.loadContentsPage];
+                handlers = [
+                    function(e) {
+                        e.preventDefault();
+                        
+                        magazineBuilder.loadContentsPage();
+                    }
+                ];
             } else if ($this.is('#button-archive')) {
                 handlers = [
-                    function() {
+                    function(e) {
+                        e.preventDefault();
+                        
                         magazineBuilder.jumpToPage(magazineBuilder.get_NumberOfPages());
                     }
                 ];
@@ -599,7 +619,6 @@
     }, false, true);
     
     registerAction('resizeCredits', function(operator) {
-        console.log('res', operator);
         app.Credits.resize(operator);
     }, false, true);
     

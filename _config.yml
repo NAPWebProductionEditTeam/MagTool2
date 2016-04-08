@@ -19,6 +19,25 @@ navigation:
           - name: Installation
             type: page
             url: "installation"
+          - name: Start Editing
+            type: page
+            url: "start-edit"
+          - name: Basic Editing Controls
+            type: category
+          - name: Selecting and Moving Elements
+            type: page
+            url: "general-editing"
+          - name: Slug Controls
+            type: page
+            url: "slug-controls"
+          - name: Credit Controls
+            type: page
+            url: "credits"
+          - name: Advanced Tools
+            type: category
+          - name: Text Boxes
+            type: page
+            url: "text-boxes"
       - name: Developer
         url: "dev"
         navigation:
@@ -41,9 +60,20 @@ navigation:
           - name: The Application
             type: page
             url: "application"
+          - name: Actions
+            type: page
+            url: "actions"
           - name: Modules
             type: page
             url: "modules"
+          - name: API Reference
+            type: category
+          - name: API
+            type: hide
+            url: "api"
+          - name: Application
+            type: page
+            url: "api/application"
 url: "https://napwebproductioneditteam.github.com/MagTool2"
 github_username: NAPWebProductionEditTeam
 
