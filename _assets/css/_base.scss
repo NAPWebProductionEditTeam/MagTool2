@@ -51,12 +51,6 @@ h1, h2, h3, h4, h5, h6 {
                 }
             }
         }
-        
-        code {
-            display: inline-block;
-            padding: 4px 4px 0;
-            font-size: inherit;
-        }
     }
 }
 
@@ -297,6 +291,18 @@ h1, h2, h3, h4, h5, h6 {
   .main-content {
     padding: 2rem 1rem;
     font-size: 1rem; } }
+
+.main-content {
+    h1, h2, h3, h4, h5, h6 {
+        a {
+            code {
+                display: inline-block;
+                padding: 4px 4px 0;
+                font-size: inherit;
+            }
+        }
+    }
+}
 
 .site-footer {
   position:absolute;
