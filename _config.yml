@@ -66,6 +66,9 @@ navigation:
           - name: Modules
             type: page
             url: "modules"
+          - name: Release Process
+            type: page
+            url: "release"
           - name: API Reference
             type: category
           - name: API
