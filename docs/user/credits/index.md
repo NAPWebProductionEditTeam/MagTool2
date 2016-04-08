@@ -2,7 +2,11 @@
 layout: default
 ---
 
-# Positioning
+# Credits
+
+This page outlines how to edit the credit elements found on most pages of the magazine in the lower-left or lower-right hand corners of the page.
+
+## Positioning
 <!-- [[TOC]] -->
 The credits can appear on either side of the page. To switch between the left and right, click the arrows key, next to the word Credits.
 

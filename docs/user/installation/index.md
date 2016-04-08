@@ -3,6 +3,8 @@ layout: default
 ---
 
 # Installation
+
+The steps below describe how to install the Magazine Tool on your browser.
 <!-- [[TOC]] -->
 
 ## Setup
