@@ -26,6 +26,7 @@ module Jekyll
 
       def directory_files_content
         @assets = Jekyll.configuration({})['assets']['sources'][0]
+        print file_name
         @filetype = file_name.gsub(/.*?\.([a-z]+)/, '\1')
         target_path = File.join(@assets, @filetype, '**', '*')
         Dir[target_path].map{|f| File.read(f) unless File.directory?(f) }.join
