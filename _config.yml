@@ -68,8 +68,8 @@ navigation:
             url: "modules"
           - name: API Reference
             type: category
-          - name: Introduction
-            type: page
+          - name: API
+            type: hide
             url: "api"
           - name: Application
             type: page

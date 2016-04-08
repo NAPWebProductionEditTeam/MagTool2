@@ -359,7 +359,7 @@
                     function(e) {
                         e.preventDefault();
                         
-                        magazineBuilder.goToPreviousPage;
+                        magazineBuilder.goToPreviousPage();
                     }
                 ];
             } else if ($this.is('.control.next')) {
@@ -367,7 +367,7 @@
                     function(e) {
                         e.preventDefault();
                         
-                        magazineBuilder.goToNextPage;
+                        magazineBuilder.goToNextPage();
                     }
                 ];
             } else if ($this.is('#button-content')) {
@@ -375,7 +375,7 @@
                     function(e) {
                         e.preventDefault();
                         
-                        magazineBuilder.loadContentsPage;
+                        magazineBuilder.loadContentsPage();
                     }
                 ];
             } else if ($this.is('#button-archive')) {
