@@ -7,6 +7,7 @@ LAYOUT_PREFIX='---\nlayout: default\n---\n'
 # Switch to build_site branch to sync it with master
 ###################################################################
 git checkout build_site
+git pull
 
 # Sync _config.yml
 ###################################################################
@@ -56,6 +57,7 @@ git push origin build_site
 
 # Switch to gh-pages branch to sync it with build_site /_site
 git checkout gh-pages
+git pull
 
 git checkout build_site -- _site
 cp -r _site/ .
