@@ -182,6 +182,7 @@
         
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
+            console.log($selected.not($el));
             
             if (! this.getSelection().filter($el).length) {
                 this.select($el);
@@ -224,6 +225,7 @@
         
         this.deselect = function($el) {
             $el = $el.filter(getSelectableSelector());
+            $selected = $selected.not($el);
             
             $el.removeClass('ui-selected');
             triggerSelectable();
@@ -405,8 +407,6 @@
                                 
                                 $this.data('offset', $this.position());
                             });
-                            
-                            window.$selected = $selected;
                         } else {
                             $selected = $([]);
                             $this.data('offset', $this.position());
