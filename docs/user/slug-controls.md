@@ -1,7 +1,3 @@
----
-layout: default
----
-
 # Positioning
 <!-- [[TOC]] -->
 The Slug has three possible positions: left, right or none. To move the Slug to either side of the page, click the left or right arrow keys found next to the word Slug. To remove the slug from the page altogether, "none".  

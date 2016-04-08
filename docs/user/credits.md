@@ -1,7 +1,3 @@
----
-layout: default
----
-
 # Positioning
 <!-- [[TOC]] -->
 The credits can appear on either side of the page. To switch between the left and right, click the arrows key, next to the word Credits.
