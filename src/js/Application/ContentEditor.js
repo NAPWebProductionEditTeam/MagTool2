@@ -182,7 +182,6 @@
         
         this.selectOnly = function($el) {
             this.deselect($selected.not($el));
-            console.log($selected.not($el));
             
             if (! this.getSelection().filter($el).length) {
                 this.select($el);
