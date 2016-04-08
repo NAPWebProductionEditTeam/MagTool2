@@ -26,7 +26,6 @@ module Jekyll
 
       def directory_files_content
         @assets = Jekyll.configuration({})['assets']['sources'][0]
-        print file_name
         @filetype = file_name.gsub(/.*?\.([a-z]+)/, '\1')
         target_path = File.join(@assets, @filetype, '**', '*')
         Dir[target_path].map{|f| File.read(f) unless File.directory?(f) }.join
@@ -37,7 +36,7 @@ module Jekyll
     # and appends a hash end of to asset file reference. Ensures deployed
     # asset files are "cachebust-ed" every time the file changes
     def md5_cache_bust(file_name)
-      CacheDigester.new(file_name: file_name).digest!
+      CacheDigester.new(file_name).digest!
     end
   end
 end
