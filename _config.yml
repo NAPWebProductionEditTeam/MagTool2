@@ -71,6 +71,9 @@ navigation:
           - name: API
             type: hide
             url: "api"
+          - name: Anchor
+            type: page
+            url: "api/anchor"
           - name: Application
             type: page
             url: "api/application"
