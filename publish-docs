@@ -46,7 +46,7 @@ git commit -a -m "Sync README and docs from master branch to build_site"
 
 # Build the site
 echo "build start"
-/usr/local/bin/jekyll build
+jekyll b
 echo "build done"
 
 git add .
