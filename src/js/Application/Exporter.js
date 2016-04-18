@@ -229,7 +229,8 @@
         
         var cleanUpForServer = function($container) {
             removeVideo();
-            trimBreakTags();
+
+            //            trimBreakTags();
             removeStyleAttributes();
             prepareCtaForTemplate();
         };
