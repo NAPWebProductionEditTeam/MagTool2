@@ -53255,14 +53255,30 @@ String.prototype.isUpperCase = function() {
             if ($creditsHolder.is('.creditsHolderRight')) {
                 $creditsHolder.addClass('creditsHolderLeft').removeClass('creditsHolderRight');
                 $creditsWhole.addClass('creditsWholeLeft').removeClass('creditsWholeRight');
-            } else {
+            } else if ($creditsHolder.is('.creditsHolderLeft')) {
                 $creditsHolder.addClass('creditsHolderRight').removeClass('creditsHolderLeft');
+                $creditsWhole.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
+            } else if ($creditsHolder.is('.creditsHolderRightWhite')) {
+                $creditsHolder.addClass('creditsHolderLeftWhite').removeClass('creditsHolderRightWhite');
+                $creditsWhole.addClass('creditsWholeLeft').removeClass('creditsWholeRight');
+            } else {
+                $creditsHolder.addClass('creditsHolderRightWhite').removeClass('creditsHolderLeftWhite');
                 $creditsWhole.addClass('creditsWholeRight').removeClass('creditsWholeLeft');
             }
         };
         
         this.toggleColor = function() {
-            getCreditsHolder().toggleClass('white');
+            var $creditsHolder = getCreditsHolder();
+            
+            if ($creditsHolder.is('.creditsHolderRight')) {
+                $creditsHolder.addClass('creditsHolderRightWhite').removeClass('creditsHolderRight');
+            } else if ($creditsHolder.is('.creditsHolderLeft')) {
+                $creditsHolder.addClass('creditsHolderLeftWhite').removeClass('creditsHolderLeft');
+            } else if ($creditsHolder.is('.creditsHolderRightWhite')) {
+                $creditsHolder.addClass('creditsHolderRight').removeClass('creditsHolderRightWhite');
+            } else {
+                $creditsHolder.addClass('creditsHolderLeft').removeClass('creditsHolderLeftWhite');
+            }
         };
         
         this.setVisibility = function(visible) {
