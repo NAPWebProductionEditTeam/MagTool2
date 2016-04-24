@@ -98,23 +98,23 @@
             if (node.nodeType !== Node.ELEMENT_NODE || $.inArray(node.tagName, ['DIV', 'P', 'BR', 'AREA']) > -1) {
                 return;
             }
-
+            
             var next = node.nextSibling;
             var removeNodes = [];
             var appendNode = null;
-
+            
             while (next !== null) {
                 if (next.nodeType === Node.ELEMENT_NODE && node.tagName === next.tagName && node.className === next.className) {
                     var children = Array.from(next.childNodes);
-
+                    
                     if (appendNode !== null) {
                         node.appendChild(appendNode);
                     }
-
+                    
                     for (var i = 0; i < children.length; i++) {
                         node.appendChild(children[i]);
                     }
-
+                    
                     removeNodes.push(next);
                 } else if (next.nodeType === Node.ELEMENT_NODE && next.tagName === 'BR') {
                     appendNode = next;
@@ -125,15 +125,15 @@
                 } else {
                     break;
                 }
-
+                
                 next = next.nextSibling;
             }
-
+            
             for (var j = 0; j < removeNodes.length; j++) {
                 removeNodes[j].parentNode.removeChild(removeNodes[j]);
             }
         };
-
+        
         /**
          * Ensure braces are always outside em tags and colon always inside em tag.
          *
@@ -187,20 +187,44 @@
             });
         };
         
-        var removeVideo = function() {
-            getCloneContainer().find('.videoLoader').children().remove();
+        var removeVideo = function($container) {
+            $container.find('.videoLoader').children().remove();
         };
         
-        var trimBreakTags = function() {
-            getCloneContainer().find('br:last-child').remove();
+        var trimBreakTags = function($container) {
+            $container.find('br').each(function() {
+                var br = this;
+                var prev = br.previousSibling;
+                var next = br.nextSibling;
+                
+                if (! prev || (next && ! next.textContent.match(/^[\s\t\n]*$/))) {
+                    return;
+                } else if (prev.nodeType == Node.TEXT_NODE && prev.textContent.match(/^[\s\t\n]*$/)) {
+                    var prevEmpty = true;
+                    
+                    while (prev = prev.previousSibling) {
+                        if (! (prev.nodeType == Node.TEXT_NODE && prev.textContent.match(/^[\s\t\n]*$/))) {
+                            prevEmpty = false;
+                        }
+                    }
+                    
+                    if (prevEmpty) {
+                        return;
+                    }
+                }
+                
+                var parent = br.parentNode;
+                
+                parent.removeChild(br);
+            });
         };
         
-        var removeStyleAttributes = function() {
-            getCloneContainer().find('[style]:not(.videoLoader)').removeAttr('style');
+        var removeStyleAttributes = function($container) {
+            $container.find('[style]:not(.videoLoader)').removeAttr('style');
         };
         
-        var prepareCtaForTemplate = function() {
-            var $ctaLinks = getCloneContainer().find('a[data-magtool]');
+        var prepareCtaForTemplate = function($container) {
+            var $ctaLinks = $container.find('a[data-magtool]');
             
             $ctaLinks.each(function() {
                 var $this = $(this);
@@ -228,11 +252,10 @@
         };
         
         var cleanUpForServer = function($container) {
-            removeVideo();
-
-            //            trimBreakTags();
-            removeStyleAttributes();
-            prepareCtaForTemplate();
+            removeVideo($container);
+            trimBreakTags($container);
+            removeStyleAttributes($container);
+            prepareCtaForTemplate($container);
         };
         
         var getHtml = function($elements) {
