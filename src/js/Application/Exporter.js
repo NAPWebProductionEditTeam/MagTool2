@@ -199,10 +199,12 @@
                 
                 if (! prev || (next && ! next.textContent.match(/^[\s\t\n]*$/))) {
                     return;
-                } else if (prev.nodeType == Node.TEXT_NODE && prev.textContent.match(/^[\s\t\n]*$/)) {
+                }
+                
+                if (prev.nodeType == Node.TEXT_NODE && prev.textContent.match(/^[\s\t\n]*$/)) {
                     var prevEmpty = true;
                     
-                    while (prev = prev.previousSibling) {
+                    while ((prev = prev.previousSibling) !== null) {
                         if (! (prev.nodeType == Node.TEXT_NODE && prev.textContent.match(/^[\s\t\n]*$/))) {
                             prevEmpty = false;
                         }
