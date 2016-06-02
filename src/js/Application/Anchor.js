@@ -3,7 +3,7 @@
         this.detectAnchor = function() {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getBottomSection();
-            var currentPosition = $selected.attr("class").match(/\s(push-down-|pull-up-).*?\s/g);
+            var currentPosition = $selected.attr("class").match(/(\s|)(push-down-|pull-up-).*?\s/g);
             
             if ($selected.is('[class*=push-down]')) {
                 $('#anchorTop').prop('checked', true);
