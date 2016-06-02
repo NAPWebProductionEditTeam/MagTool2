@@ -3,6 +3,7 @@
         this.detectAnchor = function() {
             var $selected = app.ContentEditor.getSelection();
             var $selectionControls = app.UI.getBottomSection();
+            var currentPosition = $selected.attr("class").match(/\s(push-down-|pull-up-).*?\s/g);
             
             if ($selected.is('[class*=push-down]')) {
                 $('#anchorTop').prop('checked', true);
@@ -15,8 +16,10 @@
             } else if ($selected.is('[class*=pull-left]')) {
                 $('#anchorRight').prop('checked', true);
             }
+                       
+            $('#divPosition').text(currentPosition);
         };
-        
+               
         this.changeVerticalAnchor = function(anchor) {
             app.ContentEditor.changeVerticalPos(app.ContentEditor.getSelection(), anchor);
         };

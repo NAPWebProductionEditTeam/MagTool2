@@ -520,6 +520,7 @@
                     $el.attr('class', newClass);
                 }
             });
+            app.Anchor.detectAnchor();
         };
         
         this.applyResizable = function($el) {
