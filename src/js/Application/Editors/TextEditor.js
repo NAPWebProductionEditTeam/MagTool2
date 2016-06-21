@@ -43,6 +43,30 @@
             
             $selected.removeClass('black white').addClass(color);
         };
+        
+        this.changeBG = function(bg) {
+            var $selected = app.ContentEditor.getSelection();
+
+            if ($selected.is(".kickerBlock, .kickerBlockWhite")) {
+                if (bg == "noBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("noBG");
+                } else if (bg == "wBG") {
+                    if ($selected.is(".kickerBlock")) {
+                        $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque kickerBlock kickerBlockWhite").addClass("kickerBlock");
+                    } else if ($selected.is(".kickerBlockWhite")) {
+                        $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque kickerBlock kickerBlockWhite").addClass("kickerBlockWhite");
+                    }
+                    
+                }
+            } else {
+                if (bg == "noBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("noBG");
+                } else if (bg == "wBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("paddingBoxBlockWhite");
+                }
+            }
+        };
+            
     }
     
     app.registerModule('TextEditor', TextEditor);

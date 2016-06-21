@@ -640,6 +640,10 @@
         app.TextEditor.changeColor(color);
     }, false, true);
     
+    registerAction('changeBG', function(bg) {
+        app.TextEditor.changeBG(bg);
+    }, false, true);
+    
     // CTA Editor
     registerAction('changeCtaId', function(id) {
         app.CtaEditor.changeId(id);
