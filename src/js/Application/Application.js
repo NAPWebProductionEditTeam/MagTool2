@@ -579,8 +579,8 @@
     }, false, true);
     
     // Create New Elements
-    registerAction('new-text', function() {
-        app.NewElement.newText();
+    registerAction('changeClass', function(classType) {
+        app.NewElement.newText(classType);
     }, false, true);
     
     registerAction('new-image', function() {
