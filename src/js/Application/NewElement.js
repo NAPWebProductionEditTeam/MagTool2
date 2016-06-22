@@ -41,51 +41,10 @@
          * Create New Text Element.
          */
         this.newText = function(ClassType) {
-            console.log(ClassType);
+            
             var $container;
-
-            switch (ClassType)
-                {
-                case "TEXT":
-                    $container = createContainer('article draggable resizable editable', 12);
-                    break;
-                case "article":
-                    $container = createContainer('article draggable resizable editable', 12);
-                    break;
-                case "quote":
-                    $container = createContainer('quote draggable resizable editable', 11);
-                    break;
-                case "sellCopy":
-                    $container = createContainer('sellCopy draggable resizable editable', 12);
-                    break;
-                case "kickerBlock":
-                    $container = createContainer('kickerBlock draggable resizable editable', 12);
-                    break;
-                case "kickerBlockWhite":
-                    $container = createContainer('kickerBlockWhite draggable resizable editable', 12);
-                    break;
-                case "rethinkSideBar":
-                    $container = createContainer('rethinkSideBar draggable resizable editable', 12);
-                    break;
-                case "travelStyle":
-                    $container = createContainer('travelStyle draggable resizable editable', 12);
-                    break;
-                case "fashionCredit":
-                    $container = createContainer('fashionCredit draggable resizable editable', 12);
-                    break;
-                case "theListLook":
-                    $container = createContainer('theListLook draggable resizable editable', 12);
-                    break;
-                case "theListDisplay":
-                    $container = createContainer('theListDisplay draggable resizable editable', 12);
-                    break;
-                case "photographyCredits":
-                    $container = createContainer('photographyCredits draggable resizable editable', 12);
-                    break;
-                default:
-                    break;
-            }
-         
+            $container = createContainer(ClassType + ' draggable resizable editable', 12);
+            
             var $p = $('<p/>');
             
             $p.text("Geronimo! I once spent a hell of a long time trying to get a gobby Australian to Heathrow airport. Oh, I always rip out the last page of a book. Then it doesn't have to end. I hate endings! There are fixed points throughout time where things must stay exactly the way they are. This is not one of them. This is an opportunity! Whatever happens here will create its own timeline, its own reality, a temporal tipping point. The future revolves around you, here, now, so do good! Overconfidence, this, and a small screwdriver. I’m absolutely sorted.")
