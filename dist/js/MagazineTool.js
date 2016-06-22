@@ -385,7 +385,8 @@ if (!("classList" in document.createElement("_"))) {
 
 (function (root, factory) {
     'use strict';
-    if (typeof module === 'object') {
+    var isElectron = typeof module === 'object' && process && process.versions && process.versions.electron;
+    if (!isElectron && typeof module === 'object') {
         module.exports = factory;
     } else if (typeof define === 'function' && define.amd) {
         define(function () {
@@ -2788,6 +2789,8 @@ MediumEditor.extensions = {};
                     // Detecting drop on the contenteditables
                     this.attachToEachElement('drop', this.handleDrop);
                     break;
+                // TODO: We need to have a custom 'paste' event separate from 'editablePaste'
+                // Need to think about the way to introduce this without breaking folks
                 case 'editablePaste':
                     // Detecting paste on the contenteditables
                     this.attachToEachElement('paste', this.handlePaste);
@@ -2984,7 +2987,7 @@ MediumEditor.extensions = {};
         },
 
         handlePaste: function (event) {
-            this.triggerCustomEvent('editablePaste', { currentTarget: event.currentTarget, target: event.target }, event.currentTarget);
+            this.triggerCustomEvent('editablePaste', event, event.currentTarget);
         },
 
         handleKeydown: function (event) {
@@ -5171,9 +5174,18 @@ MediumEditor.extensions = {};
             MediumEditor.Extension.prototype.init.apply(this, arguments);
 
             if (this.forcePlainText || this.cleanPastedHTML) {
-                this.subscribe('editablePaste', this.handlePaste.bind(this));
                 this.subscribe('editableKeydown', this.handleKeydown.bind(this));
+                // We need access to the full event data in paste
+                // so we can't use the editablePaste event here
+                this.getEditorElements().forEach(function (element) {
+                    this.on(element, 'paste', this.handlePaste.bind(this));
+                }, this);
+                this.subscribe('addElement', this.handleAddElement.bind(this));
             }
+        },
+
+        handleAddElement: function (event, editable) {
+            this.on(editable, 'paste', this.handlePaste.bind(this));
         },
 
         destroy: function () {
@@ -5573,37 +5585,61 @@ MediumEditor.extensions = {};
         },
 
         initPlaceholders: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (!el.getAttribute('data-placeholder')) {
-                    el.setAttribute('data-placeholder', this.text);
-                }
-                this.updatePlaceholder(el);
-            }, this);
+            this.getEditorElements().forEach(this.initElement, this);
+        },
+
+        handleAddElement: function (event, editable) {
+            this.initElement(editable);
+        },
+
+        initElement: function (el) {
+            if (!el.getAttribute('data-placeholder')) {
+                el.setAttribute('data-placeholder', this.text);
+            }
+            this.updatePlaceholder(el);
         },
 
         destroy: function () {
-            this.getEditorElements().forEach(function (el) {
-                if (el.getAttribute('data-placeholder') === this.text) {
-                    el.removeAttribute('data-placeholder');
-                }
-            }, this);
+            this.getEditorElements().forEach(this.cleanupElement, this);
+        },
+
+        handleRemoveElement: function (event, editable) {
+            this.cleanupElement(editable);
+        },
+
+        cleanupElement: function (el) {
+            if (el.getAttribute('data-placeholder') === this.text) {
+                el.removeAttribute('data-placeholder');
+            }
         },
 
         showPlaceholder: function (el) {
             if (el) {
-                el.classList.add('medium-editor-placeholder');
+                // https://github.com/yabwe/medium-editor/issues/234
+                // In firefox, styling the placeholder with an absolutely positioned
+                // pseudo element causes the cursor to appear in a bad location
+                // when the element is completely empty, so apply a different class to
+                // style it with a relatively positioned pseudo element
+                if (MediumEditor.util.isFF && el.childNodes.length === 0) {
+                    el.classList.add('medium-editor-placeholder-relative');
+                    el.classList.remove('medium-editor-placeholder');
+                } else {
+                    el.classList.add('medium-editor-placeholder');
+                    el.classList.remove('medium-editor-placeholder-relative');
+                }
             }
         },
 
         hidePlaceholder: function (el) {
             if (el) {
                 el.classList.remove('medium-editor-placeholder');
+                el.classList.remove('medium-editor-placeholder-relative');
             }
         },
 
         updatePlaceholder: function (el, dontShow) {
             // If the element has content, hide the placeholder
-            if (el.querySelector('img, blockquote, ul, ol') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
+            if (el.querySelector('img, blockquote, ul, ol, table') || (el.textContent.replace(/^\s+|\s+$/g, '') !== '')) {
                 return this.hidePlaceholder(el);
             }
 
@@ -5623,6 +5659,10 @@ MediumEditor.extensions = {};
 
             // When the editor loses focus, check if the placeholder should be visible
             this.subscribe('blur', this.handleBlur.bind(this));
+
+            // Need to know when elements are added/removed from the editor
+            this.subscribe('addElement', this.handleAddElement.bind(this));
+            this.subscribe('removeElement', this.handleRemoveElement.bind(this));
         },
 
         handleInput: function (event, element) {
@@ -6776,6 +6816,7 @@ MediumEditor.extensions = {};
             var elementId = MediumEditor.util.guid();
 
             element.setAttribute('data-medium-editor-element', true);
+            element.classList.add('medium-editor-element');
             element.setAttribute('role', 'textbox');
             element.setAttribute('aria-multiline', true);
             element.setAttribute('data-medium-editor-editor-index', editorId);
@@ -7064,6 +7105,7 @@ MediumEditor.extensions = {};
                 element.removeAttribute('contentEditable');
                 element.removeAttribute('spellcheck');
                 element.removeAttribute('data-medium-editor-element');
+                element.classList.remove('medium-editor-element');
                 element.removeAttribute('role');
                 element.removeAttribute('aria-multiline');
                 element.removeAttribute('medium-editor-index');
@@ -7573,6 +7615,9 @@ MediumEditor.extensions = {};
 
                 // Add new elements to our internal elements array
                 this.elements.push(element);
+
+                // Trigger event so extensions can know when an element has been added
+                this.trigger('addElement', { target: element, currentTarget: element }, element);
             }, this);
         },
 
@@ -7595,6 +7640,8 @@ MediumEditor.extensions = {};
                     if (element.getAttribute('medium-editor-textarea-id')) {
                         cleanupTextareaElement(element);
                     }
+                    // Trigger event so extensions can clean-up elements that are being removed
+                    this.trigger('removeElement', { target: element, currentTarget: element }, element);
                     return false;
                 }
                 return true;
@@ -7650,7 +7697,7 @@ MediumEditor.parseVersionString = function (release) {
 
 MediumEditor.version = MediumEditor.parseVersionString.call(this, ({
     // grunt-bump looks for this:
-    'version': '5.20.0'
+    'version': '5.21.0'
 }).version);
 
     return MediumEditor;
@@ -52588,8 +52635,8 @@ String.prototype.isUpperCase = function() {
     }, false, true);
     
     // Create New Elements
-    registerAction('new-text', function() {
-        app.NewElement.newText();
+    registerAction('changeClass', function(classType) {
+        app.NewElement.newText(classType);
     }, false, true);
     
     registerAction('new-image', function() {
@@ -52647,6 +52694,10 @@ String.prototype.isUpperCase = function() {
     
     registerAction('changeColor', function(color) {
         app.TextEditor.changeColor(color);
+    }, false, true);
+    
+    registerAction('changeBG', function(bg) {
+        app.TextEditor.changeBG(bg);
     }, false, true);
     
     // CTA Editor
@@ -54069,6 +54120,30 @@ String.prototype.isUpperCase = function() {
             
             $selected.removeClass('black white').addClass(color);
         };
+        
+        this.changeBG = function(bg) {
+            var $selected = app.ContentEditor.getSelection();
+
+            if ($selected.is(".kickerBlock, .kickerBlockWhite")) {
+                if (bg == "noBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("noBG");
+                } else if (bg == "wBG") {
+                    if ($selected.is(".kickerBlock")) {
+                        $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque kickerBlock kickerBlockWhite").addClass("kickerBlock");
+                    } else if ($selected.is(".kickerBlockWhite")) {
+                        $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque kickerBlock kickerBlockWhite").addClass("kickerBlockWhite");
+                    }
+                    
+                }
+            } else {
+                if (bg == "noBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("noBG");
+                } else if (bg == "wBG") {
+                    $selected.removeClass("noBG paddingBoxBlockWhite paddingBoxBlockOpaque").addClass("paddingBoxBlockWhite");
+                }
+            }
+        };
+            
     }
     
     app.registerModule('TextEditor', TextEditor);
@@ -54890,8 +54965,11 @@ String.prototype.isUpperCase = function() {
         /**
          * Create New Text Element.
          */
-        this.newText = function() {
-            var $container = createContainer('draggable resizable editable', 12);
+        this.newText = function(ClassType) {
+            
+            var $container;
+            $container = createContainer(ClassType + ' draggable resizable editable', 12);
+            
             var $p = $('<p/>');
             
             $p.text("Geronimo! I once spent a hell of a long time trying to get a gobby Australian to Heathrow airport. Oh, I always rip out the last page of a book. Then it doesn't have to end. I hate endings! There are fixed points throughout time where things must stay exactly the way they are. This is not one of them. This is an opportunity! Whatever happens here will create its own timeline, its own reality, a temporal tipping point. The future revolves around you, here, now, so do good! Overconfidence, this, and a small screwdriver. I’m absolutely sorted.")

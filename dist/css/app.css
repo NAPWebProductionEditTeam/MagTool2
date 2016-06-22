@@ -112,9 +112,22 @@
 .medium-editor-placeholder:after {
   content: attr(data-placeholder) !important;
   font-style: italic;
-  left: 0;
   position: absolute;
+  left: 0;
   top: 0;
+  white-space: pre;
+  padding: inherit;
+  margin: inherit;
+}
+
+.medium-editor-placeholder-relative {
+  position: relative;
+}
+
+.medium-editor-placeholder-relative:after {
+  content: attr(data-placeholder) !important;
+  font-style: italic;
+  position: relative;
   white-space: pre;
   padding: inherit;
   margin: inherit;
@@ -268,20 +281,20 @@
   display: table;
 }
 
-[data-medium-editor-element] {
+.medium-editor-element {
   word-wrap: break-word;
   min-height: 30px;
 }
 
-[data-medium-editor-element] img {
+.medium-editor-element img {
   max-width: 100%;
 }
 
-[data-medium-editor-element] sub {
+.medium-editor-element sub {
   vertical-align: sub;
 }
 
-[data-medium-editor-element] sup {
+.medium-editor-element sup {
   vertical-align: super;
 }
 
@@ -2190,44 +2203,28 @@ fieldset[disabled] #magtoolComponents .form-control {
   #magtoolComponents input[type="month"].form-control {
     line-height: 34px;
   }
-  #magtoolComponents input[type="date"].input-sm, #magtoolComponents .input-group-sm > input[type="date"].form-control,
-  #magtoolComponents .input-group-sm > input[type="date"].input-group-addon,
-  #magtoolComponents .input-group-sm > .input-group-btn > input[type="date"].btn,
+  #magtoolComponents input[type="date"].input-sm, #magtoolComponents .input-group-sm > input[type="date"].form-control, #magtoolComponents .input-group-sm > input[type="date"].input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > input[type="date"].btn,
   .input-group-sm #magtoolComponents input[type="date"],
-  #magtoolComponents input[type="time"].input-sm, #magtoolComponents .input-group-sm > input[type="time"].form-control,
-  #magtoolComponents .input-group-sm > input[type="time"].input-group-addon,
-  #magtoolComponents .input-group-sm > .input-group-btn > input[type="time"].btn,
+  #magtoolComponents input[type="time"].input-sm, #magtoolComponents .input-group-sm > input[type="time"].form-control, #magtoolComponents .input-group-sm > input[type="time"].input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > input[type="time"].btn,
   .input-group-sm
   #magtoolComponents input[type="time"],
-  #magtoolComponents input[type="datetime-local"].input-sm, #magtoolComponents .input-group-sm > input[type="datetime-local"].form-control,
-  #magtoolComponents .input-group-sm > input[type="datetime-local"].input-group-addon,
-  #magtoolComponents .input-group-sm > .input-group-btn > input[type="datetime-local"].btn,
+  #magtoolComponents input[type="datetime-local"].input-sm, #magtoolComponents .input-group-sm > input[type="datetime-local"].form-control, #magtoolComponents .input-group-sm > input[type="datetime-local"].input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > input[type="datetime-local"].btn,
   .input-group-sm
   #magtoolComponents input[type="datetime-local"],
-  #magtoolComponents input[type="month"].input-sm, #magtoolComponents .input-group-sm > input[type="month"].form-control,
-  #magtoolComponents .input-group-sm > input[type="month"].input-group-addon,
-  #magtoolComponents .input-group-sm > .input-group-btn > input[type="month"].btn,
+  #magtoolComponents input[type="month"].input-sm, #magtoolComponents .input-group-sm > input[type="month"].form-control, #magtoolComponents .input-group-sm > input[type="month"].input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > input[type="month"].btn,
   .input-group-sm
   #magtoolComponents input[type="month"] {
     line-height: 30px;
   }
-  #magtoolComponents input[type="date"].input-lg, #magtoolComponents .input-group-lg > input[type="date"].form-control,
-  #magtoolComponents .input-group-lg > input[type="date"].input-group-addon,
-  #magtoolComponents .input-group-lg > .input-group-btn > input[type="date"].btn,
+  #magtoolComponents input[type="date"].input-lg, #magtoolComponents .input-group-lg > input[type="date"].form-control, #magtoolComponents .input-group-lg > input[type="date"].input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > input[type="date"].btn,
   .input-group-lg #magtoolComponents input[type="date"],
-  #magtoolComponents input[type="time"].input-lg, #magtoolComponents .input-group-lg > input[type="time"].form-control,
-  #magtoolComponents .input-group-lg > input[type="time"].input-group-addon,
-  #magtoolComponents .input-group-lg > .input-group-btn > input[type="time"].btn,
+  #magtoolComponents input[type="time"].input-lg, #magtoolComponents .input-group-lg > input[type="time"].form-control, #magtoolComponents .input-group-lg > input[type="time"].input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > input[type="time"].btn,
   .input-group-lg
   #magtoolComponents input[type="time"],
-  #magtoolComponents input[type="datetime-local"].input-lg, #magtoolComponents .input-group-lg > input[type="datetime-local"].form-control,
-  #magtoolComponents .input-group-lg > input[type="datetime-local"].input-group-addon,
-  #magtoolComponents .input-group-lg > .input-group-btn > input[type="datetime-local"].btn,
+  #magtoolComponents input[type="datetime-local"].input-lg, #magtoolComponents .input-group-lg > input[type="datetime-local"].form-control, #magtoolComponents .input-group-lg > input[type="datetime-local"].input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > input[type="datetime-local"].btn,
   .input-group-lg
   #magtoolComponents input[type="datetime-local"],
-  #magtoolComponents input[type="month"].input-lg, #magtoolComponents .input-group-lg > input[type="month"].form-control,
-  #magtoolComponents .input-group-lg > input[type="month"].input-group-addon,
-  #magtoolComponents .input-group-lg > .input-group-btn > input[type="month"].btn,
+  #magtoolComponents input[type="month"].input-lg, #magtoolComponents .input-group-lg > input[type="month"].form-control, #magtoolComponents .input-group-lg > input[type="month"].input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > input[type="month"].btn,
   .input-group-lg
   #magtoolComponents input[type="month"] {
     line-height: 46px;
@@ -2318,18 +2315,12 @@ fieldset[disabled]
   min-height: 34px;
 }
 
-#magtoolComponents .form-control-static.input-lg, #magtoolComponents .input-group-lg > .form-control-static.form-control,
-#magtoolComponents .input-group-lg > .form-control-static.input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > .form-control-static.btn, #magtoolComponents .form-control-static.input-sm, #magtoolComponents .input-group-sm > .form-control-static.form-control,
-#magtoolComponents .input-group-sm > .form-control-static.input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > .form-control-static.btn {
+#magtoolComponents .form-control-static.input-lg, #magtoolComponents .input-group-lg > .form-control-static.form-control, #magtoolComponents .input-group-lg > .form-control-static.input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > .form-control-static.btn, #magtoolComponents .form-control-static.input-sm, #magtoolComponents .input-group-sm > .form-control-static.form-control, #magtoolComponents .input-group-sm > .form-control-static.input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > .form-control-static.btn {
   padding-left: 0;
   padding-right: 0;
 }
 
-#magtoolComponents .input-sm, #magtoolComponents .input-group-sm > .form-control,
-#magtoolComponents .input-group-sm > .input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > .btn {
+#magtoolComponents .input-sm, #magtoolComponents .input-group-sm > .form-control, #magtoolComponents .input-group-sm > .input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > .btn {
   height: 30px;
   padding: 5px 10px;
   font-size: 12px;
@@ -2337,19 +2328,13 @@ fieldset[disabled]
   border-radius: 3px;
 }
 
-#magtoolComponents select.input-sm, #magtoolComponents .input-group-sm > select.form-control,
-#magtoolComponents .input-group-sm > select.input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > select.btn {
+#magtoolComponents select.input-sm, #magtoolComponents .input-group-sm > select.form-control, #magtoolComponents .input-group-sm > select.input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > select.btn {
   height: 30px;
   line-height: 30px;
 }
 
-#magtoolComponents textarea.input-sm, #magtoolComponents .input-group-sm > textarea.form-control,
-#magtoolComponents .input-group-sm > textarea.input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > textarea.btn,
-#magtoolComponents select[multiple].input-sm, #magtoolComponents .input-group-sm > select[multiple].form-control,
-#magtoolComponents .input-group-sm > select[multiple].input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > select[multiple].btn {
+#magtoolComponents textarea.input-sm, #magtoolComponents .input-group-sm > textarea.form-control, #magtoolComponents .input-group-sm > textarea.input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > textarea.btn,
+#magtoolComponents select[multiple].input-sm, #magtoolComponents .input-group-sm > select[multiple].form-control, #magtoolComponents .input-group-sm > select[multiple].input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > select[multiple].btn {
   height: auto;
 }
 
@@ -2379,9 +2364,7 @@ fieldset[disabled]
   line-height: 1.5;
 }
 
-#magtoolComponents .input-lg, #magtoolComponents .input-group-lg > .form-control,
-#magtoolComponents .input-group-lg > .input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > .btn {
+#magtoolComponents .input-lg, #magtoolComponents .input-group-lg > .form-control, #magtoolComponents .input-group-lg > .input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > .btn {
   height: 46px;
   padding: 10px 16px;
   font-size: 18px;
@@ -2389,19 +2372,13 @@ fieldset[disabled]
   border-radius: 6px;
 }
 
-#magtoolComponents select.input-lg, #magtoolComponents .input-group-lg > select.form-control,
-#magtoolComponents .input-group-lg > select.input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > select.btn {
+#magtoolComponents select.input-lg, #magtoolComponents .input-group-lg > select.form-control, #magtoolComponents .input-group-lg > select.input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > select.btn {
   height: 46px;
   line-height: 46px;
 }
 
-#magtoolComponents textarea.input-lg, #magtoolComponents .input-group-lg > textarea.form-control,
-#magtoolComponents .input-group-lg > textarea.input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > textarea.btn,
-#magtoolComponents select[multiple].input-lg, #magtoolComponents .input-group-lg > select[multiple].form-control,
-#magtoolComponents .input-group-lg > select[multiple].input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > select[multiple].btn {
+#magtoolComponents textarea.input-lg, #magtoolComponents .input-group-lg > textarea.form-control, #magtoolComponents .input-group-lg > textarea.input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > textarea.btn,
+#magtoolComponents select[multiple].input-lg, #magtoolComponents .input-group-lg > select[multiple].form-control, #magtoolComponents .input-group-lg > select[multiple].input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > select[multiple].btn {
   height: auto;
 }
 
@@ -2452,9 +2429,7 @@ fieldset[disabled]
   pointer-events: none;
 }
 
-#magtoolComponents .input-lg + .form-control-feedback, #magtoolComponents .input-group-lg > .form-control + .form-control-feedback,
-#magtoolComponents .input-group-lg > .input-group-addon + .form-control-feedback,
-#magtoolComponents .input-group-lg > .input-group-btn > .btn + .form-control-feedback,
+#magtoolComponents .input-lg + .form-control-feedback, #magtoolComponents .input-group-lg > .form-control + .form-control-feedback, #magtoolComponents .input-group-lg > .input-group-addon + .form-control-feedback, #magtoolComponents .input-group-lg > .input-group-btn > .btn + .form-control-feedback,
 #magtoolComponents .input-group-lg + .form-control-feedback,
 #magtoolComponents .form-group-lg .form-control + .form-control-feedback {
   width: 46px;
@@ -2462,9 +2437,7 @@ fieldset[disabled]
   line-height: 46px;
 }
 
-#magtoolComponents .input-sm + .form-control-feedback, #magtoolComponents .input-group-sm > .form-control + .form-control-feedback,
-#magtoolComponents .input-group-sm > .input-group-addon + .form-control-feedback,
-#magtoolComponents .input-group-sm > .input-group-btn > .btn + .form-control-feedback,
+#magtoolComponents .input-sm + .form-control-feedback, #magtoolComponents .input-group-sm > .form-control + .form-control-feedback, #magtoolComponents .input-group-sm > .input-group-addon + .form-control-feedback, #magtoolComponents .input-group-sm > .input-group-btn > .btn + .form-control-feedback,
 #magtoolComponents .input-group-sm + .form-control-feedback,
 #magtoolComponents .form-group-sm .form-control + .form-control-feedback {
   width: 30px;
@@ -3602,17 +3575,13 @@ fieldset[disabled] #magtoolComponents .btn-link:focus {
   border-radius: 4px;
 }
 
-#magtoolComponents .input-group-addon.input-sm,
-#magtoolComponents .input-group-sm > .input-group-addon,
-#magtoolComponents .input-group-sm > .input-group-btn > .input-group-addon.btn {
+#magtoolComponents .input-group-addon.input-sm, #magtoolComponents .input-group-sm > .input-group-addon, #magtoolComponents .input-group-sm > .input-group-btn > .input-group-addon.btn {
   padding: 5px 10px;
   font-size: 12px;
   border-radius: 3px;
 }
 
-#magtoolComponents .input-group-addon.input-lg,
-#magtoolComponents .input-group-lg > .input-group-addon,
-#magtoolComponents .input-group-lg > .input-group-btn > .input-group-addon.btn {
+#magtoolComponents .input-group-addon.input-lg, #magtoolComponents .input-group-lg > .input-group-addon, #magtoolComponents .input-group-lg > .input-group-btn > .input-group-addon.btn {
   padding: 10px 16px;
   font-size: 18px;
   border-radius: 6px;
