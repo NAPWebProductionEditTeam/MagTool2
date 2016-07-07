@@ -4,6 +4,7 @@ label {
 
 .help-block {
 	padding: 0 12px;
+    color: yellow;
 }
 
 @include component(radioBtn, uRadioBtn, checkbox) {
