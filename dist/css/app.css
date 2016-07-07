@@ -6574,6 +6574,7 @@ fieldset[disabled] #magtoolComponents .navbar-inverse .btn-link:focus {
 
 #magtoolComponents .help-block {
   padding: 0 12px;
+  color: yellow;
 }
 
 #magtoolComponents .radioBtn, #magtoolComponents .uRadioBtn, #magtoolComponents .checkbox {
