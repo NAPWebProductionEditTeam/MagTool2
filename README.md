@@ -20,4 +20,4 @@ Now open The EDIT magazine to a page you'd like to edit, and click the bookmark 
 
 [docs/user]: http://napwebproductioneditteam.github.io/MagTool2/docs/user/
 [docs/dev]: http://napwebproductioneditteam.github.io/MagTool2/docs/dev/
-[bookmark]: http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/js/bookmark.min.js?v=1.0.17
+[bookmark]: http://staging.net-a-porter.com/alfresco/nap/webAssets/magazine/_shared/contents/MagTool/js/bookmark.min.js?v=1.0.18
