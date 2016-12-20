@@ -512,7 +512,6 @@
 }
 
 #magtoolComponents a:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -2120,7 +2119,6 @@
 #magtoolComponents input[type="file"]:focus,
 #magtoolComponents input[type="radio"]:focus,
 #magtoolComponents input[type="checkbox"]:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }
@@ -2692,7 +2690,6 @@ fieldset[disabled]
 }
 
 #magtoolComponents .btn:focus, #magtoolComponents .btn.focus, #magtoolComponents .btn:active:focus, #magtoolComponents .btn:active.focus, #magtoolComponents .btn.active:focus, #magtoolComponents .btn.active.focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px;
 }

@@ -255,7 +255,8 @@
         
         var cleanUpForServer = function($container) {
             removeVideo($container);
-//            trimBreakTags($container);
+
+            //            trimBreakTags($container);
             removeStyleAttributes($container);
             prepareCtaForTemplate($container);
         };
