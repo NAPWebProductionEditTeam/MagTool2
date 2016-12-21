@@ -1,6 +1,6 @@
 {
     "name": "magtool2",
-    "version": "1.0.18",
+    "version": "1.0.19",
     "description": "NAP MagTool",
     "main": "build/js/MagazineTool.js",
     "scripts": {

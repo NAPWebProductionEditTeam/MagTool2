@@ -16,10 +16,10 @@
     "tests"
   ],
   "dependencies": {
-    "bourbon": "^4.2.6",
-    "bootstrap-sass": "^3.3.6",
+    "bourbon": "^4.2.7",
+    "bootstrap-sass": "^3.3.7",
     "medium-editor": "^5.14.2",
-    "MediumButton": "*",
+    "MediumButton": "1.1.0",
     "mousetrap-js": "^1.5.4",
     "jszip": "Stuk/jszip#^2.5.0"
   }
